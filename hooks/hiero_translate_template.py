@@ -12,6 +12,7 @@ class HieroTranslateTemplate(Hook):
             '{Sequence}': '{sequence}',
             '{Shot}': '{shot}',
             '{name}': '{clip}',
+            '{Step}': self.parent.context.step['name'],
         }
         raw = template.definition
 
