@@ -1,0 +1,87 @@
+# expected fields in the configuration file for this app
+configuration:
+    default_task_template:
+        type: str
+        description: The default shot task template to use when creating a shot
+        default_value: ''
+
+    # paths
+    template_plate_path:
+        type: template
+        description: "A reference to a template which specifies the directory to
+                     publish shot plates to.  The translate template hook must
+                     understand how to translate this to Hiero keywords."
+        required_fields: []
+        optional_fields: "*"
+        default_value: hiero_plate_path
+
+    template_script_path:
+        type: template
+        description: "A reference to a template which specifies what published
+                     nuke scripts will be named.  The translate template hook must
+                     understand how to translate this to Hiero keywords."
+        required_fields: []
+        optional_fields: "*"
+        default_value: hiero_script_path
+
+    template_render_path:
+        type: template
+        description: "A reference to a template which specifies what renders will
+                     be named.  The translate template hook must understand how
+                     to translate this to Hiero keywords."
+        required_fields: []
+        optional_fields: "*"
+        default_value: hiero_render_path
+
+    # hooks
+    hook_populate_shot_ui:
+        type: hook
+        description: "Called to populate the shot create gui.  The first argument
+                      is the QWidget to be populated.  The second argument is a
+                      list of the Hiero items being exported.  The third argument
+                      is a dictionary of the current values of the preset
+                      configuration (used to set the state of the gui)."
+        parameters: [widget, items, properties]
+        default_value: hiero_populate_shot_ui
+
+    hook_populate_shot_properties:
+        type: hook
+        description: "Called to populate the shot create properties.  These
+                     properties are persisted when the preset is saved.  The
+                     first argument is the dictionary of values maintained by
+                     the preset.  These will be passed into the task when it
+                     is run.  The second argument is the dictionary of values
+                     loaded from the saved preset."
+        parameters: [default_properties, passed_properties]
+        default_value: hiero_populate_shot_properties
+
+    hook_process_shot:
+        type: hook
+        description: "Called when a shot is being exported from Hiero.  Should
+                     create the proper directory structure and Shotgun data.
+                     The first parameter is the Hiero Task being processed.
+                     Return value is False when there are no errors."
+        parameters: [task]
+        default_value: hiero_process_shot
+
+    hook_translate_template:
+        type: hook
+        description: "Called when a template needs to be translated into a Hiero
+                     style replacement string.  First argument is the template
+                     to translate.  The return value is the translated string."
+        parameters: [template]
+        default_value: hiero_translate_template
+
+    hook_publish_transcode:
+        type: hook
+        description: "Called when a Shotgun transcode task finishes.  First
+                     argument is the path to the transcoded file(s). Second
+                     argument is the name of the sequence.  Third argument is
+                     the name of the shot. Fourth argument is a QImage of the
+                     thumbnail for the publish"
+        parameters: [path, sequence, shot, thumbnail]
+        default_value: hiero_publish_transcode
+
+# the Shotgun fields that this app needs in order to operate correctly
+requires_shotgun_fields:
+
