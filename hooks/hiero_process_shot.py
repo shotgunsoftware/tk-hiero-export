@@ -131,8 +131,11 @@ class HieroProcessShot(Hook):
         thumbdir = tempfile.mkdtemp(prefix='hiero_process_shot')
         try:
             path = "%s.jpg" % os.path.join(thumbdir, source.name())
-            thumb = source.thumbnail(source.posterFrame())
+            poster = source.posterFrame()
+            thumb = source.thumbnail(poster)
             thumb.save(path)
             sg.upload_thumbnail(entity['type'], entity['id'], path)
+        except:
+            self.parent.log_error("No thumbnail for %s" % source)
         finally:
             shutil.rmtree(thumbdir)
