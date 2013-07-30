@@ -17,6 +17,8 @@ import sys
 
 from tank.platform import Application
 
+from tank import TankError
+
 import hiero.ui
 import hiero.core
 import hiero.exporters
