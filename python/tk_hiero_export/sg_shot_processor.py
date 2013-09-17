@@ -19,18 +19,17 @@ from hiero.exporters import FnShotProcessor
 
 from .base import ShotgunHieroObjectBase
 from .shot_updater import ShotgunShotUpdaterPreset
-from .collating_exporter import CollatingExporter
+from .collating_exporter import CollatedShotPreset
+from .collating_exporter_ui import CollatingExporterUI
 
 
-class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor, CollatingExporter):
+class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor, CollatingExporterUI):
     """
     Add extra UI and hook functionality to the built in Shot processor.
     """
-
     def __init__(self, preset, submission=None, synchronous=False):
         FnShotProcessor.ShotProcessor.__init__(self, preset, submission, synchronous)
-        CollatingExporter.__init__(self)
-        self._shotCreatePreset = None
+        CollatingExporterUI.__init__(self)
 
     def displayName(self):
         return "Shotgun Shot Processor"
@@ -42,10 +41,6 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         """
         Executing the export
         """
-
-        # Use tank to set the project root
-        self._exportTemplate.setExportRootPath(self.app.tank.project_path)
-
         # add a top level task to manage shotgun shots
         exportTemplate = self._exportTemplate.flatten()
         properties = self._preset.properties().get('shotgunShotCreateProperties', {})
@@ -53,7 +48,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         self._exportTemplate.restore(exportTemplate)
 
         # tag app as first shot
-        self.app.first_shot = True
+        self.app.shot_count = 0
 
         # do the normal processing
         FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
@@ -100,6 +95,11 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         default_task_template = self.app.get_setting('default_task_template')
         footer_text.setText("<p>Shots without any tags will be assigned the '%s' task template.</p>" % default_task_template )
         shotgun_layout.addWidget(footer_text)
+
+        # add collate options
+        collating_widget = QtGui.QWidget()
+        shotgun_layout.addWidget(collating_widget)
+        CollatingExporterUI.populateUI(self, collating_widget, properties)
 
         # add default settings from baseclass below
         default = QtGui.QWidget()
@@ -209,24 +209,19 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         return tags
 
 
-class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessorPreset):
+class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessorPreset, CollatedShotPreset):
     """
     Handles presets for the shot processor.
-    
-    The shot processor has two main presets
-    
     """
-    
     def __init__(self, name, properties):
-        
         FnShotProcessor.ShotProcessorPreset.__init__(self, name, properties)
-        
+
         self._parentType = ShotgunShotProcessor
 
         # set up default properties
         self.properties()['shotgunShotCreateProperties'] = {}
-        
         default_properties = self.properties()['shotgunShotCreateProperties']
+        CollatedShotPreset.__init__(self, default_properties)
 
         # add setting to control how we map sg statuses and tags
         # just map the standard "status" tags in hiero against
@@ -236,17 +231,16 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
                                                        ("In Progress", "ip"),
                                                        ("On Hold", "hld"),
                                                        ("Final", "fin"), ]
-        
+
         # add setting to control the default task template in Shotgun.
-        # again, populate some of the standard tags in hiero. The rest 
+        # again, populate some of the standard tags in hiero. The rest
         # of them can be manually set.
-        default_template = self.app.get_setting('default_task_template')        
+        default_template = self.app.get_setting('default_task_template')
         default_properties["task_template_map"] = [("Ready To Start", default_template),
                                                    ("In Progress", default_template),
                                                    ("On Hold", default_template),
                                                    ("Final", default_template)]
-        
+
         # finally, update the proerties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})
         default_properties.update(explicit_constructor_properties)
-        
