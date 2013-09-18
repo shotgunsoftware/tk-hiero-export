@@ -14,6 +14,10 @@ Update the Hiero export to be Tank/Shotgun aware
 import re
 import os
 import sys
+import shutil
+import tempfile
+
+from PySide import QtCore
 
 from tank.platform import Application
 
@@ -40,7 +44,7 @@ from tk_hiero_export import ShotgunHieroObjectBase
 sys.path.pop()
 
 # list keywords Hiero is using in its export substitution
-HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event", 
+HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event",
                                "ext", "filebase", "fileext", "filehead",
                                "filename", "filepadding", "fullbinpath", "fullday", "fullmonth",
                                "MM", "month", "project", "projecroot", "sequence", "shot", "track",
@@ -48,7 +52,6 @@ HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event",
 
 
 class HieroExport(Application):
-    
     def init_app(self):
         # let the shot exporter know when the first shot is being run
         self.first_shot = False
@@ -137,6 +140,23 @@ class HieroExport(Application):
                             "or adjust the hook that converts a template to a hiero export "
                             "path to convert these fields into fixed strings or hiero "
                             "substitution tokens." % (template_str, ",".join(key_names) ) )
-        
-        
-        
+
+    def upload_poster_frame(self, sg_entity, source):
+        """
+        Updates the thumbnail for an entity in Shotgun
+        """
+        thumbdir = tempfile.mkdtemp(prefix='hiero_process_shot')
+        try:
+            path = "%s.png" % os.path.join(thumbdir, source.name())
+            poster = source.posterFrame()
+            thumb_qimage = source.thumbnail(poster)
+            # scale it down to 600px wide
+            thumb_qimage_scaled = thumb_qimage.scaledToWidth(600, QtCore.Qt.SmoothTransformation)
+            # scale thumbnail here...
+            thumb_qimage_scaled.save(path)
+            self.log_debug("Uploading thumbnail for %s %s..." % (sg_entity['type'], sg_entity['id']))
+            self.shotgun.upload_thumbnail(sg_entity['type'], sg_entity['id'], path)
+        except:
+            self.log_info("Thumbnail for %s was not refreshed in Shotgun." % source)
+        finally:
+            shutil.rmtree(thumbdir)

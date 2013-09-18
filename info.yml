@@ -3,13 +3,13 @@ configuration:
 
     default_task_template:
         type: str
-        description: The default shot task template to use when the app is 
+        description: The default shot task template to use when the app is
                      creating new shots in Shotgun. This setting is presented
-                     in the Custom Shotgun Export UI and you can change it 
-                     prior to running the export if you want. 
+                     in the Custom Shotgun Export UI and you can change it
+                     prior to running the export if you want.
         default_value: Basic shot template
 
-    # hooks    
+    # hooks
     hook_translate_template:
         type: hook
         description: "Called when a template needs to be translated into a Hiero
@@ -17,7 +17,24 @@ configuration:
                      to translate. The return value is the translated string."
         parameters: [template]
         default_value: hiero_translate_template
-    
+
+    hook_get_shot:
+        type: hook
+        description: "Called to return the shot to update cut information for.
+                     The first argument is the hiero.core.TrackItem that is
+                     driving shot creation. The second argument is a data dictionary
+                     that can be used to pass data between different calls to shot
+                     create.
+
+                     The return value is a data dictionary for the shot, whose
+                     id will be updated.  Cut information will be merged into this
+                     dictionary before Shotgun update is called on the shot.
+                     The default implementation creates or looks up a sequence
+                     named after the Hiero Sequence being exported and links that to
+                     the shot via the sg_sequence field."
+        parameters: [item, data]
+        default_value: hiero_get_shot
+
     # paths
     template_plate_path:
         type: template
