@@ -12,23 +12,30 @@ import hiero.core
 from hiero.exporters import FnShotExporter
 
 from .base import ShotgunHieroObjectBase
+from .collating_exporter import CollatingExporter
 
-class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask):
+
+class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, CollatingExporter):
     """
     Ensures that Shots and Sequences exist in Shotgun
     """
     def __init__(self, initDict):
         FnShotExporter.ShotTask.__init__(self, initDict)
+        CollatingExporter.__init__(self)
 
     def taskStep(self):
         """
         Execution payload.
         """
+        # Only process actual shots... so uncollated items and hero collated items
+        if self.isCollated() and not self.isHero():
+            return False
+
         # execute base class
         FnShotExporter.ShotTask.taskStep(self)
 
         # call the preprocess hook to get extra values
-        if self.app.first_shot:
+        if self.app.shot_count == 0:
             self.app.preprocess_data= {}
         sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=self._item, data=self.app.preprocess_data)
 
@@ -38,11 +45,20 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask):
         shot_type = sg_shot['type']
         del sg_shot['type']
 
+        # get cut info
+        handles = self._cutHandles if self._cutHandles is not None else 0
+        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
+        cut_in = head_in + handles
+        cut_out = tail_out - handles
+
         # update the frame range
-        start, end = self.outputRange(ignoreHandles=False, ignoreRetimes=False, clampToSource=True)
-        sg_shot["sg_cut_duration"] = end - start + 1
-        sg_shot["sg_cut_in"] = start
-        sg_shot["sg_cut_out"] = end
+        sg_shot["sg_cut_order"] = self.app.shot_count + 1
+        sg_shot["sg_head_in"] = head_in
+        sg_shot["sg_cut_in"] = cut_in
+        sg_shot["sg_cut_out"] = cut_out
+        sg_shot["sg_tail_out"] = tail_out
+        sg_shot["sg_cut_duration"] = cut_out - cut_in + 1
+        sg_shot["sg_working_duration"] = tail_out - head_in + 1
 
         # get status from the hiero tags
         status = None
@@ -85,8 +101,8 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask):
         # return without error
         self.app.log_info("Updated %s %s" % (shot_type, self.shotName()))
 
-        # no longer the first shot
-        self.app.first_shot = False
+        # keep shot count
+        self.app.shot_count += 1
 
         # return false to indicate success
         return False
@@ -102,5 +118,3 @@ class ShotgunShotUpdaterPreset(ShotgunHieroObjectBase, hiero.core.TaskPresetBase
 
     def supportedItems(self):
         return hiero.core.TaskPresetBase.kAllItems
-
-

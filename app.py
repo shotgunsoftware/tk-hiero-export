@@ -16,6 +16,7 @@ import os
 import sys
 import shutil
 import tempfile
+import traceback
 
 from PySide import QtCore
 
@@ -61,7 +62,6 @@ class HieroExport(Application):
         """
         Set up this app with the hiero exporter frameworks
         """
-        
         # register our app with the base class that all custom hiero objects derive from.
         ShotgunHieroObjectBase.setApp(self)
 
@@ -81,7 +81,6 @@ class HieroExport(Application):
         Hiero std method to add new exporter presets.
         Passed in to hiero.core.taskRegistry.setDefaultPresets() as a function pointer.
         """
-        
         # add all built-in defaults
         self._old_AddDefaultPresets_fn(overwrite)
 
@@ -91,7 +90,6 @@ class HieroExport(Application):
 
         # only add the preset if it is not already there - or if a reset to defaults is requested.
         if overwrite or name not in localpresets:
-            
             # grab all our path templates
             plate_template = self.get_template("template_plate_path")
             script_template = self.get_template("template_nuke_script_path")
@@ -100,13 +98,13 @@ class HieroExport(Application):
             # call the hook to translate them into hiero paths, using hiero keywords
             plate_hiero_str = self.execute_hook("hook_translate_template", template=plate_template)
             self.log_debug("Translated %s --> %s" % (plate_template, plate_hiero_str))
-            
+
             script_hiero_str = self.execute_hook("hook_translate_template", template=script_template)
             self.log_debug("Translated %s --> %s" % (script_template, script_hiero_str))
-            
+
             render_hiero_str = self.execute_hook("hook_translate_template", template=render_template)
             self.log_debug("Translated %s --> %s" % (render_template, render_hiero_str))
-            
+
             # check so that no unknown keywords exist in the templates after translation
             self._validate_hiero_export_template(plate_hiero_str)
             self._validate_hiero_export_template(script_hiero_str)
@@ -158,5 +156,8 @@ class HieroExport(Application):
             self.shotgun.upload_thumbnail(sg_entity['type'], sg_entity['id'], path)
         except:
             self.log_info("Thumbnail for %s was not refreshed in Shotgun." % source)
+
+            tb = traceback.format_exc()
+            self.app.log_debug(tb)
         finally:
             shutil.rmtree(thumbdir)

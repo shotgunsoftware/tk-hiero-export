@@ -1,42 +1,35 @@
 # Copyright (c) 2013 Shotgun Software Inc.
-# 
+#
 # CONFIDENTIAL AND PROPRIETARY
-# 
-# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit 
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
 # Source Code License included in this distribution package. See LICENSE.
-# By accessing, using, copying or modifying this work you indicate your 
-# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights 
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import os
-import sys
-import shutil
 import itertools
 
 from PySide import QtGui
-from PySide import QtCore
-
 
 import hiero.core
 from hiero.core import FnExporterBase
 
-from hiero.exporters import FnShotExporter
 from hiero.exporters import FnShotProcessor
-from hiero.exporters import FnTranscodeExporter
-import tank
 
 from .base import ShotgunHieroObjectBase
 from .shot_updater import ShotgunShotUpdaterPreset
+from .collating_exporter import CollatedShotPreset
+from .collating_exporter_ui import CollatingExporterUI
 
 
-class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor):
+class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor, CollatingExporterUI):
     """
     Add extra UI and hook functionality to the built in Shot processor.
     """
-    
     def __init__(self, preset, submission=None, synchronous=False):
         FnShotProcessor.ShotProcessor.__init__(self, preset, submission, synchronous)
-        self._shotCreatePreset = None
+        CollatingExporterUI.__init__(self)
 
     def displayName(self):
         return "Shotgun Shot Processor"
@@ -48,10 +41,6 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         """
         Executing the export
         """
-        
-        # Use tank to set the project root
-        self._exportTemplate.setExportRootPath(self.app.tank.project_path)
-
         # add a top level task to manage shotgun shots
         exportTemplate = self._exportTemplate.flatten()
         properties = self._preset.properties().get('shotgunShotCreateProperties', {})
@@ -59,7 +48,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         self._exportTemplate.restore(exportTemplate)
 
         # tag app as first shot
-        self.app.first_shot = True
+        self.app.shot_count = 0
 
         # do the normal processing
         FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
@@ -76,7 +65,6 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         master_layout = QtGui.QVBoxLayout(widget)
         master_layout.setContentsMargins(0, 0, 0, 0)
 
-        
         # add group box for shotgun stuff
         shotgun_groupbox = QtGui.QGroupBox("Shotgun Shot and Sequence Creation Settings")
         master_layout.addWidget(shotgun_groupbox)
@@ -86,14 +74,14 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         header_text = QtGui.QLabel()
         header_text.setText("""<big>Welcome to the Shotgun Shot Export!</big>
                       <p>When you are using the Shotgun Shot Processor, Shots and Sequences in<br>
-                      Shotgun will be created based on your Hiero Project. Existing Shots will<br> 
+                      Shotgun will be created based on your Hiero Project. Existing Shots will<br>
                       be updated with the latest cut lengths. Quicktimes for each shot will be <br>
                       sent to Screening Room for review when you use the special Shotgun <br>
                       Transcode plugin - all included and ready to go in the default preset.<br>&nbsp;
                       </p>
                       """)
         shotgun_layout.addWidget(header_text)
-        
+
         # make space for the spreadsheet
         spreadsheet_widget = QtGui.QWidget()
         shotgun_layout.addWidget(spreadsheet_widget)
@@ -107,18 +95,21 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         default_task_template = self.app.get_setting('default_task_template')
         footer_text.setText("<p>Shots without any tags will be assigned the '%s' task template.</p>" % default_task_template )
         shotgun_layout.addWidget(footer_text)
-        
-        # add default settings from baseclass below 
+
+        # add collate options
+        collating_widget = QtGui.QWidget()
+        shotgun_layout.addWidget(collating_widget)
+        CollatingExporterUI.populateUI(self, collating_widget, properties)
+
+        # add default settings from baseclass below
         default = QtGui.QWidget()
         master_layout.addWidget(default)
         FnShotProcessor.ShotProcessor.populateUI(self, default, exportItems, editMode)
-        
 
     def _build_tag_selector_widget(self, items, properties):
         """
-        Returns a QT widget which contains the tag/ 
+        Returns a QT widget which contains the tag
         """
-        
         fields = ['code']
         filt = [['entity_type', 'is', 'Shot']]
         templates = [t['code'] for t in self.app.shotgun.find('TaskTemplate', filt, fields=fields)]
@@ -126,11 +117,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         schema = self.app.shotgun.schema_field_read('Shot', 'sg_status_list')
         statuses = schema['sg_status_list']['properties']['valid_values']['value']
 
-
         values = [statuses, templates]
         labels = ['Shotgun Shot Status', 'Shotgun Task Template for Shots']
         keys = ['sg_status_hiero_tags', 'task_template_map']
-
 
         # build a map of tag value pairs from the properties
         propertyDicts = [dict(properties[key]) for key in keys]
@@ -203,7 +192,6 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         return tagTable
 
-
     def _get_all_tags_by_name(self):
         """
         Returns all tags by name
@@ -220,31 +208,20 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         tags = [tag for tag in tags if "Nuke Project File" not in tag.name()]
         return tags
 
-        
-        
-        
-        
-        
 
-
-class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessorPreset):
+class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessorPreset, CollatedShotPreset):
     """
     Handles presets for the shot processor.
-    
-    The shot processor has two main presets
-    
     """
-    
     def __init__(self, name, properties):
-        
         FnShotProcessor.ShotProcessorPreset.__init__(self, name, properties)
-        
+
         self._parentType = ShotgunShotProcessor
 
         # set up default properties
         self.properties()['shotgunShotCreateProperties'] = {}
-        
         default_properties = self.properties()['shotgunShotCreateProperties']
+        CollatedShotPreset.__init__(self, default_properties)
 
         # add setting to control how we map sg statuses and tags
         # just map the standard "status" tags in hiero against
@@ -254,17 +231,16 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
                                                        ("In Progress", "ip"),
                                                        ("On Hold", "hld"),
                                                        ("Final", "fin"), ]
-        
+
         # add setting to control the default task template in Shotgun.
-        # again, populate some of the standard tags in hiero. The rest 
+        # again, populate some of the standard tags in hiero. The rest
         # of them can be manually set.
-        default_template = self.app.get_setting('default_task_template')        
+        default_template = self.app.get_setting('default_task_template')
         default_properties["task_template_map"] = [("Ready To Start", default_template),
                                                    ("In Progress", default_template),
                                                    ("On Hold", default_template),
                                                    ("Final", default_template)]
-        
+
         # finally, update the proerties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})
         default_properties.update(explicit_constructor_properties)
-        
