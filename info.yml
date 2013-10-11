@@ -18,6 +18,15 @@ configuration:
         parameters: [template]
         default_value: hiero_translate_template
 
+    hook_upload_thumbnail:
+        type: hook
+        description: "Called when a thumbnail needs to be uploaded to Shotgun
+                     for a Hiero source.  First argument is a dictionary that
+                     is the Shotgun entity to upload for.  The second argument
+                     is the Hiero Source to get the thumbnail from."
+        parameters: [entity, source]
+        default_value: hiero_upload_thumbnail
+
     hook_get_shot:
         type: hook
         description: "Called to return the shot to update cut information for.
