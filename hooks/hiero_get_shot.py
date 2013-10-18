@@ -47,7 +47,7 @@ class HieroGetShot(Hook):
             shot = shots[0]
 
         # update the thumbnail for the shot
-        self.parent.execute_hook("hook_upload_thumbnail", entity=shot, source=item.source())
+        self.parent.execute_hook("hook_upload_thumbnail", entity=shot, source=item.source(), item=item)
 
         return shot
 
@@ -84,7 +84,7 @@ class HieroGetShot(Hook):
             sequence = sequences[0]
 
         # update the thumbnail for the sequence
-        self.parent.execute_hook("hook_upload_thumbnail", entity=sequence, source=hiero_sequence)
+        self.parent.execute_hook("hook_upload_thumbnail", entity=sequence, source=hiero_sequence, item=None)
 
         # cache the results
         data['seq_cache'][hiero_sequence.guid()] = sequence

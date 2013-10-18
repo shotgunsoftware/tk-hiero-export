@@ -23,7 +23,7 @@ class HieroUploadThumbnail(Hook):
     """
     Upload a thumbnail to a given Shotgun entity for a given Hiero source item.
     """
-    def execute(self, entity, source, **kwargs):
+    def execute(self, entity, source, item, **kwargs):
         thumbdir = tempfile.mkdtemp(prefix='hiero_process_shot')
         try:
             path = "%s.png" % os.path.join(thumbdir, source.name())

@@ -23,8 +23,11 @@ configuration:
         description: "Called when a thumbnail needs to be uploaded to Shotgun
                      for a Hiero source.  First argument is a dictionary that
                      is the Shotgun entity to upload for.  The second argument
-                     is the Hiero Source to get the thumbnail from."
-        parameters: [entity, source]
+                     is the Hiero Source to get the thumbnail from. The third
+                     argument is the Hiero TrackItem that the source was pulled
+                     from.  The TrackItem may be None when the thumbnail does
+                     not correspond to an item from a timeline."
+        parameters: [entity, source, item]
         default_value: hiero_upload_thumbnail
 
     hook_get_shot:
