@@ -34,4 +34,13 @@ class ShotgunHieroObjectBase(object):
     def app(self):
         return self._app
 
+    def _formatTkVersionString(self, hiero_version_str):
+        """Reformat the Hiero version string to the tk format.
+        """
+        version_template = self.app.get_template('template_version')
+        tk_version_str = version_template.apply_fields({'version': int(hiero_version_str[1:])})
+        return tk_version_str
+
+
+
 

@@ -37,10 +37,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "python"))
 from tk_hiero_export import ShotgunShotUpdater
 from tk_hiero_export import ShotgunShotProcessor
 from tk_hiero_export import ShotgunTranscodePreset
+from tk_hiero_export import ShotgunNukeShotPreset
 from tk_hiero_export import ShotgunShotUpdaterPreset
 from tk_hiero_export import ShotgunTranscodeExporter
+from tk_hiero_export import ShotgunNukeShotExporter
 from tk_hiero_export import ShotgunShotProcessorPreset
 from tk_hiero_export import ShotgunTranscodeExporterUI
+from tk_hiero_export import ShotgunNukeShotExporterUI
 from tk_hiero_export import ShotgunHieroObjectBase
 sys.path.pop()
 
@@ -48,8 +51,8 @@ sys.path.pop()
 HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event",
                                "ext", "filebase", "fileext", "filehead",
                                "filename", "filepadding", "fullbinpath", "fullday", "fullmonth",
-                               "MM", "month", "project", "projecroot", "sequence", "shot", "track",
-                               "user", "version", "YY", "YYYY"]
+                               "MM", "month", "project", "projecroot", "sequence", "shot", 
+                               "tk_version", "track", "user", "version", "YY", "YYYY"]
 
 
 class HieroExport(Application):
@@ -67,14 +70,17 @@ class HieroExport(Application):
 
         hiero.core.taskRegistry.registerTask(ShotgunShotUpdaterPreset, ShotgunShotUpdater)
         hiero.core.taskRegistry.registerTask(ShotgunTranscodePreset, ShotgunTranscodeExporter)
+        hiero.core.taskRegistry.registerTask(ShotgunNukeShotPreset, ShotgunNukeShotExporter)
         hiero.core.taskRegistry.registerProcessor(ShotgunShotProcessorPreset, ShotgunShotProcessor)
 
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunTranscodePreset, ShotgunTranscodeExporterUI)
+        hiero.ui.taskUIRegistry.registerTaskUI(ShotgunNukeShotPreset, ShotgunNukeShotExporterUI)
         hiero.ui.taskUIRegistry.registerProcessorUI(ShotgunShotProcessorPreset, ShotgunShotProcessor)
 
         # Add our default preset
         self._old_AddDefaultPresets_fn = hiero.core.taskRegistry._defaultPresets
         hiero.core.taskRegistry.setDefaultPresets(self._add_default_presets)
+
 
     def _add_default_presets(self, overwrite):
         """
@@ -113,7 +119,7 @@ class HieroExport(Application):
             # and set the default properties to be based off of those templates
             properties = {
                 "exportTemplate": (
-                    (script_hiero_str, FnNukeShotExporter.NukeShotPreset("", {'readPaths': [], 'writePaths': []})),
+                    (script_hiero_str, ShotgunNukeShotPreset("", {'readPaths': [], 'writePaths': []})),
                     (render_hiero_str, FnExternalRender.NukeRenderPreset("", {'file_type': 'dpx', 'dpx': {'datatype' : '10 bit'}})),
                     (plate_hiero_str, ShotgunTranscodePreset("", {'file_type': 'mov', 'mov': {}})),
                 )
