@@ -244,3 +244,8 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
         # finally, update the proerties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})
         default_properties.update(explicit_constructor_properties)
+
+    def addUserResolveEntries(self, resolver):
+        self.app.log_info('Adding custom resolver tk_version')
+        resolver.addResolver("{tk_version}", "Version string (without the 'v') formatted by Shotgun Toolkit", 
+                             lambda keyword, task: self._formatTkVersionString(task.versionString()))
