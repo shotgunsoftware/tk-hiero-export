@@ -74,7 +74,8 @@ configuration:
 
     version_template:
         type: template
-        description: "tk"
+        description: "Template that specifies how to format the Hiero tk_version
+                      token as a version string for tk."
         required_fields: [version]
         optional_fields: "*"        
 
