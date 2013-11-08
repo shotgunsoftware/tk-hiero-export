@@ -40,11 +40,8 @@ class ShotgunHieroObjectBase(object):
         Heiro's {version} tag includes the 'v'. Strip it off and have
         tk format the numeric value as defined in the templates file.
         """
-        version_template = self.app.get_template_by_name('hiero_version')
-        if not version_template:
-            raise tank.TankError("'hiero_version' must be defined in your templates file!")
-        tpl_field = version_template.get_fields(hiero_version_str[1:]).popitem()
-        tk_version_str = version_template.apply_fields({tpl_field[0]: tpl_field[1]})
+        version_template = self.app.get_template('version_template')
+        tk_version_str = version_template.apply_fields({'version': int(hiero_version_str[1:])})
         return tk_version_str
 
 

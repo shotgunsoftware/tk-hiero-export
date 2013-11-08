@@ -72,6 +72,12 @@ configuration:
         required_fields: []
         optional_fields: "*"
 
+    version_template:
+        type: template
+        description: "tk"
+        required_fields: [version]
+        optional_fields: "*"        
+
 
 # the engines that this app can operate in:
 supported_engines: [tk-hiero]
