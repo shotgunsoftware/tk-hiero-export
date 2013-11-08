@@ -34,29 +34,19 @@ class ShotgunHieroObjectBase(object):
     def app(self):
         return self._app
 
-    def _formatTkVersionString(self, version_str):
+    def _formatTkVersionString(self, hiero_version_str):
         """Reformat the Hiero version string to the tk format.
 
         Heiro's {version} tag includes the 'v'. Strip it off and have
         tk format the numeric value as defined in the templates file.
-
-        We can't assume that the {version} key will exist in any specific
-        template object so we iterate through all of them until we find
-        one and use it to format the value. If we don't find one, log an
-        error and return the original value.
         """
-        # find a version TemplateKey
-        for name, template in self._app.sgtk.templates.items():
-            if 'version' in template.keys:
-                version_template_key = template.keys['version']
-                break
-        try:
-            val = int(version_str[1:])
-            return version_template_key.str_from_value(val)
-        except NameError:
-            self._app.log_error("Unable to find a version TemplateKey to translate "
-                                "the Hiero version string")
-            return version_str
+        version_template = self.app.get_template_by_name('hiero_version')
+        if not version_template:
+            raise tank.TankError("'hiero_version' must be defined in your templates file!")
+        tpl_field = version_template.get_fields(hiero_version_str[1:]).popitem()
+        tk_version_str = version_template.apply_fields({tpl_field[0]: tpl_field[1]})
+        return tk_version_str
+
 
 
 
