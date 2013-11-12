@@ -72,6 +72,14 @@ configuration:
         required_fields: []
         optional_fields: "*"
 
+    template_version:
+        type: template
+        description: "Template that specifies how to format the Hiero tk_version
+                      token as a version string for tk."
+        required_fields: [version]
+        optional_fields: "*"
+        default_value: hiero_version        
+
 
 # the engines that this app can operate in:
 supported_engines: [tk-hiero]

@@ -33,7 +33,8 @@ class HieroTranslateTemplate(Hook):
         # first convert basic fields
         mapping = { "{Sequence}": "{sequence}",
                     "{Shot}": "{shot}",
-                    "{name}": "{clip}" }
+                    "{name}": "{clip}",
+                    "{version}": "{tk_version}" }
         
         # get the string representation of the template object
         template_str = template.definition

@@ -48,8 +48,8 @@ sys.path.pop()
 HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event",
                                "ext", "filebase", "fileext", "filehead",
                                "filename", "filepadding", "fullbinpath", "fullday", "fullmonth",
-                               "MM", "month", "project", "projecroot", "sequence", "shot", "track",
-                               "user", "version", "YY", "YYYY"]
+                               "MM", "month", "project", "projecroot", "sequence", "shot", 
+                               "tk_version", "track", "user", "version", "YY", "YYYY"]
 
 
 class HieroExport(Application):
