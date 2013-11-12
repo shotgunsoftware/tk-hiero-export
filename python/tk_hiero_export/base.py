@@ -36,11 +36,8 @@ class ShotgunHieroObjectBase(object):
 
     def _formatTkVersionString(self, hiero_version_str):
         """Reformat the Hiero version string to the tk format.
-
-        Heiro's {version} tag includes the 'v'. Strip it off and have
-        tk format the numeric value as defined in the templates file.
         """
-        version_template = self.app.get_template('version_template')
+        version_template = self.app.get_template('template_version')
         tk_version_str = version_template.apply_fields({'version': int(hiero_version_str[1:])})
         return tk_version_str
 
