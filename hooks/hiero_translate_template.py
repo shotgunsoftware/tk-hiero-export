@@ -34,7 +34,8 @@ class HieroTranslateTemplate(Hook):
         mapping = { "{Sequence}": "{sequence}",
                     "{Shot}": "{shot}",
                     "{name}": "{clip}",
-                    "{version}": "{tk_version}" }
+                    "{version}": "{tk_version}",
+                    "{Step}": self.parent.settings['nuke_script_path_step'] }
         
         # get the string representation of the template object
         template_str = template.definition

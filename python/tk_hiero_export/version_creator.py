@@ -68,6 +68,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         self._sequence_name = None
         self._shot_name = None
         self._thumbnail = None
+        self._tk_version = None
 
     def taskStep(self):
         """
@@ -77,6 +78,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self._resolved_export_path = self.resolvedExportPath()
             self._shot_name = self.shotName()
             self._sequence_name = self.sequenceName()
+            self._tk_version = self._formatTkVersionString(self.versionString())
 
             source = self._item.source()
             self._thumbnail = source.thumbnail(source.posterFrame())
@@ -90,6 +92,29 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         
         # run base class implementation
         FnTranscodeExporter.TranscodeExporter.finishTask(self)
+
+        # create publish
+        ctx = self.app.tank.context_from_path(self._resolved_export_path)
+
+        args = {
+            "tk": self.app.tank,
+            "context": ctx, 
+            "path": self._resolved_export_path,
+            "name": os.path.basename(self._resolved_export_path),
+            "version_number": int(self._tk_version),
+            "published_file_type": 'Plate',  # should come from config 
+        }
+                
+        # register publish;
+        self.app.log_debug("Register publish in shotgun: %s" % str(args))
+        pub_data = tank.util.register_publish(**args)
+
+        # upload thumbnail for publish
+        try:
+            self._upload_poster_frame(pub_data, self._project.sequences()[0])
+        except IndexError:
+            self.app.log_warning("Couldn't find sequence to upload thumbnail from")
+        
 
         sg = self.app.shotgun
 
@@ -117,6 +142,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             "project": self.app.context.project,
             "sg_path_to_movie": self._resolved_export_path,
             "code": file_name,
+            "published_files": [pub_data]
         }
 
         self.app.log_debug("Creating Shotgun Version %s" % str(data))
@@ -124,9 +150,6 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         self.app.log_debug("Uploading quicktime to Shotgun...")
         sg.upload("Version", vers["id"], self._resolved_export_path, "sg_uploaded_movie")
-
-        
-        
 
 
 class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset):

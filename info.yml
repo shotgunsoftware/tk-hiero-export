@@ -67,7 +67,7 @@ configuration:
     template_render_path:
         type: template
         description: "A reference to a template which specifies what renders will
-                     be named.  The translate template hook must understand how
+                     be named. The translate template hook must understand how
                      to translate this to Hiero keywords."
         required_fields: []
         optional_fields: "*"
