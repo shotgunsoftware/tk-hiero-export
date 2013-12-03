@@ -43,7 +43,6 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         """
         FnNukeShotExporter.NukeShotExporter.__init__(self, initDict)
         self._resolved_export_path = None
-        self._thumbnail = None
         self._tk_version_number = None
 
     def taskStep(self):
@@ -53,8 +52,6 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
             self._tk_version_number = self._formatTkVersionString(self.versionString())
-            source = self._item.source()
-            self._thumbnail = source.thumbnail(source.posterFrame())
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
     def finishTask(self):
@@ -67,8 +64,23 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         # register publish
         #
 
-        # context we're publishing to
+        # get context we're publishing to
         ctx = self.app.tank.context_from_path(self._resolved_export_path)
+
+        # get the type of file we're publishing from multi-publish
+        published_file_type = None
+        multi_publish_settings = tank.platform.find_app_settings('tk-nuke', 'tk-multi-publish', self.app.tank, ctx)
+        if multi_publish_settings:
+            try:
+                published_file_type = multi_publish_settings[0]['settings'].get('primary_tank_type')
+            except:
+                pass
+        if not published_file_type:
+            self.app.log_error("No 'primary_tank_type' defined in tk-nuke:tk-multi-publish for "
+                               "context %s! This is used to determine the published file type "
+                               "value when publishing Nuke scripts during the export process. "
+                               "Continuing but this value will be blank on the PublishedFile "
+                               "record" % ctx)
 
         args = {
             "tk": self.app.tank,
@@ -76,15 +88,15 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             "path": self._resolved_export_path,
             "name": os.path.basename(self._resolved_export_path),
             "version_number": int(self._tk_version_number),
-            "published_file_type": 'Nuke Script',  # comes from config - try for nuke
+            "published_file_type": published_file_type,  
         }
                 
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
-        sg_data = tank.util.register_publish(**args)
+        sg_publish = tank.util.register_publish(**args)
 
         # upload thumbnail for sequence
         try:
-            self._upload_poster_frame(sg_data, self._project.sequences()[0])
+            self._upload_poster_frame(sg_publish, self._project.sequences()[0])
         except IndexError:
             self.app.log_warning("Couldn't find sequence to upload thumbnail from")
 
@@ -121,7 +133,6 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         valid. Raise a TankError if anything is missing or invalid. 
         Return a tuple of the valid relevant settings on success
         """
-        # each write node has a couple of entries
         name = wn_settings.get("name", "unknown")
         file_type = wn_settings.get("file_type")
         file_settings = wn_settings.get("settings", {})
@@ -168,6 +179,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 
             self.app.log_debug("Created HieroWriteTank MetadataNode Node: %s" % node._knobValues)
             script.addNode(node)
+
 
 class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset):
     """

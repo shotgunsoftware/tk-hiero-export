@@ -44,8 +44,6 @@ class ShotgunHieroObjectBase(object):
     def _upload_poster_frame(self, sg_entity, source):
         """
         Updates the thumbnail for an entity in Shotgun
-        @todo: move this code somewhere where it can be re-used instead of 
-               essentially duplicated from ShotgunShotUpdater
         """
         import tempfile
         import uuid

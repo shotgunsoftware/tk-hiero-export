@@ -115,12 +115,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         except IndexError:
             self.app.log_warning("Couldn't find sequence to upload thumbnail from")
         
-
         sg = self.app.shotgun
-
         # lookup current login
         sg_current_user = tank.util.get_current_user(self.app.tank)
-
         # lookup sequence
         sg_sequence = sg.find_one("Sequence",
                                   [["project", "is", self.app.context.project], 
