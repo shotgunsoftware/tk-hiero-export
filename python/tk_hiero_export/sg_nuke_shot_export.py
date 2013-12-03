@@ -9,22 +9,17 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
-import sys
-import shutil
-
-from PySide import QtGui
-from PySide import QtCore
+import json
 
 import hiero.core
-from hiero.exporters import FnShotExporter
-from hiero.exporters import FnShotProcessor
+from hiero.core import nuke
 from hiero.exporters import FnNukeShotExporter
-import tank
-from tank import TankError
-
 from hiero.exporters import FnNukeShotExporterUI
 
+import tank
+from tank import TankError
 from .base import ShotgunHieroObjectBase
+
 
 class ShotgunNukeShotExporterUI(FnNukeShotExporterUI.NukeShotExporterUI):
     """
@@ -58,12 +53,8 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
             self._tk_version_number = self._formatTkVersionString(self.versionString())
-            self.app.log_info("TK_VERSION: %s" % self._tk_version_number)
-            # access settings for writenode app from shot env and use those settings
-            # other_settings = tank.platform.find_app_settings(self._app.engine.name, self._app.name, self._app.tank, context)
             source = self._item.source()
             self._thumbnail = source.thumbnail(source.posterFrame())
-        self.app.log_info('TASKSTEP: %s' % self)
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
     def finishTask(self):
@@ -73,10 +64,9 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         # run base class implementation
         FnNukeShotExporter.NukeShotExporter.finishTask(self)
 
-        sg_current_user = tank.util.get_current_user(self.app.tank)
-
         # register publish
-         
+        #
+
         # context we're publishing to
         ctx = self.app.tank.context_from_path(self._resolved_export_path)
 
@@ -89,7 +79,6 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             "published_file_type": 'Nuke Script',  # comes from config - try for nuke
         }
                 
-        # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         sg_data = tank.util.register_publish(**args)
 
@@ -99,33 +88,86 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         except IndexError:
             self.app.log_warning("Couldn't find sequence to upload thumbnail from")
 
+    def _get_write_node_settings(self):
+        """
+        Return write node settings from the tk-nuke-writenode app for the context
+        of the published nuke script.
+        """
+        ctx = self.app.tank.context_from_path(self._resolved_export_path)
+        app_settings_list = tank.platform.find_app_settings('tk-nuke', 'tk-nuke-writenode', self.app.tank, ctx)
+
+        # no settings found for app!
+        if len(app_settings_list) == 0:
+            self.app.log_error("Could not find Shotgun Nuke write node settings. "
+                               "Check your tk-nuke-writenode config. No write "
+                               "node will be added.")
+            return           
+        elif len(app_settings_list) > 1:
+            self.app.log_error("More than one set of tk-nuke-writenode app settings "
+                               "was returned. Don't know which one to use so no "
+                               "write node will be added.")  
+            return          
+
+        # a single app setting dict exists, extract the settings
+        app_settings = app_settings_list[0].get("settings")
+        # extract the list of write node settings from the app settings
+        write_node_settings = app_settings.get("write_nodes")
+
+        return write_node_settings
+
+    def _parse_write_node_settings(self, wn_settings):
+        """
+        Parse the write node settings and ensure that the settings are all
+        valid. Raise a TankError if anything is missing or invalid. 
+        Return a tuple of the valid relevant settings on success
+        """
+        # each write node has a couple of entries
+        name = wn_settings.get("name", "unknown")
+        file_type = wn_settings.get("file_type")
+        file_settings = wn_settings.get("settings", {})
+        if not isinstance(file_settings, dict):
+            raise TankError("Configuration Error: Write node contains invalid settings. "
+                            "Settings must be a dictionary. Current config: %s" % wn_settings)
+
+        render_template_name = wn_settings.get("render_template")
+        if render_template_name is None:
+            raise TankError("Configuration Error: Write node has no render_template: %s" % wn_settings)
+
+        publish_template_name = wn_settings.get("publish_template")
+        if publish_template_name is None:
+            raise TankError("Configuration Error: Write node has no publish_template: %s" % wn_settings)
+
+        return (name, render_template_name, publish_template_name, file_type, file_settings)
+
 
     def _beforeNukeScriptWrite(self, script):
-        """Remove existing WriteNodes and replace with Tk WriteNodes
         """
-        pass
-        return
+        Add HieroWriteTank Metadata Nodes for tk-nuke-writenode to use in order
+        to create full Tk WriteNodes in the Nuke environment
+        """
+        tk_wn_settings = self._get_write_node_settings()
 
-        self.app.log_debug('SCRIPT: %s' % script)
-        self.app.log_debug('SCRIPT dir(): %s' % dir(script))
-        
-        # find the node to use from the config
-        tk_write_node_setting = self.app.get_setting("nuke_write_node_setting")
-        if not tk_write_node_setting:
-            self.app.log_debug("No Shotgun Nuke write node setting defined in "
-                               "the config. No write node will be added.")
-            return
+        metadata = []
+        for wn_settings in tk_wn_settings:
+            (name, 
+             render_template_name, 
+             publish_template_name, 
+             file_type, 
+             file_settings) = self._parse_write_node_settings(wn_settings)
 
-        # we will need the write node app to create Shotgun write nodes for the
-        # nuke script.
-        write_node_app = self.app.engine.apps.get("tk-nuke-writenode")
-        if not write_node_app:
-            raise TankError("Unable to create write node without tk-nuke-writenode app!")
-        tk_write_node = write_node_app.create_write_node(tk_write_node_setting)
-        script.add_node(tk_write_node)
+            metadata = {
+                'name': name,
+                'render_template': render_template_name,
+                'publish_template': publish_template_name,
+                'file_type': file_type,
+                'file_settings': json.dumps(file_settings).replace('"', '\\"')
+            }
 
+            node = nuke.MetadataNode(metadatavalues=metadata.items())
+            node.setName('HieroWriteTank')
 
-
+            self.app.log_debug("Created HieroWriteTank MetadataNode Node: %s" % node._knobValues)
+            script.addNode(node)
 
 class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset):
     """
