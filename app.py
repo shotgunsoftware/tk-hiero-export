@@ -51,7 +51,7 @@ sys.path.pop()
 HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event",
                                "ext", "filebase", "fileext", "filehead",
                                "filename", "filepadding", "fullbinpath", "fullday", "fullmonth",
-                               "MM", "month", "project", "projecroot", "sequence", "shot", 
+                               "MM", "month", "project", "projectroot", "sequence", "shot", 
                                "tk_version", "track", "user", "version", "YY", "YYYY"]
 
 
