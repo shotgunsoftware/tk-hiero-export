@@ -36,7 +36,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         # call the preprocess hook to get extra values
         if self.app.shot_count == 0:
-            self.app.preprocess_data= {}
+            self.app.preprocess_data = {}
         sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=self._item, data=self.app.preprocess_data)
 
         # clean up the dict
@@ -81,13 +81,13 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 break
 
         # if there are no associated, assign default template...
-        if len(self._item.tags()) == 0:
-            default_template = self.parent.get_setting('default_task_template')
+        if template is None:
+            default_template = self.app.get_setting('default_task_template')
             if default_template:
-                template = self.parent.tank.shotgun.find_one('TaskTemplate', [['entity_type', 'is', shot_type],
-                                                                              ['code', 'is', default_template]])
+                template = self.app.tank.shotgun.find_one('TaskTemplate',
+                    [['entity_type', 'is', shot_type], ['code', 'is', default_template]])
 
-        if template:
+        if template is not None:
             sg_shot['task_template'] = template
 
         # commit the changes and update the thumbnail
