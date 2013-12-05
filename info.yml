@@ -9,6 +9,35 @@ configuration:
                      prior to running the export if you want.
         default_value: Basic shot template
 
+    nuke_script_path_step:
+        type: str
+        description: If the template pointed to by template_nuke_script_path
+                     contains the Step token, this value will be used for it.
+                     It should be set to the pipeline step that the nuke script
+                     is being delivered to.
+        default_value: Comp
+
+    plate_published_file_type:
+        type: tank_type
+        description: The string value of the Published File/Tank Type used for published plates.
+        default_value: Hiero Plate
+
+    nuke_script_toolkit_write_nodes:
+        type: list
+        description: "A list of dictionaries in which you define the Sgtk write
+                     nodes that will be added to the published nuke scripts.
+                     Each dictionary entry needs to have the following keys:
+                     channel - the value for the channel knob in the created node.
+                     name - the profile name of the write node to create."
+        allows_empty: True
+        values:
+            type: dict
+            items:
+                channel: { type: str }
+                name: { type: str }
+        description:
+
+
     # hooks
     hook_translate_template:
         type: hook
