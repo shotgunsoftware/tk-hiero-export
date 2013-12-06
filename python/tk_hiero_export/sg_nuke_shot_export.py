@@ -81,6 +81,12 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         self._resolved_export_path = None
         self._tk_version_number = None
 
+    def sequenceName(self):
+        # override getSequence from the resolver to be collate friendly
+        if getattr(self, '_collate', False):
+            return self._item.parentSequence().name()
+        return FnNukeShotExporter.NukeShotExporter.sequenceName(self)
+
     def taskStep(self):
         """
         Run Task
