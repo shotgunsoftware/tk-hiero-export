@@ -19,11 +19,12 @@ from hiero.exporters import FnTranscodeExporter
 from hiero.exporters import FnTranscodeExporterUI
 
 import tank
+import sgtk.util
 
 from .base import ShotgunHieroObjectBase
 
 
-class ShotgunTranscodeExporterUI(FnTranscodeExporterUI.TranscodeExporterUI):
+class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.TranscodeExporterUI):
     """
     Custom Preferences UI for the shotgun transcoder
 
@@ -108,6 +109,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self._resolved_export_path = self.resolvedExportPath()
             self._shot_name = self.shotName()
             self._sequence_name = self.sequenceName()
+            self._tk_version = self._formatTkVersionString(self.versionString())
 
             source = self._item.source()
             self._thumbnail = source.thumbnail(source.posterFrame())
@@ -118,6 +120,29 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         """ Finish Task """
         # run base class implementation
         FnTranscodeExporter.TranscodeExporter.finishTask(self)
+
+        # create publish
+        ctx = self.app.tank.context_from_path(self._resolved_export_path)
+        published_file_type = self.app.get_setting('plate_published_file_type')
+
+        args = {
+            "tk": self.app.tank,
+            "context": ctx,
+            "path": self._resolved_export_path,
+            "name": os.path.basename(self._resolved_export_path),
+            "version_number": int(self._tk_version),
+            "published_file_type": published_file_type,
+        }
+
+        # register publish;
+        self.app.log_debug("Register publish in shotgun: %s" % str(args))
+        pub_data = tank.util.register_publish(**args)
+
+        # upload thumbnail for publish
+        try:
+            self._upload_poster_frame(pub_data, self._project.sequences()[0])
+        except IndexError:
+            self.app.log_warning("Couldn't find sequence to upload thumbnail from")
 
         sg = self.app.shotgun
 
@@ -146,6 +171,12 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             "sg_path_to_movie": self._resolved_export_path,
             "code": file_name,
         }
+
+        published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
+        if published_file_entity_type == "PublishedFile":
+            data["published_files"] = [pub_data]
+        else:  # == "TankPublishedFile
+            data["tank_published_file"] = pub_data
 
         self.app.log_debug("Creating Shotgun Version %s" % str(data))
         vers = sg.create("Version", data)
