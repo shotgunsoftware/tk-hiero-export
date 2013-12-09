@@ -22,6 +22,11 @@ configuration:
         description: The string value of the Published File/Tank Type used for published plates.
         default_value: Hiero Plate
 
+    nuke_script_published_file_type:
+        type: tank_type
+        description: The string value of the Published File/Tank Type used for Nuke scripts.
+        default_value: Nuke Script
+
     nuke_script_toolkit_write_nodes:
         type: list
         description: "A list of dictionaries in which you define the Sgtk write

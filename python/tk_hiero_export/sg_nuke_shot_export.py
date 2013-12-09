@@ -106,21 +106,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         # register publish
         # get context we're publishing to
         ctx = self.app.tank.context_from_path(self._resolved_export_path)
-
-        # get the type of file we're publishing from multi-publish
-        published_file_type = None
-        multi_publish_settings = tank.platform.find_app_settings('tk-nuke', 'tk-multi-publish', self.app.tank, ctx)
-        if multi_publish_settings:
-            try:
-                published_file_type = multi_publish_settings[0]['settings'].get('primary_tank_type')
-            except:
-                pass
-        if not published_file_type:
-            self.app.log_error("No 'primary_tank_type' defined in tk-nuke:tk-multi-publish for "
-                               "context %s! This is used to determine the published file type "
-                               "value when publishing Nuke scripts during the export process. "
-                               "Continuing but this value will be blank on the PublishedFile "
-                               "record" % ctx)
+        published_file_type = self.app.get_setting('nuke_script_published_file_type')
 
         args = {
             "tk": self.app.tank,
@@ -142,8 +128,8 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 
     def _beforeNukeScriptWrite(self, script):
         """
-        Add HieroWriteTank Metadata Nodes for tk-nuke-writenode to use in order
-        to create full Tk WriteNodes in the Nuke environment
+        Add ShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to 
+        create full Tk WriteNodes in the Nuke environment
         """
         FnNukeShotExporter.NukeShotExporter._beforeNukeScriptWrite(self, script)
 
@@ -156,7 +142,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             node = nuke.MetadataNode(metadatavalues=metadata.items())
             node.setName('ShotgunWriteNodePlaceholder')
 
-            self.app.log_debug("Created HieroWriteTank MetadataNode Node: %s" % node._knobValues)
+            self.app.log_debug("Created ShotgunWriteNodePlaceholder Node: %s" % node._knobValues)
             script.addNode(node)
 
 
