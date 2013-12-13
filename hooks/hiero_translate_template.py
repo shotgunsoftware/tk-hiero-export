@@ -31,11 +31,12 @@ class HieroTranslateTemplate(Hook):
         """
         
         # first convert basic fields
+        # @todo: better solution for translating the Step token
         mapping = { "{Sequence}": "{sequence}",
                     "{Shot}": "{shot}",
                     "{name}": "{clip}",
                     "{version}": "{tk_version}",
-                    "{Step}": self.parent.settings['nuke_script_path_step'] }
+                    "{Step}": "Comp" }
         
         # get the string representation of the template object
         template_str = template.definition
@@ -44,7 +45,7 @@ class HieroTranslateTemplate(Hook):
         # the nuke script name is hard coded to ensure a valid template
         if output_type == 'script':
             template_str = template_str.replace('{name}', 'hiero')
-            
+
         for (orig, repl) in mapping.iteritems():
             template_str = template_str.replace(orig, repl)
 

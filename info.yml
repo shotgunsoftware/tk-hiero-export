@@ -9,14 +9,6 @@ configuration:
                      prior to running the export if you want.
         default_value: Basic shot template
 
-    nuke_script_path_step:
-        type: str
-        description: If the template pointed to by template_nuke_script_path
-                     contains the Step token, this value will be used for it.
-                     It should be set to the pipeline step that the nuke script
-                     is being delivered to.
-        default_value: Comp
-
     plate_published_file_type:
         type: tank_type
         description: The string value of the Published File/Tank Type used for published plates.
