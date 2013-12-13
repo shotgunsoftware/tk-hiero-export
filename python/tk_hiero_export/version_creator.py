@@ -139,10 +139,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         pub_data = tank.util.register_publish(**args)
 
         # upload thumbnail for publish
-        try:
-            self._upload_poster_frame(pub_data, self._project.sequences()[0])
-        except IndexError:
-            self.app.log_warning("Couldn't find sequence to upload thumbnail from")
+        self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
 
         sg = self.app.shotgun
 

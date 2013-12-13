@@ -41,27 +41,26 @@ class ShotgunHieroObjectBase(object):
         tk_version_str = version_template.apply_fields({'version': int(hiero_version_str[1:])})
         return tk_version_str
 
-    def _upload_poster_frame(self, sg_entity, source):
+    def _upload_thumbnail_to_sg(self, sg_entity, thumb_qimage):
         """
         Updates the thumbnail for an entity in Shotgun
         """
         import tempfile
         import uuid
 
-        thumbdir = tempfile.mkdtemp(prefix='hiero_process_nuke_script_')
+        thumbdir = tempfile.mkdtemp(prefix='hiero_process_thumbnail_')
         try:
-            path = "%s.png" % os.path.join(thumbdir, source.name())
-            poster = source.posterFrame()
-            thumb_qimage = source.thumbnail(poster)
+            path = "%s.png" % os.path.join(thumbdir, sg_entity.get('name', 'thumbnail'))
             # scale it down to 600px wide
             thumb_qimage_scaled = thumb_qimage.scaledToWidth(600, QtCore.Qt.SmoothTransformation)
             thumb_qimage_scaled.save(path)
             self.app.log_debug("Uploading thumbnail for %s %s..." % (sg_entity['type'], sg_entity['id']))
             self.app.shotgun.upload_thumbnail(sg_entity['type'], sg_entity['id'], path)
         except Exception, e:
-            self.app.log_info("Thumbnail for %s was not refreshed in Shotgun: %s" % (source, e))
+            self.app.log_info("Thumbnail for %s %s (#%s) was not refreshed in Shotgun: %s" % (sg_entity['type'], sg_entity.get('name'), sg_entity['id'], e))
         finally:
             shutil.rmtree(thumbdir)
+
 
 
 

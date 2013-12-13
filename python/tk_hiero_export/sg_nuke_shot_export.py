@@ -80,6 +80,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         FnNukeShotExporter.NukeShotExporter.__init__(self, initDict)
         self._resolved_export_path = None
         self._tk_version_number = None
+        self._thumbnail = None
 
     def sequenceName(self):
         # override getSequence from the resolver to be collate friendly
@@ -94,6 +95,10 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
             self._tk_version_number = self._formatTkVersionString(self.versionString())
+        
+        source = self._item.source()
+        self._thumbnail = source.thumbnail(source.posterFrame())
+        
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
     def finishTask(self):
@@ -121,10 +126,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         sg_publish = tank.util.register_publish(**args)
 
         # upload thumbnail for sequence
-        try:
-            self._upload_poster_frame(sg_publish, self._project.sequences()[0])
-        except IndexError:
-            self.app.log_warning("Couldn't find sequence to upload thumbnail from")
+        self._upload_thumbnail_to_sg(sg_publish, self._thumbnail)
 
     def _beforeNukeScriptWrite(self, script):
         """
