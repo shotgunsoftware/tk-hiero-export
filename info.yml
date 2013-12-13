@@ -48,8 +48,10 @@ configuration:
         type: hook
         description: "Called when a template needs to be translated into a Hiero
                      style replacement string.  First argument is the template
-                     to translate. The return value is the translated string."
-        parameters: [template]
+                     to translate. Second argument is a string describing the
+                     type of template being translated. The return value is the
+                     translated string."
+        parameters: [template, output_type]
         default_value: hiero_translate_template
 
     hook_upload_thumbnail:

@@ -102,13 +102,13 @@ class HieroExport(Application):
             render_template = self.get_template("template_render_path")
 
             # call the hook to translate them into hiero paths, using hiero keywords
-            plate_hiero_str = self.execute_hook("hook_translate_template", template=plate_template)
+            plate_hiero_str = self.execute_hook("hook_translate_template", template=plate_template, output_type='plate')
             self.log_debug("Translated %s --> %s" % (plate_template, plate_hiero_str))
 
-            script_hiero_str = self.execute_hook("hook_translate_template", template=script_template)
+            script_hiero_str = self.execute_hook("hook_translate_template", template=script_template, output_type='script')
             self.log_debug("Translated %s --> %s" % (script_template, script_hiero_str))
 
-            render_hiero_str = self.execute_hook("hook_translate_template", template=render_template)
+            render_hiero_str = self.execute_hook("hook_translate_template", template=render_template, output_type='render')
             self.log_debug("Translated %s --> %s" % (render_template, render_hiero_str))
 
             # check so that no unknown keywords exist in the templates after translation

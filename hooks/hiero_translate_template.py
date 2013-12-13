@@ -17,7 +17,7 @@ class HieroTranslateTemplate(Hook):
     Translates a template object into a hiero export string.
     """ 
     
-    def execute(self, template, **kwargs):
+    def execute(self, template, output_type, **kwargs):
         """
         Takes a sgtk template object as input and returns a string
         representation which is suitable for hiero exports. The hiero export templates
@@ -41,6 +41,10 @@ class HieroTranslateTemplate(Hook):
         template_str = template.definition
 
         # simple string to string replacement
+        # the nuke script name is hard coded to ensure a valid template
+        if output_type == 'script':
+            template_str = template_str.replace('{name}', 'hiero')
+            
         for (orig, repl) in mapping.iteritems():
             template_str = template_str.replace(orig, repl)
 
