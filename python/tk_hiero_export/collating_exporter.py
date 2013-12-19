@@ -25,6 +25,7 @@ class CollatingExporter(object):
         self._parentSequence = None
         self._collate = False
         self._hero = False
+        self._heroItem = False
 
         if properties is None:
             properties = self._preset.properties()
@@ -100,6 +101,7 @@ class CollatingExporter(object):
             return ((sys.maxint - item.timelineIn()) * 1000) + item.parent().trackIndex()
         heroItem = max(self._collatedItems, key=keyFunc)
         self._hero = (heroItem.guid() == self._item.guid())
+        self._heroItem = heroItem
 
         # Build a new sequence from the collated items
         newSequence = hiero.core.Sequence(self._item.name())
@@ -200,6 +202,9 @@ class CollatingExporter(object):
 
     def isHero(self):
         return self._hero
+
+    def heroItem(self):
+        return self._heroItem
 
     def finishTask(self):
         self._parentSequence = None

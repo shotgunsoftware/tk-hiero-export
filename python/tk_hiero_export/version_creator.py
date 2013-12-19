@@ -22,6 +22,7 @@ import tank
 import sgtk.util
 
 from .base import ShotgunHieroObjectBase
+from .collating_exporter import CollatingExporter, CollatedShotPreset
 
 
 class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.TranscodeExporterUI):
@@ -51,13 +52,14 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
         layout = QtGui.QVBoxLayout(top)
 
 
-class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodeExporter):
+class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodeExporter, CollatingExporter):
     """
     Create Transcode object and send to Shotgun
     """
     def __init__(self, initDict):
         """ Constructor """
         FnTranscodeExporter.TranscodeExporter.__init__(self, initDict)
+        CollatingExporter.__init__(self)
         self._resolved_export_path = None
         self._sequence_name = None
         self._shot_name = None
@@ -103,13 +105,28 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         self._script.addNode(movWriteNode)
 
+    def sequenceName(self):
+        """override default sequenceName() to handle collated shots"""
+        try:
+            if self.isCollated():
+                return self._parentSequence.name()
+            else:
+                return FnTranscodeExporter.TranscodeExporter.sequenceName(self)
+        except AttributeError:
+            return FnTranscodeExporter.TranscodeExporter.sequenceName(self)
+
     def taskStep(self):
         """ Run Task """
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
-            self._shot_name = self.shotName()
-            self._sequence_name = self.sequenceName()
             self._tk_version = self._formatTkVersionString(self.versionString())
+            self._sequence_name = self.sequenceName()
+
+            if self.isCollated() and not self.isHero():
+                heroItem = self.heroItem()
+                self._shot_name = heroItem.name()
+            else:
+                self._shot_name = self.shotName()
 
             source = self._item.source()
             self._thumbnail = source.thumbnail(source.posterFrame())
@@ -121,8 +138,22 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # run base class implementation
         FnTranscodeExporter.TranscodeExporter.finishTask(self)
 
+        sg = self.app.shotgun
+        # lookup current login
+        sg_current_user = tank.util.get_current_user(self.app.tank)
+        # lookup sequence
+        sg_sequence = sg.find_one("Sequence",
+                                  [["project", "is", self.app.context.project],
+                                   ["code", "is", self._sequence_name]])
+        sg_shot = None
+        if sg_sequence:
+            sg_shot = sg.find_one("Shot", [["sg_sequence", "is", sg_sequence], ["code", "is", self._shot_name]])
+        
         # create publish
-        ctx = self.app.tank.context_from_path(self._resolved_export_path)
+        ################
+        # by using entity instead of export path to get context, this ensures 
+        # collated plates get linked to the hero shot
+        ctx = self.app.tank.context_from_entity('Shot', sg_shot['id'])
         published_file_type = self.app.get_setting('plate_published_file_type')
 
         args = {
@@ -141,25 +172,12 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # upload thumbnail for publish
         self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
 
-        sg = self.app.shotgun
-
-        # lookup current login
-        sg_current_user = tank.util.get_current_user(self.app.tank)
-
-        # lookup sequence
-        sg_sequence = sg.find_one("Sequence",
-                                  [["project", "is", self.app.context.project],
-                                   ["code", "is", self._sequence_name]])
-        sg_shot = None
-        if sg_sequence:
-            sg_shot = sg.find_one("Shot", [["sg_sequence", "is", sg_sequence], ["code", "is", self._shot_name]])
-
-        # file name
+        # create version
+        ################
         file_name = os.path.basename(self._resolved_export_path)
         file_name = os.path.splitext(file_name)[0]
         file_name = file_name.capitalize()
 
-        # lookup seq/shot
         data = {
             "user": sg_current_user,
             "created_by": sg_current_user,
@@ -185,8 +203,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 shutil.rmtree(os.path.dirname(self._temp_quicktime))
 
 
-class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset):
+class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset):
     """ Settings for the shotgun transcode step """
     def __init__(self, name, properties):
         FnTranscodeExporter.TranscodePreset.__init__(self, name, properties)
         self._parentType = ShotgunTranscodeExporter
+        CollatedShotPreset.__init__(self, self.properties())
+        self.properties().update(properties)
+

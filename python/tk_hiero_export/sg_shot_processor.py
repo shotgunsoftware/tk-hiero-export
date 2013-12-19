@@ -44,6 +44,16 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # add a top level task to manage shotgun shots
         exportTemplate = self._exportTemplate.flatten()
         properties = self._preset.properties().get('shotgunShotCreateProperties', {})
+
+        # inject collate settings into Tasks where needed
+        collateTracks = properties.get('collateTracks', False)
+        collateShotNames = properties.get('collateShotNames', False)
+        for (itemPath, itemPreset) in exportTemplate:
+            if 'collateTracks' in itemPreset.properties():
+                itemPreset.properties()['collateTracks'] = collateTracks
+            if 'collateShotNames' in itemPreset.properties():
+                itemPreset.properties()['collateShotNames'] = collateShotNames
+
         exportTemplate.insert(0, (".shotgun", ShotgunShotUpdaterPreset(".shotgun", properties)))
         self._exportTemplate.restore(exportTemplate)
 
@@ -241,7 +251,7 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
                                                    ("On Hold", default_template),
                                                    ("Final", default_template)]
 
-        # finally, update the proerties based on the properties passed to the constructor
+        # finally, update the properties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})
         default_properties.update(explicit_constructor_properties)
 
