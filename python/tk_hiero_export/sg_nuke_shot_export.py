@@ -10,6 +10,7 @@
 
 import re
 import os
+import sys
 
 from PySide import QtGui
 from PySide import QtCore
@@ -17,6 +18,7 @@ from PySide import QtCore
 from hiero.core import nuke
 from hiero.exporters import FnNukeShotExporter
 from hiero.exporters import FnNukeShotExporterUI
+from .collating_exporter import CollatedShotPreset
 
 import tank
 from .base import ShotgunHieroObjectBase
@@ -81,6 +83,15 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         self._resolved_export_path = None
         self._tk_version_number = None
         self._thumbnail = None
+        self._hero = None
+        self._heroItem = None
+
+        if self._collate:
+            def keyFunc(item):
+                return ((sys.maxint - item.timelineIn()) * 1000) + item.parent().trackIndex()
+            heroItem = max(self._collatedItems, key=keyFunc)
+            self._hero = (heroItem.guid() == self._item.guid())
+            self._heroItem = heroItem
 
     def sequenceName(self):
         # override getSequence from the resolver to be collate friendly
@@ -107,6 +118,10 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         """
         # run base class implementation
         FnNukeShotExporter.NukeShotExporter.finishTask(self)
+        
+        # Don't create PublishedFiles for non-hero collated items
+        if self._collate and not self._hero:
+            return
 
         # register publish
         # get context we're publishing to
@@ -148,7 +163,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             script.addNode(node)
 
 
-class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset):
+class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset, CollatedShotPreset):
     """
     Settings for the shotgun transcode step
     """
@@ -156,7 +171,8 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
     def __init__(self, name, properties):
         FnNukeShotExporter.NukeShotPreset.__init__(self, name, properties)
         self._parentType = ShotgunNukeShotExporter
-
+        CollatedShotPreset.__init__(self, self.properties())
+        
         if "toolkitWriteNodes" in properties:
             # already taken care of by loading the preset
             return
