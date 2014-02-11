@@ -162,6 +162,12 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             for (row, name) in enumerate(names):
                 for (col, key) in enumerate(keys):
                     combo = tagTable.cellWidget(row, col+1)
+
+                    # if no tag mapped to a name
+                    if combo is None:
+                        continue
+
+                    # otherwise grab the text and keep it in the properties
                     select = combo.currentText()
                     propertyDicts[col][name] = (select and str(select) or None)
                     properties[key] = [(k, v) for (k, v) in propertyDicts[col].items() if v]
