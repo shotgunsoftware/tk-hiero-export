@@ -122,6 +122,10 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self._tk_version = self._formatTkVersionString(self.versionString())
             self._sequence_name = self.sequenceName()
 
+            # convert slashes to native os style..
+            self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
+
+
             if self.isCollated() and not self.isHero():
                 heroItem = self.heroItem()
                 self._shot_name = heroItem.name()

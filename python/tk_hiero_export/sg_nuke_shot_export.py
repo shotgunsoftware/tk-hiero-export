@@ -106,7 +106,11 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
             self._tk_version_number = self._formatTkVersionString(self.versionString())
-        
+
+            # convert slashes to native os style..
+            self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
+
+
         source = self._item.source()
         self._thumbnail = source.thumbnail(source.posterFrame())
         
