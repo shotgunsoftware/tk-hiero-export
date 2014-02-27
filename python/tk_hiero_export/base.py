@@ -37,8 +37,15 @@ class ShotgunHieroObjectBase(object):
     def _formatTkVersionString(self, hiero_version_str):
         """Reformat the Hiero version string to the tk format.
         """
+        try:
+            version_number = int(hiero_version_str[1:])
+        except ValueError:
+            # Version is sometimes a glob expression (when building tracks for example)
+            # in these cases, return the original string without the leading 'v'
+            return hiero_version_str[1:]
+
         version_template = self.app.get_template('template_version')
-        tk_version_str = version_template.apply_fields({'version': int(hiero_version_str[1:])})
+        tk_version_str = version_template.apply_fields({'version': version_number})
         return tk_version_str
 
     def _upload_thumbnail_to_sg(self, sg_entity, thumb_qimage):
