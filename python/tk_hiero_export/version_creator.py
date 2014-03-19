@@ -13,6 +13,7 @@ import shutil
 import tempfile
 
 from PySide import QtGui
+from PySide import QtCore
 
 from hiero.exporters import FnExternalRender
 from hiero.exporters import FnTranscodeExporter
@@ -36,15 +37,37 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
         self._displayName = "Shotgun Transcode Images"
         self._taskType = ShotgunTranscodeExporter
 
+    def create_version_changed(self, state):
+        create_version = (state == QtCore.Qt.Checked)
+        self._preset._properties["create_version"] = create_version
+
     def populateUI(self, widget, exportTemplate):
         # create a layout with custom top and bottom widgets
         layout = QtGui.QVBoxLayout(widget)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(9)
+
         top = QtGui.QWidget()
         middle = QtGui.QWidget()
         bottom = QtGui.QWidget()
         layout.addWidget(top)
         layout.addWidget(middle)
         layout.addWidget(bottom)
+
+        top_layout = QtGui.QVBoxLayout(top)
+        top_layout.setContentsMargins(9, 0, 9, 0)
+        create_version_checkbox = QtGui.QCheckBox("Create Shotgun Version", widget)
+        create_version_checkbox.setToolTip(
+            "Create a Version in Shotgun for this transcode.\n\n"
+            "If the output format is not a quicktime, then\n"
+            "a quicktime will be created.  The quicktime will\n"
+            "be uploaded to Shotgun as Screening Room media."
+            )
+        create_version_checkbox.setCheckState(QtCore.Qt.Checked)
+        if not self._preset._properties.get("create_version", True):
+            create_version_checkbox.setCheckState(QtCore.Qt.Unchecked)
+        create_version_checkbox.stateChanged.connect(self.create_version_changed)
+        top_layout.addWidget(create_version_checkbox)
 
         # populate the middle with the standard layout
         FnTranscodeExporterUI.TranscodeExporterUI.populateUI(self, middle, exportTemplate)
@@ -74,6 +97,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         """
         # Build the usual script
         FnTranscodeExporter.TranscodeExporter.buildScript(self)
+
+        # If we are not creating a version then we do not need the extra node
+        if not self._preset.properties()['create_version']:
+            return
+
         if self._preset.properties()['file_type'] == 'mov':
             # already outputting a mov file, use that for upload
             self._quicktime_path = self.resolvedExportPath()
@@ -143,8 +171,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         FnTranscodeExporter.TranscodeExporter.finishTask(self)
 
         sg = self.app.shotgun
-        # lookup current login
-        sg_current_user = tank.util.get_current_user(self.app.tank)
+
         # lookup sequence
         sg_sequence = sg.find_one("Sequence",
                                   [["project", "is", self.app.context.project],
@@ -152,10 +179,10 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         sg_shot = None
         if sg_sequence:
             sg_shot = sg.find_one("Shot", [["sg_sequence", "is", sg_sequence], ["code", "is", self._shot_name]])
-        
+
         # create publish
         ################
-        # by using entity instead of export path to get context, this ensures 
+        # by using entity instead of export path to get context, this ensures
         # collated plates get linked to the hero shot
         ctx = self.app.tank.context_from_entity('Shot', sg_shot['id'])
         published_file_type = self.app.get_setting('plate_published_file_type')
@@ -169,7 +196,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             "published_file_type": published_file_type,
         }
 
-        # register publish;
+        # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         pub_data = tank.util.register_publish(**args)
 
@@ -178,33 +205,38 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # create version
         ################
-        file_name = os.path.basename(self._resolved_export_path)
-        file_name = os.path.splitext(file_name)[0]
-        file_name = file_name.capitalize()
 
-        data = {
-            "user": sg_current_user,
-            "created_by": sg_current_user,
-            "entity": sg_shot,
-            "project": self.app.context.project,
-            "sg_path_to_movie": self._resolved_export_path,
-            "code": file_name,
-        }
+        if self._preset.properties()['create_version']:
+            # lookup current login
+            sg_current_user = tank.util.get_current_user(self.app.tank)
 
-        published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
-        if published_file_entity_type == "PublishedFile":
-            data["published_files"] = [pub_data]
-        else:  # == "TankPublishedFile
-            data["tank_published_file"] = pub_data
+            file_name = os.path.basename(self._resolved_export_path)
+            file_name = os.path.splitext(file_name)[0]
+            file_name = file_name.capitalize()
 
-        self.app.log_debug("Creating Shotgun Version %s" % str(data))
-        vers = sg.create("Version", data)
+            data = {
+                "user": sg_current_user,
+                "created_by": sg_current_user,
+                "entity": sg_shot,
+                "project": self.app.context.project,
+                "sg_path_to_movie": self._resolved_export_path,
+                "code": file_name,
+            }
 
-        if os.path.exists(self._quicktime_path):
-            self.app.log_debug("Uploading quicktime to Shotgun... (%s)" % self._quicktime_path)
-            sg.upload("Version", vers["id"], self._quicktime_path, "sg_uploaded_movie")
-            if self._temp_quicktime:
-                shutil.rmtree(os.path.dirname(self._temp_quicktime))
+            published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
+            if published_file_entity_type == "PublishedFile":
+                data["published_files"] = [pub_data]
+            else:  # == "TankPublishedFile
+                data["tank_published_file"] = pub_data
+
+            self.app.log_debug("Creating Shotgun Version %s" % str(data))
+            vers = sg.create("Version", data)
+
+            if os.path.exists(self._quicktime_path):
+                self.app.log_debug("Uploading quicktime to Shotgun... (%s)" % self._quicktime_path)
+                sg.upload("Version", vers["id"], self._quicktime_path, "sg_uploaded_movie")
+                if self._temp_quicktime:
+                    shutil.rmtree(os.path.dirname(self._temp_quicktime))
 
 
 class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset):
@@ -213,5 +245,9 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
         FnTranscodeExporter.TranscodePreset.__init__(self, name, properties)
         self._parentType = ShotgunTranscodeExporter
         CollatedShotPreset.__init__(self, self.properties())
+
+        # set default values
+        self._properties["create_version"] = True
+
         self.properties().update(properties)
 
