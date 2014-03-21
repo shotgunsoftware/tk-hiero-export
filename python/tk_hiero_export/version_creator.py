@@ -9,6 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import os
+import ast
 import shutil
 import tempfile
 
@@ -196,6 +197,20 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             "published_file_type": published_file_type,
         }
 
+        # see if we get a task to use
+        task = None
+        try:
+            task_filter = self.app.get_setting("default_task_filter", "[]")
+            task_filter = ast.literal_eval(task_filter)
+            task_filter.append(["entity", "is", sg_shot])
+            tasks = self.app.shotgun.find("Task", task_filter)
+            if len(tasks) == 1:
+                task = tasks[0]
+                args["task"] = task
+        except ValueError:
+            # continue without task
+            self.parent.log_error("Invalid value for 'default_task_filter'")
+
         # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         pub_data = tank.util.register_publish(**args)
@@ -222,6 +237,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 "sg_path_to_movie": self._resolved_export_path,
                 "code": file_name,
             }
+
+            if task is not None:
+                data["sg_task"] = task
 
             published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
             if published_file_entity_type == "PublishedFile":

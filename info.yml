@@ -47,6 +47,21 @@ configuration:
             description: { type: str }
       default_value: []
 
+    default_task_filter:
+        type: str
+        description: "A filter that will return the task in the Shot that publishes will
+                     be registered against.  This value must be a valid filter that can be
+                     passed to the find method of the Shotgun api, without a condition for
+                     entity (a value linking entity to the Shot will be added at publish
+                     time).  If the filter contains a condition in the form
+                     ['step.Step.code', 'is', VALUE], then whatver VALUE is will be used
+                     by the default translate_template hook as the value to use when
+                     expanding {Step} in the publish templates.  If the filter results
+                     in a single task, then any publishes created by the app will be
+                     associated with that task.  Otherwise they will only be associated
+                     with the Shot."
+        default_value: "[['step.Step.code', 'is', 'Comp']]"
+
     # hooks
     hook_translate_template:
         type: hook
