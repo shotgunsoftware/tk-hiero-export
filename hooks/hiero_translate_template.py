@@ -8,6 +8,8 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights 
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
+import ast
+
 from tank import Hook
 import tank.templatekey
 
@@ -29,15 +31,26 @@ class HieroTranslateTemplate(Hook):
         validated to check that no leftover template fields are present and that the 
         returned path is fully understood by hiero. 
         """
-        
+
         # first convert basic fields
-        # @todo: better solution for translating the Step token
-        mapping = { "{Sequence}": "{sequence}",
-                    "{Shot}": "{shot}",
-                    "{name}": "{clip}",
-                    "{version}": "{tk_version}",
-                    "{Step}": "Comp" }
-        
+        mapping = {
+            "{Sequence}": "{sequence}",
+            "{Shot}": "{shot}",
+            "{name}": "{clip}",
+            "{version}": "{tk_version}",
+        }
+
+        # see if we have a value to use for Step
+        try:
+            task_filter = self.parent.get_setting("default_task_filter", "[]")
+            task_filter = ast.literal_eval(task_filter)
+            for (field, op, value) in task_filter:
+                if field == "step.Step.code":
+                    mapping["{Step}"] = value
+        except ValueError:
+            # continue without Step
+            self.parent.log_error("Invalid value for 'default_task_filter'")
+
         # get the string representation of the template object
         template_str = template.definition
 

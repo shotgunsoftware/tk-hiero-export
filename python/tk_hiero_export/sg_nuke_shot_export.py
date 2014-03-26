@@ -11,6 +11,7 @@
 import re
 import os
 import sys
+import ast
 
 from PySide import QtGui
 from PySide import QtCore
@@ -140,6 +141,19 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             "version_number": int(self._tk_version_number),
             "published_file_type": published_file_type,
         }
+
+        # see if we get a task to use
+        if (ctx.entity is not None) and (ctx.entity.get("type", "") == "Shot"):
+            try:
+                task_filter = self.app.get_setting("default_task_filter", "[]")
+                task_filter = ast.literal_eval(task_filter)
+                task_filter.append(["entity", "is", ctx.entity])
+                tasks = self.app.shotgun.find("Task", task_filter)
+                if len(tasks) == 1:
+                    args["task"] = tasks[0]
+            except ValueError:
+                # continue without task
+                self.parent.log_error("Invalid value for 'default_task_filter'")
 
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         sg_publish = tank.util.register_publish(**args)
