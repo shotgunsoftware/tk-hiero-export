@@ -117,11 +117,20 @@ class HieroExport(Application):
             self._validate_hiero_export_template(render_hiero_str)
 
             # and set the default properties to be based off of those templates
+
+            # Set the default file type to be consistent with the operating system
+            if sys.platform.startswith("linux"):
+                file_type = "ffmpeg"
+                file_options = {"format": "MOV format (mov)", "bitrate": 2000000}
+            else:
+                file_type = "mov"
+                file_options = {}
+
             properties = {
                 "exportTemplate": (
-                    (script_hiero_str, ShotgunNukeShotPreset("", {'readPaths': [], 'writePaths': []})),
-                    (render_hiero_str, FnExternalRender.NukeRenderPreset("", {'file_type': 'dpx', 'dpx': {'datatype' : '10 bit'}})),
-                    (plate_hiero_str, ShotgunTranscodePreset("", {'file_type': 'mov', 'mov': {}})),
+                    (script_hiero_str, ShotgunNukeShotPreset("", {"readPaths": [], "writePaths": []})),
+                    (render_hiero_str, FnExternalRender.NukeRenderPreset("", {"file_type": "dpx", "dpx": {"datatype": "10 bit"}})),
+                    (plate_hiero_str, ShotgunTranscodePreset("", {"file_type": file_type, file_type: file_options})),
                 )
             }
             preset = ShotgunShotProcessorPreset(name, properties)

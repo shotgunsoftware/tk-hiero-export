@@ -10,6 +10,7 @@
 
 import os
 import ast
+import sys
 import shutil
 import tempfile
 
@@ -103,7 +104,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         if not self._preset.properties()['create_version']:
             return
 
-        if self._preset.properties()['file_type'] == 'mov':
+        if self._preset.properties()['file_type'] in ["mov", "ffmpeg"]:
             # already outputting a mov file, use that for upload
             self._quicktime_path = self.resolvedExportPath()
             self._temp_quicktime = False
@@ -120,15 +121,23 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             framerate = self._clip.framerate()
 
         preset = FnTranscodeExporter.TranscodePreset("Qt Write", self._preset.properties())
-        preset.properties().update({
-            'file_type': u'mov',
-            'mov': {
-                'codec': 'avc1\tH.264',
-                'quality': 3,
-                'settingsString': 'H.264, High Quality',
-                'keyframerate': 1,
-            }
-        })
+
+        # insert the appropriate file type for the operating system
+        if sys.platform.startswith("linux"):
+            preset.properties().update({
+                "file_type": u"ffmpeg",
+                "ffmpeg": {"format": u"MOV format (mov)", "bitrate": 2000000},
+            })
+        else:
+            preset.properties().update({
+                "file_type": u"mov",
+                "mov": {
+                    "codec": "avc1\tH.264",
+                    "quality": 3,
+                    "settingsString": "H.264, High Quality",
+                    "keyframerate": 1,
+                }
+            })
         movWriteNode = FnExternalRender.createWriteNode(self._quicktime_path,
             preset, nodeName, framerate=framerate, projectsettings=self._projectSettings)
 
@@ -209,7 +218,8 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 args["task"] = task
         except ValueError:
             # continue without task
-            self.parent.log_error("Invalid value for 'default_task_filter'")
+            setting = self.app.get_setting("default_task_filter", "[]")
+            self.app.log_error("Invalid value for 'default_task_filter': %s" % setting)
 
         # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
@@ -254,7 +264,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 self.app.log_debug("Uploading quicktime to Shotgun... (%s)" % self._quicktime_path)
                 sg.upload("Version", vers["id"], self._quicktime_path, "sg_uploaded_movie")
                 if self._temp_quicktime:
-                    shutil.rmtree(os.path.dirname(self._temp_quicktime))
+                    shutil.rmtree(os.path.dirname(self._quicktime_path))
 
 
 class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset):
