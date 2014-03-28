@@ -113,6 +113,22 @@ configuration:
         parameters: [keyword, task]
         default_value: hiero_resolve_custom_strings
 
+    hook_get_quicktime_settings:
+        type: hook
+        description: "Called when generating the default settings for creating
+                     a quicktime.  The argument is a boolean that is True when
+                     the resulting quicktime is only for upload to Shotgun and
+                     False when the settings are used for a default Quicktime
+                     transcode.
+
+                     The return value is a tuple of two items.  The first is a
+                     string that is the file_type for the Nuke write node that
+                     will be generated.  The second is a dictionary where the
+                     keys are knob names for the write node, and the values are
+                     the corresponding node values."
+        parameters: [for_shotgun]
+        default_value: hiero_get_quicktime_settings
+
     # paths
     template_plate_path:
         type: template

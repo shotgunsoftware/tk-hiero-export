@@ -117,11 +117,14 @@ class HieroExport(Application):
             self._validate_hiero_export_template(render_hiero_str)
 
             # and set the default properties to be based off of those templates
+
+            # Set the quicktime defaults per our hook
+            file_type, file_options = self.execute_hook("hook_get_quicktime_settings", for_shotgun=False)
             properties = {
                 "exportTemplate": (
-                    (script_hiero_str, ShotgunNukeShotPreset("", {'readPaths': [], 'writePaths': []})),
-                    (render_hiero_str, FnExternalRender.NukeRenderPreset("", {'file_type': 'dpx', 'dpx': {'datatype' : '10 bit'}})),
-                    (plate_hiero_str, ShotgunTranscodePreset("", {'file_type': 'mov', 'mov': {}})),
+                    (script_hiero_str, ShotgunNukeShotPreset("", {"readPaths": [], "writePaths": []})),
+                    (render_hiero_str, FnExternalRender.NukeRenderPreset("", {"file_type": "dpx", "dpx": {"datatype": "10 bit"}})),
+                    (plate_hiero_str, ShotgunTranscodePreset("", {"file_type": file_type, file_type: file_options})),
                 )
             }
             preset = ShotgunShotProcessorPreset(name, properties)
