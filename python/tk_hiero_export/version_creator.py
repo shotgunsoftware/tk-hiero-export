@@ -122,26 +122,17 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         preset = FnTranscodeExporter.TranscodePreset("Qt Write", self._preset.properties())
 
-        # insert the appropriate file type for the operating system
-        if sys.platform.startswith("linux"):
-            preset.properties().update({
-                "file_type": u"ffmpeg",
-                "ffmpeg": {"format": u"MOV format (mov)", "bitrate": 2000000},
-            })
-        else:
-            preset.properties().update({
-                "file_type": u"mov",
-                "mov": {
-                    "codec": "avc1\tH.264",
-                    "quality": 3,
-                    "settingsString": "H.264, High Quality",
-                    "keyframerate": 1,
-                }
-            })
-        movWriteNode = FnExternalRender.createWriteNode(self._quicktime_path,
+        # insert the write node to generate the quicktime
+        file_type, properties = self.app.execute_hook("hook_get_quicktime_settings", for_shotgun=True)
+        preset.properties().update({
+            "file_type": file_type,
+            file_type: properties,
+        })
+
+        mov_write_node = FnExternalRender.createWriteNode(self._quicktime_path,
             preset, nodeName, framerate=framerate, projectsettings=self._projectSettings)
 
-        self._script.addNode(movWriteNode)
+        self._script.addNode(mov_write_node)
 
     def sequenceName(self):
         """override default sequenceName() to handle collated shots"""

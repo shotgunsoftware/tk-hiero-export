@@ -118,14 +118,8 @@ class HieroExport(Application):
 
             # and set the default properties to be based off of those templates
 
-            # Set the default file type to be consistent with the operating system
-            if sys.platform.startswith("linux"):
-                file_type = "ffmpeg"
-                file_options = {"format": "MOV format (mov)", "bitrate": 2000000}
-            else:
-                file_type = "mov"
-                file_options = {}
-
+            # Set the quicktime defaults per our hook
+            file_type, file_options = self.execute_hook("hook_get_quicktime_settings", for_shotgun=False)
             properties = {
                 "exportTemplate": (
                     (script_hiero_str, ShotgunNukeShotPreset("", {"readPaths": [], "writePaths": []})),
