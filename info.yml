@@ -24,7 +24,7 @@ configuration:
         description: "A list of dictionaries in which you define the Sgtk write
                      nodes that will be added to the published nuke scripts.
                      Each dictionary entry needs to have the following keys:
-                     channel - the value for the channel knob in the created node.
+                     channel - the value for the 'output' knob in the created node.
                      name - the profile name of the write node to create."
         allows_empty: True
         values:

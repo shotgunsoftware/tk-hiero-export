@@ -169,8 +169,8 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         FnNukeShotExporter.NukeShotExporter._beforeNukeScriptWrite(self, script)
 
         for toolkit_specifier in self._preset.properties()["toolkitWriteNodes"]:
-            # break down a string like 'Toolkit Node: Mono Dpx ("editorial")' into name and channel
-            match = re.match("^Toolkit Node: (?P<name>.+) \(\"(?P<channel>.+)\"\)",
+            # break down a string like 'Toolkit Node: Mono Dpx ("editorial")' into name and output
+            match = re.match("^Toolkit Node: (?P<name>.+) \(\"(?P<output>.+)\"\)",
                 toolkit_specifier)
 
             metadata = match.groupdict()
