@@ -133,12 +133,18 @@ class HieroExport(Application):
 
     def _validate_hiero_export_template(self, template_str):
         """
-        Validate that a template_str only contains hiero substitution keywords.
+        Validate that a template_str only contains Hiero substitution keywords or custom 
+        keywords created via the resolve_custom_strings hook.
         """
-        hiero_keywords = ["{%s}" % x for x in HIERO_SUBSTITUTION_KEYWORDS]
-        for x in hiero_keywords:
+        # build list of valid tokens
+        custom_substitution_keywords = [x['keyword'] for x in self.get_setting('custom_template_fields')]
+        valid_substitution_keywords = HIERO_SUBSTITUTION_KEYWORDS + custom_substitution_keywords
+        hiero_resolver_tokens = ["{%s}" % x for x in valid_substitution_keywords]
+        # replace all tokens we know about in the template
+        for x in hiero_resolver_tokens:
             template_str = template_str.replace(x, "")
-        # find any {xyz}
+        
+        # find any remaining {xyz} tokens in the template
         regex = r"(?<={)[a-zA-Z_ 0-9]+(?=})"
         key_names = re.findall(regex, template_str)
         if len(key_names) > 0:
