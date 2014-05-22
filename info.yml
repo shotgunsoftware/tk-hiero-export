@@ -37,8 +37,12 @@ configuration:
     custom_template_fields:
       type: list
       description: "A list of custom strings to add to Hiero's resolver.
-                   Each item needs to be translated to a resolved string
-                   by the resolve custom strings hook."
+                   Each item is a dictionary specifying the keyword to be
+                   replaced and a description for that keyword that will show
+                   up in the tooltip for the export tree.  A valid entry will
+                   look like '{keyword: a_keyword, description: This is a keyword}'.
+                   Each keyword needs to be translated to a resolved string by the
+                   resolve custom strings hook."
       allows_empty: True
       values:
         type: dict
