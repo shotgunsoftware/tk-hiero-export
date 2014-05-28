@@ -144,7 +144,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         except AttributeError:
             return FnTranscodeExporter.TranscodeExporter.sequenceName(self)
 
-    def taskStep(self):
+    def startTask(self):
         """ Run Task """
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
@@ -154,17 +154,24 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             # convert slashes to native os style..
             self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
 
+        # call the get_shot hook
+        if self.app.shot_count == 0:
+            self.app.preprocess_data = {}
 
-            if self.isCollated() and not self.isHero():
-                heroItem = self.heroItem()
-                self._shot_name = heroItem.name()
-            else:
-                self._shot_name = self.shotName()
+        # associate publishes with correct shot, which will be the hero item
+        # if we are collating
+        if self.isCollated() and not self.isHero():
+            item = self.heroItem()
+        else:
+            item = self._item
 
-            source = self._item.source()
-            self._thumbnail = source.thumbnail(source.posterFrame())
+        # store the shot for use in finishTask
+        self._sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=item, data=self.app.preprocess_data)
 
-        return FnTranscodeExporter.TranscodeExporter.taskStep(self)
+        source = self._item.source()
+        self._thumbnail = source.thumbnail(source.posterFrame())
+
+        return FnTranscodeExporter.TranscodeExporter.startTask(self)
 
     def finishTask(self):
         """ Finish Task """
@@ -173,19 +180,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         sg = self.app.shotgun
 
-        # lookup sequence
-        sg_sequence = sg.find_one("Sequence",
-                                  [["project", "is", self.app.context.project],
-                                   ["code", "is", self._sequence_name]])
-        sg_shot = None
-        if sg_sequence:
-            sg_shot = sg.find_one("Shot", [["sg_sequence", "is", sg_sequence], ["code", "is", self._shot_name]])
-
         # create publish
         ################
         # by using entity instead of export path to get context, this ensures
         # collated plates get linked to the hero shot
-        ctx = self.app.tank.context_from_entity('Shot', sg_shot['id'])
+        ctx = self.app.tank.context_from_entity('Shot', self._sg_shot['id'])
         published_file_type = self.app.get_setting('plate_published_file_type')
 
         args = {
@@ -202,7 +201,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         try:
             task_filter = self.app.get_setting("default_task_filter", "[]")
             task_filter = ast.literal_eval(task_filter)
-            task_filter.append(["entity", "is", sg_shot])
+            task_filter.append(["entity", "is", self._sg_shot])
             tasks = self.app.shotgun.find("Task", task_filter)
             if len(tasks) == 1:
                 task = tasks[0]
@@ -233,7 +232,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             data = {
                 "user": sg_current_user,
                 "created_by": sg_current_user,
-                "entity": sg_shot,
+                "entity": self._sg_shot,
                 "project": self.app.context.project,
                 "sg_path_to_movie": self._resolved_export_path,
                 "code": file_name,
@@ -269,4 +268,3 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
         self._properties["create_version"] = True
 
         self.properties().update(properties)
-
