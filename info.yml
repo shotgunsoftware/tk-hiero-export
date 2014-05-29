@@ -133,6 +133,16 @@ configuration:
         parameters: [for_shotgun]
         default_value: hiero_get_quicktime_settings
 
+    hook_update_version_data:
+        type: hook
+        description: "Called before creating a Version in Shotgun for a transcode.
+                     The default values for the version will already be filled in
+                     in the version_data dictionary.  Modify this dictionary to
+                     change what will be passed as an argument to the Shotgun API
+                     create call."
+        parameters: [version_data, task]
+        default_value: hiero_update_version_data
+
     # paths
     template_plate_path:
         type: template

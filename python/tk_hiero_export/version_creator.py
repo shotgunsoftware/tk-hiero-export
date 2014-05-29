@@ -155,6 +155,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
 
         # call the get_shot hook
+        ########################
         if self.app.shot_count == 0:
             self.app.preprocess_data = {}
 
@@ -168,6 +169,50 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # store the shot for use in finishTask
         self._sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=item, data=self.app.preprocess_data)
 
+        # populate the data dictionary for our Version while the item is still valid
+        ##############################
+        # see if we get a task to use
+        self._sg_task = None
+        try:
+            task_filter = self.app.get_setting("default_task_filter", "[]")
+            task_filter = ast.literal_eval(task_filter)
+            task_filter.append(["entity", "is", self._sg_shot])
+            tasks = self.app.shotgun.find("Task", task_filter)
+            if len(tasks) == 1:
+                self._sg_task = tasks[0]
+        except ValueError:
+            # continue without task
+            setting = self.app.get_setting("default_task_filter", "[]")
+            self.app.log_error("Invalid value for 'default_task_filter': %s" % setting)
+
+        if self._preset.properties()['create_version']:
+            # lookup current login
+            sg_current_user = tank.util.get_current_user(self.app.tank)
+
+            file_name = os.path.basename(self._resolved_export_path)
+            file_name = os.path.splitext(file_name)[0]
+            file_name = file_name.capitalize()
+
+            self._version_data = {
+                "user": sg_current_user,
+                "created_by": sg_current_user,
+                "entity": self._sg_shot,
+                "project": self.app.context.project,
+                "sg_path_to_movie": self._resolved_export_path,
+                "code": file_name,
+            }
+
+            if self._sg_task is not None:
+                self._version_data["sg_task"] = self._sg_task
+
+            # call the update version hook to allow for customization
+            self.app.execute_hook(
+                "hook_update_version_data",
+                version_data=self._version_data,
+                task=self)
+
+        # figure out the thumbnail frame
+        ##########################
         source = self._item.source()
         self._thumbnail = source.thumbnail(source.posterFrame())
 
@@ -177,8 +222,6 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         """ Finish Task """
         # run base class implementation
         FnTranscodeExporter.TranscodeExporter.finishTask(self)
-
-        sg = self.app.shotgun
 
         # create publish
         ################
@@ -196,20 +239,8 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             "published_file_type": published_file_type,
         }
 
-        # see if we get a task to use
-        task = None
-        try:
-            task_filter = self.app.get_setting("default_task_filter", "[]")
-            task_filter = ast.literal_eval(task_filter)
-            task_filter.append(["entity", "is", self._sg_shot])
-            tasks = self.app.shotgun.find("Task", task_filter)
-            if len(tasks) == 1:
-                task = tasks[0]
-                args["task"] = task
-        except ValueError:
-            # continue without task
-            setting = self.app.get_setting("default_task_filter", "[]")
-            self.app.log_error("Invalid value for 'default_task_filter': %s" % setting)
+        if self._sg_task is not None:
+            args["task"] = self._sg_task
 
         # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
@@ -220,39 +251,19 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # create version
         ################
-
         if self._preset.properties()['create_version']:
-            # lookup current login
-            sg_current_user = tank.util.get_current_user(self.app.tank)
-
-            file_name = os.path.basename(self._resolved_export_path)
-            file_name = os.path.splitext(file_name)[0]
-            file_name = file_name.capitalize()
-
-            data = {
-                "user": sg_current_user,
-                "created_by": sg_current_user,
-                "entity": self._sg_shot,
-                "project": self.app.context.project,
-                "sg_path_to_movie": self._resolved_export_path,
-                "code": file_name,
-            }
-
-            if task is not None:
-                data["sg_task"] = task
-
             published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
             if published_file_entity_type == "PublishedFile":
-                data["published_files"] = [pub_data]
+                self._version_data["published_files"] = [pub_data]
             else:  # == "TankPublishedFile
-                data["tank_published_file"] = pub_data
+                self._version_data["tank_published_file"] = pub_data
 
-            self.app.log_debug("Creating Shotgun Version %s" % str(data))
-            vers = sg.create("Version", data)
+            self.app.log_debug("Creating Shotgun Version %s" % str(self._version_data))
+            vers = self.app.shotgun.create("Version", self._version_data)
 
             if os.path.exists(self._quicktime_path):
                 self.app.log_debug("Uploading quicktime to Shotgun... (%s)" % self._quicktime_path)
-                sg.upload("Version", vers["id"], self._quicktime_path, "sg_uploaded_movie")
+                self.app.shotgun.upload("Version", vers["id"], self._quicktime_path, "sg_uploaded_movie")
                 if self._temp_quicktime:
                     shutil.rmtree(os.path.dirname(self._quicktime_path))
 
