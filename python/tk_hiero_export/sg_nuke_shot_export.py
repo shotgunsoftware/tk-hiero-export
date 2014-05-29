@@ -153,7 +153,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
                     args["task"] = tasks[0]
             except ValueError:
                 # continue without task
-                self.parent.log_error("Invalid value for 'default_task_filter'")
+                self.app.log_error("Invalid value for 'default_task_filter'")
 
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         sg_publish = tank.util.register_publish(**args)
