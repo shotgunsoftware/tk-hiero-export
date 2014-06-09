@@ -64,7 +64,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
 
         # get rid of our placeholder
-        exportTemplate.pop()
+        exportTemplate.pop(0)
         self._exportTemplate.restore(exportTemplate)
 
     def populateUI(self, widget, exportItems, editMode=None):
