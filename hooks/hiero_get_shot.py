@@ -26,49 +26,55 @@ class HieroGetShot(Hook):
         # grab shot from Shotgun
         sg = self.parent.shotgun
         filt = [
-            ['project', 'is', self.parent.context.project],
-            ['sg_sequence', 'is', sequence],
-            ['code', 'is', item.name()],
+            ["project", "is", self.parent.context.project],
+            ["sg_sequence", "is", sequence],
+            ["code", "is", item.name()],
         ]
-        shots = sg.find('Shot', filt)
+        fields = kwargs.get("fields", [])
+        shots = sg.find("Shot", filt, fields=fields)
         if len(shots) > 1:
             # can not handle multiple shots with the same name
             raise StandardError("Multiple shots named '%s' found", item.name())
         if len(shots) == 0:
             # create shot in shotgun
             shot_data = {
-                'code': item.name(),
-                'sg_sequence': sequence,
-                'project': self.parent.context.project,
+                "code": item.name(),
+                "sg_sequence": sequence,
+                "project": self.parent.context.project,
             }
-            shot = sg.create('Shot', shot_data)
+            shot = sg.create("Shot", shot_data)
             self.parent.log_info("Created Shot in Shotgun: %s" % shot_data)
         else:
             shot = shots[0]
 
         # update the thumbnail for the shot
-        self.parent.execute_hook("hook_upload_thumbnail",
-            entity=shot, source=item.source(), item=item, task=kwargs.get('task'))
+        self.parent.execute_hook(
+            "hook_upload_thumbnail",
+            entity=shot,
+            source=item.source(),
+            item=item,
+            task=kwargs.get("task")
+        )
 
         return shot
 
     def _get_sequence(self, item, data):
         """Return the shotgun sequence for the given Hiero items"""
         # stick a lookup cache on the data object.
-        if not 'seq_cache' in data:
-            data['seq_cache'] = {}
+        if "seq_cache" not in data:
+            data["seq_cache"] = {}
 
         hiero_sequence = item.parentSequence()
-        if hiero_sequence.guid() in data['seq_cache']:
-            return data['seq_cache'][hiero_sequence.guid()]
+        if hiero_sequence.guid() in data["seq_cache"]:
+            return data["seq_cache"][hiero_sequence.guid()]
 
         # sequence not found in cache, grab it from Shotgun
         sg = self.parent.shotgun
         filt = [
-            ['project', 'is', self.parent.context.project],
-            ['code', 'is', hiero_sequence.name()],
+            ["project", "is", self.parent.context.project],
+            ["code", "is", hiero_sequence.name()],
         ]
-        sequences = sg.find('Sequence', filt)
+        sequences = sg.find("Sequence", filt)
         if len(sequences) > 1:
             # can not handle multiple sequences with the same name
             raise StandardError("Multiple sequences named '%s' found" % hiero_sequence.name())
@@ -76,10 +82,10 @@ class HieroGetShot(Hook):
         if len(sequences) == 0:
             # create the sequence in shotgun
             seq_data = {
-                'code': hiero_sequence.name(),
-                'project': self.parent.context.project,
+                "code": hiero_sequence.name(),
+                "project": self.parent.context.project,
             }
-            sequence = sg.create('Sequence', seq_data)
+            sequence = sg.create("Sequence", seq_data)
             self.parent.log_info("Created Sequence in Shotgun: %s" % seq_data)
         else:
             sequence = sequences[0]
@@ -88,6 +94,6 @@ class HieroGetShot(Hook):
         self.parent.execute_hook("hook_upload_thumbnail", entity=sequence, source=hiero_sequence, item=None)
 
         # cache the results
-        data['seq_cache'][hiero_sequence.guid()] = sequence
+        data["seq_cache"][hiero_sequence.guid()] = sequence
 
         return sequence

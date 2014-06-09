@@ -26,24 +26,26 @@ class HieroResolveCustomStrings(Hook):
         """
         shot_code = task._item.name()
 
-        # grab the shot from the cache, or from Shotgun if it is not cached
+        # grab the shot from the cache, or the get_shot hook if not cached
         sg_shot = self._sg_lookup_cache.get(shot_code)
         if sg_shot is None:
             fields = [ctf['keyword'] for ctf in self.parent.get_setting('custom_template_fields')]
-            sg_shot = self.parent.shotgun.find_one(
-                "Shot",
-                [['code', 'is', shot_code], ['project', 'is', self.parent.context.project]],
-                fields,
+            sg_shot = self.parent.execute_hook(
+                "hook_get_shot",
+                task=task,
+                item=task._item,
+                data=self.parent.preprocess_data,
+                fields=fields,
             )
 
             self._sg_lookup_cache[shot_code] = sg_shot
 
         if sg_shot is None:
-            raise RuntimeError("Could not find shot for custom resolver: %s" % shot_code)
+            raise RuntimeError("Could not find shot for custom resolver: %s" % keyword)
 
         # strip off the leading and trailing curly brackets
         keyword = keyword[1:-1]
-        result = sg_shot.get(keyword, '')
+        result = sg_shot.get(keyword, "")
 
         self.parent.log_debug("Custom resolver: %s[%s] -> %s" % (shot_code, keyword, result))
 
