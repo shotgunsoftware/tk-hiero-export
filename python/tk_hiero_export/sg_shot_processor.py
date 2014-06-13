@@ -64,7 +64,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
 
         # get rid of our placeholder
-        exportTemplate.pop()
+        exportTemplate.pop(0)
         self._exportTemplate.restore(exportTemplate)
 
     def populateUI(self, widget, exportItems, editMode=None):
@@ -263,6 +263,13 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
 
     def addUserResolveEntries(self, resolver):
         self.app.log_debug('Adding custom resolver tk_version')
+
+        # the following hook can end up pulling shots from the get_shot hook,
+        # so initialize the cache that is used to store the values from that
+        # hook.
+        if not hasattr(self.app, "preprocess_data"):
+            self.app.preprocess_data = {}
+
         resolver.addResolver("{tk_version}", "Version string formatted by Shotgun Toolkit.", 
                              lambda keyword, task: self._formatTkVersionString(task.versionString()))
 
