@@ -36,6 +36,7 @@ class HieroResolveCustomStrings(Hook):
                 item=task._item,
                 data=self.parent.preprocess_data,
                 fields=fields,
+                upload_thumbnail=False,
             )
 
             self._sg_lookup_cache[shot_code] = sg_shot

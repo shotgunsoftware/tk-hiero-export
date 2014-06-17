@@ -48,13 +48,15 @@ class HieroGetShot(Hook):
             shot = shots[0]
 
         # update the thumbnail for the shot
-        self.parent.execute_hook(
-            "hook_upload_thumbnail",
-            entity=shot,
-            source=item.source(),
-            item=item,
-            task=kwargs.get("task")
-        )
+        upload_thumbnail = kwargs.get("upload_thumbnail", True)
+        if upload_thumbnail:
+            self.parent.execute_hook(
+                "hook_upload_thumbnail",
+                entity=shot,
+                source=item.source(),
+                item=item,
+                task=kwargs.get("task")
+            )
 
         return shot
 
