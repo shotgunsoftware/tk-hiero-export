@@ -143,6 +143,15 @@ configuration:
         parameters: [version_data, task]
         default_value: hiero_update_version_data
 
+    hook_get_extra_publish_data:
+        type: hook
+        description: "Called before creating a PublishedFile in Shotgun for a transcode.
+                     This hook should return None if there is no extra info to
+                     associate with the published file, or a dictionary that is
+                     compatible with the Shotgun API's update method."
+        parameters: [task]
+        default_value: hiero_get_extra_publish_data
+
     # paths
     template_plate_path:
         type: template

@@ -117,6 +117,14 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
+    def startTask(self):
+        """ Run Task """
+        # call the publish data hook to allow for publish customization
+        self._extra_publish_data = self.app.execute_hook(
+            "hook_get_extra_publish_data", task=self)
+
+        return FnNukeShotExporter.NukeShotExporter.startTask(self)
+
     def finishTask(self):
         """
         Finish Task
@@ -157,6 +165,15 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         sg_publish = tank.util.register_publish(**args)
+        if self._extra_publish_data is not None:
+            self.app.log_debug("Updating Shotgun PublishedFile %s" % str(self._extra_publish_data))
+            self.app.shotgun.update(sg_publish["type"], sg_publish["id"], self._extra_publish_data)
+
+        # call the publish data hook to allow for publish customization
+        extra_publish_data = self.app.execute_hook("hook_get_extra_publish_data", task=self)
+        if extra_publish_data is not None:
+            self.app.log_debug("Updating Shotgun PublishedFile %s" % str(extra_publish_data))
+            self.app.shotgun.update(sg_publish["type"], sg_publish["id"], extra_publish_data)
 
         # upload thumbnail for sequence
         self._upload_thumbnail_to_sg(sg_publish, self._thumbnail)

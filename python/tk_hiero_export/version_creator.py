@@ -211,6 +211,10 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 version_data=self._version_data,
                 task=self)
 
+        # call the publish data hook to allow for publish customization
+        self._extra_publish_data = self.app.execute_hook(
+            "hook_get_extra_publish_data", task=self)
+
         # figure out the thumbnail frame
         ##########################
         source = self._item.source()
@@ -245,6 +249,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         pub_data = tank.util.register_publish(**args)
+        if self._extra_publish_data is not None:
+            self.app.log_debug("Updating Shotgun PublishedFile %s" % str(self._extra_publish_data))
+            self.app.shotgun.update(pub_data["type"], pub_data["id"], self._extra_publish_data)
 
         # upload thumbnail for publish
         self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
