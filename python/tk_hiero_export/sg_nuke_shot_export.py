@@ -34,6 +34,10 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
         self._displayName = "Shotgun Nuke Project File"
         self._taskType = ShotgunNukeShotExporter
 
+        a = QtGui.QMessageBox()
+        a.setText('testing... A')
+        b = a._exec()
+
     def populateUI(self, widget, exportTemplate):
         FnNukeShotExporterUI.NukeShotExporterUI.populateUI(self, widget, exportTemplate)
 

@@ -13,3 +13,4 @@ from .sg_shot_processor import ShotgunShotProcessor, ShotgunShotProcessorPreset
 from .shot_updater import ShotgunShotUpdater, ShotgunShotUpdaterPreset
 from .version_creator import ShotgunTranscodeExporterUI, ShotgunTranscodeExporter, ShotgunTranscodePreset
 from .sg_nuke_shot_export import ShotgunNukeShotExporterUI, ShotgunNukeShotExporter, ShotgunNukeShotPreset
+from .sg_audio_export import ShotgunAudioExporterUI, ShotgunAudioExporter, ShotgunAudioPreset

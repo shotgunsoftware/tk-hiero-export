@@ -38,12 +38,15 @@ from tk_hiero_export import ShotgunShotUpdater
 from tk_hiero_export import ShotgunShotProcessor
 from tk_hiero_export import ShotgunTranscodePreset
 from tk_hiero_export import ShotgunNukeShotPreset
+from tk_hiero_export import ShotgunAudioPreset
 from tk_hiero_export import ShotgunShotUpdaterPreset
 from tk_hiero_export import ShotgunTranscodeExporter
 from tk_hiero_export import ShotgunNukeShotExporter
+from tk_hiero_export import ShotgunAudioExporter
 from tk_hiero_export import ShotgunShotProcessorPreset
 from tk_hiero_export import ShotgunTranscodeExporterUI
 from tk_hiero_export import ShotgunNukeShotExporterUI
+from tk_hiero_export import ShotgunAudioExporterUI
 from tk_hiero_export import ShotgunHieroObjectBase
 sys.path.pop()
 
@@ -71,10 +74,12 @@ class HieroExport(Application):
         hiero.core.taskRegistry.registerTask(ShotgunShotUpdaterPreset, ShotgunShotUpdater)
         hiero.core.taskRegistry.registerTask(ShotgunTranscodePreset, ShotgunTranscodeExporter)
         hiero.core.taskRegistry.registerTask(ShotgunNukeShotPreset, ShotgunNukeShotExporter)
+        hiero.core.taskRegistry.registerTask(ShotgunAudioPreset, ShotgunAudioExporter)
         hiero.core.taskRegistry.registerProcessor(ShotgunShotProcessorPreset, ShotgunShotProcessor)
 
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunTranscodePreset, ShotgunTranscodeExporterUI)
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunNukeShotPreset, ShotgunNukeShotExporterUI)
+        hiero.ui.taskUIRegistry.registerTaskUI(ShotgunAudioPreset, ShotgunAudioExporterUI)
         hiero.ui.taskUIRegistry.registerProcessorUI(ShotgunShotProcessorPreset, ShotgunShotProcessor)
 
         # Add our default preset
