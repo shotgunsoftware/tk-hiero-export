@@ -28,16 +28,13 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
     """
     def __init__(self, preset):
         FnAudioExportUI.AudioExportUI.__init__(self, preset)
-        a = QtGui.QMessageBox()
-        a.setText('testing...')
-        b = a._exec()
         self._displayName = "Shotgun Audio Export"
         self._taskType = ShotgunAudioExporter
 
     def populateUI(self, widget, exportTemplate):
         FnAudioExportUI.AudioExportUI.populateUI(self, widget, exportTemplate)
 
-class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExporterTask.AudioExportTask):
+class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask):
     """
     Create Audio object and send to Shotgun
     """
@@ -45,15 +42,15 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExporterTask.AudioExpo
         """
         Constructor
         """
-        FnAudioExporterTask.AudioExportTask.__init__(self, initDict)
+        FnAudioExportTask.AudioExportTask.__init__(self, initDict)
 
 
-class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExporterTask.AudioExportPreset):
+class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset):
     """
     Settings for the shotgun audio export step
     """
 
     def __init__(self, name, properties):
-        FnAudioExporterTask.AudioExportPreset.__init__(self, name, properties)
+        FnAudioExportTask.AudioExportPreset.__init__(self, name, properties)
         self._parentType = ShotgunAudioExporter
         

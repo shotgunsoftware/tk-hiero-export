@@ -24,7 +24,6 @@ from .collating_exporter import CollatedShotPreset
 import tank
 from .base import ShotgunHieroObjectBase
 
-
 class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
     """
     Custom Preferences UI for the shotgun nuke shot exporter
@@ -33,10 +32,6 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
         FnNukeShotExporterUI.NukeShotExporterUI.__init__(self, preset)
         self._displayName = "Shotgun Nuke Project File"
         self._taskType = ShotgunNukeShotExporter
-
-        a = QtGui.QMessageBox()
-        a.setText('testing... A')
-        b = a._exec()
 
     def populateUI(self, widget, exportTemplate):
         FnNukeShotExporterUI.NukeShotExporterUI.populateUI(self, widget, exportTemplate)
