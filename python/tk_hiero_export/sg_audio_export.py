@@ -19,8 +19,12 @@ from PySide import QtCore
 from hiero.exporters import FnAudioExportTask
 from hiero.exporters import FnAudioExportUI
 
-import tank
+import sgtk
 from .base import ShotgunHieroObjectBase
+from .collating_exporter import CollatingExporter, CollatedShotPreset
+
+from hiero import core
+
 
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
     """
@@ -44,8 +48,131 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         """
         FnAudioExportTask.AudioExportTask.__init__(self, initDict)
 
+        self._resolved_export_path = None
+        self._sequence_name = None
+        self._thumbnail = None
+        self._do_publish = self._item.mediaType() is core.TrackItem.MediaType.kVideo
 
-class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset):
+    def startTask(self):
+        """ Run Task """
+        if self._resolved_export_path is None:
+            self._resolved_export_path = self.resolvedExportPath()
+            self._tk_version = self._formatTkVersionString(self.versionString())
+            self._sequence_name = self.sequenceName()
+
+            # convert slashes to native os style..
+            self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
+
+        # associate publishes with correct shot, which will be the hero item
+        # if we are collating
+        item = self._item
+
+        # store the shot for use in finishTask
+        self._sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=item, data=self.app.preprocess_data)
+
+        ##############################
+        # see if we get a task to use
+        self._sg_task = None
+        try:
+            task_filter = self.app.get_setting("default_task_filter", "[]")
+            task_filter = ast.literal_eval(task_filter)
+            task_filter.append(["entity", "is", self._sg_shot])
+            tasks = self.app.shotgun.find("Task", task_filter)
+            if len(tasks) == 1:
+                self._sg_task = tasks[0]
+        except ValueError:
+            # continue without task
+            setting = self.app.get_setting("default_task_filter", "[]")
+            self.app.log_error("Invalid value for 'default_task_filter': %s" % setting)
+
+        if self._preset.properties()['create_version']:
+            # lookup current login
+            sg_current_user = sgtk.util.get_current_user(self.app.tank)
+
+            file_name = os.path.basename(self._resolved_export_path)
+            file_name = os.path.splitext(file_name)[0]
+            file_name = file_name.capitalize()
+
+            self._version_data = {
+                "user": sg_current_user,
+                "created_by": sg_current_user,
+                "entity": self._sg_shot,
+                "project": self.app.context.project,
+                "sg_path_to_movie": self._resolved_export_path,     # TODO: path_to_AUDIO
+                "code": file_name,
+            }
+
+            if self._sg_task is not None:
+                self._version_data["sg_task"] = self._sg_task
+
+            # call the update version hook to allow for customization
+            self.app.execute_hook(
+                "hook_update_version_data",
+                version_data=self._version_data,
+                task=self)
+
+        # figure out the thumbnail frame
+        ##########################
+        source = self._item.source()
+        self._thumbnail = source.thumbnail(source.posterFrame())
+
+        return FnAudioExportTask.AudioExportTask.startTask(self)
+
+    def finishTask(self):
+        """ Finish Task """
+        # run base class implementation
+        FnAudioExportTask.AudioExportTask.finishTask(self)
+
+        # Only publish combined audio. This is done by only publishing video track output
+        if self._do_publish:
+            self._publish()
+
+    def _publish(self):
+        """
+        Publish task output.
+        """
+        ctx = self.app.tank.context_from_entity('Shot', self._sg_shot['id'])
+        published_file_type = self.app.get_setting('audio_published_file_type')
+        if published_file_type is None:
+            published_file_type = "Hiero Audio"
+
+        args = {
+            "tk": self.app.tank,
+            "context": ctx,
+            "path": self._resolved_export_path,
+            "name": os.path.basename(self._resolved_export_path),
+            "version_number": int(self._tk_version),
+            "published_file_type": published_file_type,
+        }
+
+        if self._sg_task is not None:
+            args["task"] = self._sg_task
+
+        # register publish
+        self.app.log_debug("Register publish in shotgun: %s" % str(args))
+        pub_data = sgtk.util.register_publish(**args)
+
+        # upload thumbnail for publish
+        self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
+
+        # create version
+        ################
+        if self._preset.properties()['create_version']:
+            published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
+            if published_file_entity_type == "PublishedFile":
+                self._version_data["published_files"] = [pub_data]
+            else:  # == "TankPublishedFile
+                self._version_data["tank_published_file"] = pub_data
+
+            self.app.log_debug("Creating Shotgun Version %s" % str(self._version_data))
+            vers = self.app.shotgun.create("Version", self._version_data)
+
+            if os.path.exists(self._resolved_export_path):
+                self.app.log_debug("Uploading audio to Shotgun... (%s)" % self._resolved_export_path)
+                self.app.shotgun.upload("Version", vers["id"], self._resolved_export_path, "sg_uploaded_movie")
+
+
+class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset, CollatedShotPreset):
     """
     Settings for the shotgun audio export step
     """
@@ -53,4 +180,9 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
     def __init__(self, name, properties):
         FnAudioExportTask.AudioExportPreset.__init__(self, name, properties)
         self._parentType = ShotgunAudioExporter
+        CollatedShotPreset.__init__(self, self.properties())
         
+        # set default values
+        self._properties["create_version"] = True
+
+        self.properties().update(properties)
