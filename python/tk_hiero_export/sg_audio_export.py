@@ -38,7 +38,7 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
     def populateUI(self, widget, exportTemplate):
         FnAudioExportUI.AudioExportUI.populateUI(self, widget, exportTemplate)
 
-class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask):
+class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask, CollatingExporter):
     """
     Create Audio object and send to Shotgun
     """
@@ -47,11 +47,22 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         Constructor
         """
         FnAudioExportTask.AudioExportTask.__init__(self, initDict)
+        CollatingExporter.__init__(self)
 
         self._resolved_export_path = None
         self._sequence_name = None
         self._thumbnail = None
         self._do_publish = self._item.mediaType() is core.TrackItem.MediaType.kVideo
+
+    def sequenceName(self):
+        """override default sequenceName() to handle collated shots"""
+        try:
+            if self.isCollated():
+                return self._parentSequence.name()
+            else:
+                return FnAudioExportTask.AudioExportTask.sequenceName(self)
+        except AttributeError:
+            return FnAudioExportTask.AudioExportTask.sequenceName(self)
 
     def startTask(self):
         """ Run Task """
@@ -63,9 +74,17 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
             # convert slashes to native os style..
             self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
 
+        # call the get_shot hook
+        ########################
+        if self.app.shot_count == 0:
+            self.app.preprocess_data = {}
+
         # associate publishes with correct shot, which will be the hero item
         # if we are collating
-        item = self._item
+        if self.isCollated() and not self.isHero():
+            item = self.heroItem()
+        else:
+            item = self._item
 
         # store the shot for use in finishTask
         self._sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=item, data=self.app.preprocess_data)
@@ -176,7 +195,6 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
     """
     Settings for the shotgun audio export step
     """
-
     def __init__(self, name, properties):
         FnAudioExportTask.AudioExportPreset.__init__(self, name, properties)
         self._parentType = ShotgunAudioExporter
