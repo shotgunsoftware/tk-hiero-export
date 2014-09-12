@@ -104,32 +104,6 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
             setting = self.app.get_setting("default_task_filter", "[]")
             self.app.log_error("Invalid value for 'default_task_filter': %s" % setting)
 
-        if self._preset.properties()['create_version']:
-            # lookup current login
-            sg_current_user = sgtk.util.get_current_user(self.app.tank)
-
-            file_name = os.path.basename(self._resolved_export_path)
-            file_name = os.path.splitext(file_name)[0]
-            file_name = file_name.capitalize()
-
-            self._version_data = {
-                "user": sg_current_user,
-                "created_by": sg_current_user,
-                "entity": self._sg_shot,
-                "project": self.app.context.project,
-                "sg_path_to_movie": self._resolved_export_path,     # TODO: path_to_AUDIO
-                "code": file_name,
-            }
-
-            if self._sg_task is not None:
-                self._version_data["sg_task"] = self._sg_task
-
-            # call the update version hook to allow for customization
-            self.app.execute_hook(
-                "hook_update_version_data",
-                version_data=self._version_data,
-                task=self)
-
         # figure out the thumbnail frame
         ##########################
         source = self._item.source()
@@ -174,23 +148,6 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         # upload thumbnail for publish
         self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
 
-        # create version
-        ################
-        if self._preset.properties()['create_version']:
-            published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
-            if published_file_entity_type == "PublishedFile":
-                self._version_data["published_files"] = [pub_data]
-            else:  # == "TankPublishedFile
-                self._version_data["tank_published_file"] = pub_data
-
-            self.app.log_debug("Creating Shotgun Version %s" % str(self._version_data))
-            vers = self.app.shotgun.create("Version", self._version_data)
-
-            if os.path.exists(self._resolved_export_path):
-                self.app.log_debug("Uploading audio to Shotgun... (%s)" % self._resolved_export_path)
-                self.app.shotgun.upload("Version", vers["id"], self._resolved_export_path, "sg_uploaded_movie")
-
-
 class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset, CollatedShotPreset):
     """
     Settings for the shotgun audio export step
@@ -199,8 +156,3 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
         FnAudioExportTask.AudioExportPreset.__init__(self, name, properties)
         self._parentType = ShotgunAudioExporter
         CollatedShotPreset.__init__(self, self.properties())
-        
-        # set default values
-        self._properties["create_version"] = True
-
-        self.properties().update(properties)
