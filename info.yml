@@ -9,6 +9,11 @@ configuration:
                      prior to running the export if you want.
         default_value: Basic shot template
 
+    audio_published_file_type:
+        type: tank_type
+        description: The string value of the Published File/Tank Type used for published audio.
+        default_value: Hiero Audio
+
     plate_published_file_type:
         type: tank_type
         description: The string value of the Published File/Tank Type used for published plates.

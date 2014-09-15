@@ -35,9 +35,6 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
         self._displayName = "Shotgun Audio Export"
         self._taskType = ShotgunAudioExporter
 
-    def populateUI(self, widget, exportTemplate):
-        FnAudioExportUI.AudioExportUI.populateUI(self, widget, exportTemplate)
-
 class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask, CollatingExporter):
     """
     Create Audio object and send to Shotgun
@@ -52,6 +49,8 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         self._resolved_export_path = None
         self._sequence_name = None
         self._thumbnail = None
+
+        # Only publish combined audio. This is done by only publishing video track output
         self._do_publish = self._item.mediaType() is core.TrackItem.MediaType.kVideo
 
     def sequenceName(self):
@@ -116,7 +115,6 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         # run base class implementation
         FnAudioExportTask.AudioExportTask.finishTask(self)
 
-        # Only publish combined audio. This is done by only publishing video track output
         if self._do_publish:
             self._publish()
 
@@ -125,9 +123,7 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         Publish task output.
         """
         ctx = self.app.tank.context_from_entity('Shot', self._sg_shot['id'])
-        published_file_type = self.app.get_setting('audio_published_file_type')
-        if published_file_type is None:
-            published_file_type = "Hiero Audio"
+        published_file_type = self.app.get_setting('audio_published_file_type', "Hiero Audio")
 
         args = {
             "tk": self.app.tank,
