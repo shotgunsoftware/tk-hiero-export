@@ -24,7 +24,6 @@ from .collating_exporter import CollatedShotPreset
 import tank
 from .base import ShotgunHieroObjectBase
 
-
 class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
     """
     Custom Preferences UI for the shotgun nuke shot exporter
