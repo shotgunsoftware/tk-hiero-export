@@ -24,6 +24,7 @@ from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter, CollatedShotPreset
 
 from hiero import core
+from hiero.core import *
 
 
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
@@ -109,6 +110,28 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         self._thumbnail = source.thumbnail(source.posterFrame())
 
         return FnAudioExportTask.AudioExportTask.startTask(self)
+
+    def taskStep(self):
+        if self.isCollated():
+            self._audioFile = self.resolvedExportPath()
+
+            filename, ext = os.path.splitext(self._audioFile)
+            if ext.lower() != ".wav":
+              self._audioFile = filename + ".wav"
+
+            if isinstance(self._item, Sequence):
+              start, end = self.sequenceInOutPoints(self._item, 0, self._item.duration() - 1)
+
+              # If sequence, write out full length
+              self._item.writeAudioToFile(self._audioFile, start, end)
+
+            elif isinstance(self._item, TrackItem):
+              handles = self._cutHandles if self._cutHandles is not None else 0
+              start, end = (self._item.timelineIn() - handles), (self._item.timelineOut() + handles) + 1
+              # If trackitem write out just the audio within the cut
+              self._sequence.writeAudioToFile(self._audioFile, start, end)
+        
+        return FnAudioExportTask.AudioExportTask.taskStep(self)
 
     def finishTask(self):
         """ Finish Task """

@@ -20,7 +20,7 @@ class CollatingExporter(object):
         # When building a collated sequence, everything is offset by 1000
         # This gives head room for shots which may go negative when transposed to a
         # custom start frame. This offset should be negated during script generation.
-        self.HEAD_ROOM_OFFSET = 1000
+        self.HEAD_ROOM_OFFSET = 0
 
         self._parentSequence = None
         self._collate = False
@@ -106,12 +106,17 @@ class CollatingExporter(object):
         # Build a new sequence from the collated items
         newSequence = hiero.core.Sequence(self._item.name())
 
+        # Useful for debugging, add cloned collated sequence to Project
+        hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
+
         # Copy tags from sequence to clone
         for tag in self._sequence.tags():
             newSequence.addTag(hiero.core.Tag(tag))
 
         # Apply the format of the master shot to the whole sequence
+        # NOTE: Shouldn't it be taken from self._sequence instead? Multiple clips can have different resolution/formats
         newSequence.setFormat(self._clip.format())
+        newSequence.setFramerate(self._clip.framerate())
 
         offset = self._item.sourceIn() - self._item.timelineIn()
         if self._startFrame is not None:
@@ -132,6 +137,7 @@ class CollatingExporter(object):
                 sequenceOut = trackitem.timelineOut()
 
         newTracks = {}
+        audioTracks = {}
         for trackitem in self._collatedItems:
             parentTrack = trackitem.parentTrack()
 
@@ -146,6 +152,25 @@ class CollatingExporter(object):
                     trackClone.addTag(hiero.core.Tag(tag))
 
             trackItemClone = trackitem.clone()
+            
+            # Copy audio for track item
+            linkedItems = trackitem.linkedItems()
+            newAudio = {}
+            for item in linkedItems:
+                if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
+                    audioParentTrack = item.parentTrack()
+
+                    if audioParentTrack.guid() not in audioTracks:
+                        audioTrackClone = hiero.core.AudioTrack(audioParentTrack.name())
+                        audioTracks[audioParentTrack.guid()] = audioTrackClone
+                        newSequence.addTrack(audioTrackClone)
+                    
+                    audioItemClone = item.clone()
+                    trackItemClone.link(audioItemClone)
+
+                    if audioParentTrack.guid() not in newAudio: 
+                        newAudio[audioParentTrack.guid()] = []
+                    newAudio[audioParentTrack.guid()].append(audioItemClone)
 
             # extend any shots
             if self._cutHandles is not None:
@@ -156,17 +181,31 @@ class CollatingExporter(object):
 
                 if trackItemClone.timelineIn() <= sequenceIn and handleIn:
                     trackItemClone.trimIn(-handleIn)
+                    for item in trackItemClone.linkedItems(): 
+                        if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
+                            item.trimIn(-handleIn)
                     hiero.core.log.debug("Expanding %s in by %i frames" % (trackItemClone.name(), handleIn))
                 if trackItemClone.timelineOut() >= sequenceOut and handleOut:
                     trackItemClone.trimOut(-handleOut)
+                    for item in trackItemClone.linkedItems(): 
+                        if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
+                            item.trimOut(-handleOut)
                     hiero.core.log.debug("Expanding %s out by %i frames" % (trackItemClone.name(), handleOut))
 
             trackItemClone.setTimelineOut(trackItemClone.timelineOut() + self.HEAD_ROOM_OFFSET + offset)
             trackItemClone.setTimelineIn(trackItemClone.timelineIn() + self.HEAD_ROOM_OFFSET + offset)
 
+            for item in trackItemClone.linkedItems():
+                if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
+                    item.setTimelineOut(item.timelineOut() + self.HEAD_ROOM_OFFSET + offset)
+                    item.setTimelineIn(item.timelineIn() + self.HEAD_ROOM_OFFSET + offset)
+
             # Add Cloned track item to cloned track
             try:
                 newTracks[parentTrack.guid()].addItem(trackItemClone)
+                for trackGuid in newAudio.keys():
+                    for item in newAudio[trackGuid]:
+                        audioTracks[trackGuid].addItem(audioItemClone)
             except Exception as e:
                 clash = newTracks[parentTrack.guid()].items()[0]
                 error = "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n" % (trackItemClone.name(), trackItemClone.timelineIn(), trackItemClone.timelineOut(), clash.name(), clash.timelineIn(), clash.timelineOut())
@@ -186,9 +225,6 @@ class CollatingExporter(object):
             posterFrame = base.posterFrame()
             if posterFrame:
                 newSequence.setPosterFrame(heroItem.timelineIn() + posterFrame + self.HEAD_ROOM_OFFSET + offset)
-
-        # Useful for debugging, add cloned collated sequence to Project
-        # hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
 
         # Use this newly built sequence instead
         self._parentSequence = self._sequence
