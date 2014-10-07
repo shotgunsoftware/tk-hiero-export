@@ -114,6 +114,8 @@ class CollatingExporter(object):
         # Apply the format of the master shot to the whole sequence
         # NOTE: Shouldn't it be taken from self._sequence instead? Multiple clips can have different resolution/formats
         newSequence.setFormat(self._clip.format())
+        
+        # Note: Without correct framerate, audio comes out silent when manually exporting the sequence.
         newSequence.setFramerate(self._clip.framerate())
 
         offset = self._item.sourceIn() - self._item.timelineIn()
@@ -126,6 +128,8 @@ class CollatingExporter(object):
 
             # The offset required to shift the timeline position to the custom start frame.
             offset = self._startFrame - self._item.timelineIn()
+        
+        # NOTE: For testing without any offsets..
         #offset = 0
 
         sequenceIn, sequenceOut = sys.maxint, 0
@@ -137,7 +141,6 @@ class CollatingExporter(object):
 
         newTracks = {}
         audioTracks = {}
-        tmpitem = None
         for trackitem in self._collatedItems:
             parentTrack = trackitem.parentTrack()
 
@@ -171,8 +174,10 @@ class CollatingExporter(object):
                     
                     audioItemClone = item.clone()
                     trackItemClone.link(audioItemClone)
-                    start, end = (audioItemClone.timelineIn()), (audioItemClone.timelineOut()) + 1
-                    print "Collating item: ", item.guid(), " -- cloned: ", audioItemClone.guid(), " - export range: [{start}, {end}]".format(start=start, end=end)
+                    
+                    # NOTE: Temp debug prints
+                    #start, end = (audioItemClone.timelineIn()), (audioItemClone.timelineOut()) + 1
+                    #print "Collating item: ", item.guid(), " -- cloned: ", audioItemClone.guid(), " - export range: [{start}, {end}]".format(start=start, end=end)
 
                     if audioParentTrack.guid() not in newAudio: 
                         newAudio[audioParentTrack.guid()] = []
@@ -212,7 +217,6 @@ class CollatingExporter(object):
                 for trackGuid in newAudio.keys():
                     for item in newAudio[trackGuid]:
                         audioTracks[trackGuid].addItem(item)
-                        tmpitem = item
             except Exception as e:
                 clash = newTracks[parentTrack.guid()].items()[0]
                 error = "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n" % (trackItemClone.name(), trackItemClone.timelineIn(), trackItemClone.timelineOut(), clash.name(), clash.timelineIn(), clash.timelineOut())
@@ -225,8 +229,6 @@ class CollatingExporter(object):
         # Use in/out point to constrain output framerange to track item range
         newSequence.setInTime(max(0, (sequenceIn + offset + self.HEAD_ROOM_OFFSET) - handles))
         newSequence.setOutTime((sequenceOut + offset + self.HEAD_ROOM_OFFSET) + handles)
-        print "Collating export range: [{start}, {end}]  --- {id}".format(start=newSequence.inTime(), end=newSequence.outTime(), id=id(self))
-        print "New sequence guid: ", newSequence.guid(), " replaces --> ", self._sequence.guid()
 
         # Copy posterFrame from Hero item to sequence
         base = heroItem.source()
@@ -243,11 +245,10 @@ class CollatingExporter(object):
         self._parentSequence = self._sequence
         self._sequence = newSequence
 
-        handles = self._cutHandles if self._cutHandles is not None else 0
-        start, end = (newSequence.inTime() - handles), (newSequence.outTime() + handles) + 1
-        print "Collating Audio export range (track): [{start}, {end}] -- handles: {handles} -- {id}".format(start=start, end=end, handles=handles, id=tmpitem.guid())
-        # If trackitem write out just the audio within the cut
-        newSequence.writeAudioToFile("m:/shotgun/tmp" + str(id(newSequence)) + ".wav", start, end)
+        # NOTE: Testing newSequence output (comes out silent..)
+        #start, end = (newSequence.inTime() - handles), (newSequence.outTime() + handles) + 1
+        #print "Collating Audio export range (track): [{start}, {end}] -- handles: {handles} -- {id}".format(start=start, end=end, handles=handles, id=tmpitem.guid())
+        #newSequence.writeAudioToFile("m:/shotgun/tmp" + str(id(newSequence)) + ".wav", start, end)
 
     def isCollated(self):
         return self._collate
