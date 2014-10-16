@@ -257,6 +257,8 @@ class CollatingExporter(object):
 
         # Use this newly built sequence instead
         self._parentSequence = self._sequence
+
+        # Need to use the sequence clone here, otherwise audio becomes silent for unknown reasons.
         self._sequence = newSequence.clone()
 
     def isCollated(self):
