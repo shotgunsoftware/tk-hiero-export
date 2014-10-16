@@ -111,60 +111,32 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
 
         return FnAudioExportTask.AudioExportTask.startTask(self)
 
-    # Temporarily overwritten from FnAudioExportTask to test things out...
     def taskStep(self):
-      if self.isCollated() and not self.isHero():
-        item = self.heroItem()
-      else:
-        item = self._item
-  
-      # Write out the audio bounce down
-      if isinstance(item, (Sequence, TrackItem)):
-        if self._sequenceHasAudio(self._sequence):
-          self._audioFile = self.resolvedExportPath()
-  
-          filename, ext = os.path.splitext(self._audioFile)
-          if ext.lower() != ".wav":
-            self._audioFile = filename + ".wav"
-  
-          if isinstance(item, Sequence):
-            start, end = self.sequenceInOutPoints(item, 0, item.duration() - 1)
-  
-            # If sequence, write out full length
-            item.writeAudioToFile(self._audioFile, start, end)
-  
-          elif isinstance(item, TrackItem):
-            handles = self._cutHandles if self._cutHandles is not None else 0
-            start, end = (item.timelineIn() - handles), (item.timelineOut() + handles) + 1
+        '''
+        Overridden method to allow proper timings for audio export
+        '''
+        if self.isCollated() and not self.isHero():
+            item = self.heroItem()
+        else:
+            item = self._item
 
-            # NOTE: Should actually be these timings.. The item/heroItem are in fact the original track items
-            timein, timeout = self.collatedOutputRange()
-            print "Timein: ", timein, " / ", timeout
+        if item.guid() in self._collatedItemsMap:
+            item = self._collatedItemsMap[item.guid()]
 
-            # If trackitem write out just the audio within the cut
-            self._sequence.writeAudioToFile(self._audioFile, start, end)
-  
-      elif isinstance(item, Clip):
-        # If item is clip, we're writing out the clip audio not the whole sequence
-        if item.mediaSource().hasAudio():
-          self._audioFile = self.resolvedExportPath()
-  
-          if (os.path.splitext(self._audioFile)[1]).lower() != ".wav":
-            self._audioFile += ".wav"
-  
-          # If sequence or clip, write out full length
-          item.writeAudioToFile(self._audioFile)
-  
-  
-      self._finished = True
-  
-      return False
+        # Call parent method with swapped items in order to get proper timings
+        original = self._item
+        self._item = item
+        
+        result = FnAudioExportTask.AudioExportTask.taskStep(self)
+
+        self._item = original
+
+        return result
 
     def finishTask(self):
         """ Finish Task """
         # run base class implementation
         FnAudioExportTask.AudioExportTask.finishTask(self)
-        print "Finishing: ", id(self)
 
         if self._do_publish:
             self._publish()

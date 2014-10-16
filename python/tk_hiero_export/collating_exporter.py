@@ -27,6 +27,7 @@ class CollatingExporter(object):
         self._collate = False
         self._hero = False
         self._heroItem = False
+        self._collatedItemsMap = {}
 
         if properties is None:
             properties = self._preset.properties()
@@ -40,6 +41,36 @@ class CollatingExporter(object):
                 self._collate = True
                 # Build the sequence of collated shots
                 self._buildCollatedSequence(properties)
+
+    def _offsetTimelineLinked(self, trackItem, offset):
+        '''
+        Offset timeline for trackitem and it's linked audio items
+        '''
+        trackItem.setTimelineOut(trackItem.timelineOut() + offset)
+        trackItem.setTimelineIn(trackItem.timelineIn() + offset)
+
+        for item in trackItem.linkedItems():
+            if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
+                item.setTimelineOut(item.timelineOut() + offset)
+                item.setTimelineIn(item.timelineIn() + offset)
+
+    def _trimInLinked(self, trackitem, value):
+        '''
+        Trim In trackitem and it's linked audio items
+        '''
+        trackItem.trimIn(value)
+        for item in trackItem.linkedItems(): 
+            if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
+                item.trimIn(value)
+
+    def _trimOutLinked(self, trackitem, value):
+        '''
+        Trim Out trackitem and it's linked audio items
+        '''
+        trackItem.trimOut(value)
+        for item in trackItem.linkedItems(): 
+            if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
+                item.trimOut(value)
 
     def _collatedItems(self, properties):
         """
@@ -129,9 +160,6 @@ class CollatingExporter(object):
             # The offset required to shift the timeline position to the custom start frame.
             offset = self._startFrame - self._item.timelineIn()
         
-        # NOTE: For testing without any offsets..
-        #offset = 0
-
         sequenceIn, sequenceOut = sys.maxint, 0
         for trackitem in self._collatedItems:
             if trackitem.timelineIn() <= sequenceIn:
@@ -155,6 +183,7 @@ class CollatingExporter(object):
                     trackClone.addTag(hiero.core.Tag(tag))
 
             trackItemClone = trackitem.clone()
+            self._collatedItemsMap[trackitem.guid()] = trackItemClone
             
             # Copy audio for track item
             linkedItems = trackitem.linkedItems()
@@ -174,11 +203,9 @@ class CollatingExporter(object):
                     
                     audioItemClone = item.clone()
                     trackItemClone.link(audioItemClone)
-                    
-                    # NOTE: Temp debug prints
-                    #start, end = (audioItemClone.timelineIn()), (audioItemClone.timelineOut()) + 1
-                    #print "Collating item: ", item.guid(), " -- cloned: ", audioItemClone.guid(), " - export range: [{start}, {end}]".format(start=start, end=end)
 
+                    self._collatedItemsMap[item.guid()] = audioItemClone
+                    
                     if audioParentTrack.guid() not in newAudio: 
                         newAudio[audioParentTrack.guid()] = []
                     newAudio[audioParentTrack.guid()].append(audioItemClone)
@@ -191,25 +218,13 @@ class CollatingExporter(object):
                 handleIn, handleOut = min(self._cutHandles, handleInLength), min(self._cutHandles, handleOutLength)
 
                 if trackItemClone.timelineIn() <= sequenceIn and handleIn:
-                    trackItemClone.trimIn(-handleIn)
-                    for item in trackItemClone.linkedItems(): 
-                        if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
-                            item.trimIn(-handleIn)
+                    self._trimInLinked(trackItemClone, -handleIn)
                     hiero.core.log.debug("Expanding %s in by %i frames" % (trackItemClone.name(), handleIn))
                 if trackItemClone.timelineOut() >= sequenceOut and handleOut:
-                    trackItemClone.trimOut(-handleOut)
-                    for item in trackItemClone.linkedItems(): 
-                        if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
-                            item.trimOut(-handleOut)
+                    self._trimOutLinked(trackItemClone, -handleOut)
                     hiero.core.log.debug("Expanding %s out by %i frames" % (trackItemClone.name(), handleOut))
 
-            trackItemClone.setTimelineOut(trackItemClone.timelineOut() + self.HEAD_ROOM_OFFSET + offset)
-            trackItemClone.setTimelineIn(trackItemClone.timelineIn() + self.HEAD_ROOM_OFFSET + offset)
-
-            for item in trackItemClone.linkedItems():
-                if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
-                    item.setTimelineOut(item.timelineOut() + self.HEAD_ROOM_OFFSET + offset)
-                    item.setTimelineIn(item.timelineIn() + self.HEAD_ROOM_OFFSET + offset)
+            self._offsetTimelineLinked(trackItemClone, self.HEAD_ROOM_OFFSET + offset)
 
             # Add Cloned track item to cloned track
             try:
@@ -238,17 +253,11 @@ class CollatingExporter(object):
                 newSequence.setPosterFrame(heroItem.timelineIn() + posterFrame + self.HEAD_ROOM_OFFSET + offset)
 
         # Useful for debugging, add cloned collated sequence to Project
-        # newSequence.setName(newSequence.name() + "_" + str(id(self)))
-        hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
+        #hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
 
         # Use this newly built sequence instead
         self._parentSequence = self._sequence
-        self._sequence = newSequence
-
-        # NOTE: Testing newSequence output (comes out silent..)
-        #start, end = (newSequence.inTime() - handles), (newSequence.outTime() + handles) + 1
-        #print "Collating Audio export range (track): [{start}, {end}] -- handles: {handles} -- {id}".format(start=start, end=end, handles=handles, id=tmpitem.guid())
-        #newSequence.writeAudioToFile("m:/shotgun/tmp" + str(id(newSequence)) + ".wav", start, end)
+        self._sequence = newSequence.clone()
 
     def isCollated(self):
         return self._collate
