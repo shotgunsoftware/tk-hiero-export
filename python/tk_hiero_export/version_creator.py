@@ -149,9 +149,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             return FnTranscodeExporter.TranscodeExporter.sequenceName(self)
 
     def writeAudio(self):
-        '''
+        """
         Overridden method to allow proper timings for audio export
-        '''
+        """
         if self.isCollated() and not self.isHero():
             item = self.heroItem()
         else:

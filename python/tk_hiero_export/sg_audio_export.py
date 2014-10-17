@@ -112,9 +112,9 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         return FnAudioExportTask.AudioExportTask.startTask(self)
 
     def taskStep(self):
-        '''
+        """
         Overridden method to allow proper timings for audio export
-        '''
+        """
         if self.isCollated() and not self.isHero():
             item = self.heroItem()
         else:

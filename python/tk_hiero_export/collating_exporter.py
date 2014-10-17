@@ -43,9 +43,9 @@ class CollatingExporter(object):
                 self._buildCollatedSequence(properties)
 
     def _offsetTimelineLinked(self, trackItem, offset):
-        '''
-        Offset timeline for trackitem and it's linked audio items
-        '''
+        """
+        Offset timeline for trackitem and it's linked audio items (since each video track is processed separately)
+        """
         trackItem.setTimelineOut(trackItem.timelineOut() + offset)
         trackItem.setTimelineIn(trackItem.timelineIn() + offset)
 
@@ -55,18 +55,18 @@ class CollatingExporter(object):
                 item.setTimelineIn(item.timelineIn() + offset)
 
     def _trimInLinked(self, trackitem, value):
-        '''
-        Trim In trackitem and it's linked audio items
-        '''
+        """
+        Trim In trackitem and it's linked audio items (since each video track is processed separately)
+        """
         trackItem.trimIn(value)
         for item in trackItem.linkedItems(): 
             if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
                 item.trimIn(value)
 
     def _trimOutLinked(self, trackitem, value):
-        '''
-        Trim Out trackitem and it's linked audio items
-        '''
+        """
+        Trim Out trackitem and it's linked audio items (since each video track is processed separately)
+        """
         trackItem.trimOut(value)
         for item in trackItem.linkedItems(): 
             if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
