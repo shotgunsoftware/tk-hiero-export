@@ -24,7 +24,7 @@ from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter, CollatedShotPreset
 
 from hiero import core
-
+from hiero.core import *
 
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
     """
@@ -109,6 +109,28 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         self._thumbnail = source.thumbnail(source.posterFrame())
 
         return FnAudioExportTask.AudioExportTask.startTask(self)
+
+    def taskStep(self):
+        """
+        Overridden method to allow proper timings for audio export
+        """
+        if self.isCollated() and not self.isHero():
+            item = self.heroItem()
+        else:
+            item = self._item
+
+        if item.guid() in self._collatedItemsMap:
+            item = self._collatedItemsMap[item.guid()]
+
+        # Call parent method with swapped items in order to get proper timings
+        original = self._item
+        self._item = item
+        
+        result = FnAudioExportTask.AudioExportTask.taskStep(self)
+
+        self._item = original
+
+        return result
 
     def finishTask(self):
         """ Finish Task """

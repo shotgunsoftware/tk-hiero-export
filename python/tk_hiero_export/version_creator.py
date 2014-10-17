@@ -21,6 +21,10 @@ from hiero.exporters import FnExternalRender
 from hiero.exporters import FnTranscodeExporter
 from hiero.exporters import FnTranscodeExporterUI
 
+import hiero
+from hiero import core
+from hiero.core import *
+
 import tank
 import sgtk.util
 
@@ -143,6 +147,28 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 return FnTranscodeExporter.TranscodeExporter.sequenceName(self)
         except AttributeError:
             return FnTranscodeExporter.TranscodeExporter.sequenceName(self)
+
+    def writeAudio(self):
+        """
+        Overridden method to allow proper timings for audio export
+        """
+        if self.isCollated() and not self.isHero():
+            item = self.heroItem()
+        else:
+            item = self._item
+
+        if item.guid() in self._collatedItemsMap:
+            item = self._collatedItemsMap[item.guid()]
+
+        # Call parent method with swapped items in order to get proper timings
+        original = self._item
+        self._item = item
+        
+        result = FnTranscodeExporter.TranscodeExporter.writeAudio(self)
+
+        self._item = original
+
+        return result
 
     def startTask(self):
         """ Run Task """
