@@ -246,11 +246,13 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         if self._sg_task is not None:
             args["task"] = self._sg_task
 
+        published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
+
         # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         pub_data = tank.util.register_publish(**args)
         if self._extra_publish_data is not None:
-            self.app.log_debug("Updating Shotgun PublishedFile %s" % str(self._extra_publish_data))
+            self.app.log_debug("Updating Shotgun %s %s" % (published_file_entity_type, str(self._extra_publish_data)))
             self.app.shotgun.update(pub_data["type"], pub_data["id"], self._extra_publish_data)
 
         # upload thumbnail for publish
@@ -259,7 +261,6 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # create version
         ################
         if self._preset.properties()['create_version']:
-            published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
             if published_file_entity_type == "PublishedFile":
                 self._version_data["published_files"] = [pub_data]
             else:  # == "TankPublishedFile
