@@ -19,6 +19,7 @@ from hiero.exporters import FnShotProcessor
 
 from .base import ShotgunHieroObjectBase
 from .shot_updater import ShotgunShotUpdaterPreset
+from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
@@ -63,9 +64,30 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # do the normal processing
         FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
 
+        self._setCutOrder()
+
         # get rid of our placeholder
         exportTemplate.pop(0)
         self._exportTemplate.restore(exportTemplate)
+
+    def _setCutOrder(self):
+        """
+        Set a proper time-based cut order on shot updater tasks.
+        Otherwise the cut order is entirely dependent on how tasks are
+        scheduled by the ShotProcessor.
+        """
+
+        tasks = []
+        for taskGroup in self._submission.children():
+            for task in taskGroup.children():
+                if isinstance(task, ShotgunShotUpdater):
+                    if task.isCollated() and task.isHero():
+                        tasks.append(task)
+
+        tasks.sort(key=lambda task: task._item.timelineIn())
+        for i in range(0, len(tasks)):
+            # Cut order are 1-based
+            tasks[i]._cut_order = i + 1
 
     def populateUI(self, widget, exportItems, editMode=None):
         """
