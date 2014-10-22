@@ -21,6 +21,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
     def __init__(self, initDict):
         FnShotExporter.ShotTask.__init__(self, initDict)
         CollatingExporter.__init__(self)
+        self._cut_order = None
 
     def taskStep(self):
         """
@@ -50,8 +51,9 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         cut_in = head_in + handles
         cut_out = tail_out - handles
 
+        # The cut order may have been set by the processor. Otherwise keep old behavior.
         cut_order = self.app.shot_count + 1
-        if hasattr(self, '_cut_order'): 
+        if self._cut_order: 
             cut_order = self._cut_order
         
         # update the frame range

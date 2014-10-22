@@ -81,7 +81,12 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         for taskGroup in self._submission.children():
             for task in taskGroup.children():
                 if isinstance(task, ShotgunShotUpdater):
-                    if task.isCollated() and task.isHero():
+                    if task.isCollated():
+                        # For collating sequences, skip tasks that are not hero
+                        if task.isHero():
+                            tasks.append(task)
+                    else:
+                        # For non-collating sequences, add every task
                         tasks.append(task)
 
         tasks.sort(key=lambda task: task._item.timelineIn())
