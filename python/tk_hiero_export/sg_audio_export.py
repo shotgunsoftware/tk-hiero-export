@@ -26,7 +26,6 @@ from .collating_exporter import CollatingExporter, CollatedShotPreset
 from hiero import core
 from hiero.core import *
 
-
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
     """
     Custom Preferences UI for the shotgun audio exporter
