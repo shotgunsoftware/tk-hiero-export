@@ -140,7 +140,7 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
                 elif isinstance(item, TrackItem):
                     handles = self._cutHandles if self._cutHandles is not None else 0
                     start, end = (item.timelineIn() - handles), (item.timelineOut() + handles) + 1
-                    print "Bounds: ", start, end, item.name(), self.name()
+                    
                     # If trackitem write out just the audio within the cut
                     self._sequence.writeAudioToFile(self._audioFile, start, end)
 
