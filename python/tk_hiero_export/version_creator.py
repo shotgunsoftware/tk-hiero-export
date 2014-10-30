@@ -152,11 +152,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         """
         Overridden method to allow proper timings for audio export
         """
-        if self.isCollated() and not self.isHero():
-            item = self.heroItem()
-        else:
-            item = self._item
-
+        item = self._item
         if item.guid() in self._collatedItemsMap:
             item = self._collatedItemsMap[item.guid()]
 
