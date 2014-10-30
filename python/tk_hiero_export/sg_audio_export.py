@@ -114,51 +114,50 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         """
         Overridden method to allow proper timings for audio export
         """
-        if self.isCollated() and not self.isHero():
-            item = self.heroItem()
-        else:
-            item = self._item
-
+        item = self._item
         if item.guid() in self._collatedItemsMap:
             item = self._collatedItemsMap[item.guid()]
 
-        #
-        # Copied from Base class. Cannot simply swap _item with item, because resolvedExportPath()
-        # will crash Hiero with wrong item.
+        return self._baseTaskStep(item)
+
+    def _baseTaskStep(self, item):
+        """
+        Copied from Base class. Cannot simply swap _item with item, because resolvedExportPath()
+        will crash Hiero with wrong item.
+        """
         
         # Write out the audio bounce down
         if isinstance(item, (Sequence, TrackItem)):
             if self._sequenceHasAudio(self._sequence):
                 self._audioFile = self.resolvedExportPath()
 
-            filename, ext = os.path.splitext(self._audioFile)
-            if ext.lower() != ".wav":
-                self._audioFile = filename + ".wav"
+                filename, ext = os.path.splitext(self._audioFile)
+                if ext.lower() != ".wav":
+                    self._audioFile = filename + ".wav"
 
-            if isinstance(item, Sequence):
-                start, end = self.sequenceInOutPoints(item, 0, item.duration() - 1)
+                if isinstance(item, Sequence):
+                    start, end = self.sequenceInOutPoints(item, 0, item.duration() - 1)
 
-                # If sequence, write out full length
-                item.writeAudioToFile(self._audioFile, start, end)
+                    # If sequence, write out full length
+                    item.writeAudioToFile(self._audioFile, start, end)
 
-            elif isinstance(item, TrackItem):
-                handles = self._cutHandles if self._cutHandles is not None else 0
-                start, end = (item.timelineIn() - handles), (item.timelineOut() + handles) + 1
-
-                # If trackitem write out just the audio within the cut
-                self._sequence.writeAudioToFile(self._audioFile, start, end)
+                elif isinstance(item, TrackItem):
+                    handles = self._cutHandles if self._cutHandles is not None else 0
+                    start, end = (item.timelineIn() - handles), (item.timelineOut() + handles) + 1
+                    
+                    # If trackitem write out just the audio within the cut
+                    self._sequence.writeAudioToFile(self._audioFile, start, end)
 
         elif isinstance(item, Clip):
             # If item is clip, we're writing out the clip audio not the whole sequence
             if item.mediaSource().hasAudio():
                 self._audioFile = self.resolvedExportPath()
 
-            if (os.path.splitext(self._audioFile)[1]).lower() != ".wav":
-                self._audioFile += ".wav"
+                if (os.path.splitext(self._audioFile)[1]).lower() != ".wav":
+                    self._audioFile += ".wav"
 
-            # If sequence or clip, write out full length
-            item.writeAudioToFile(self._audioFile)
-
+                # If sequence or clip, write out full length
+                item.writeAudioToFile(self._audioFile)
 
         self._finished = True
 
