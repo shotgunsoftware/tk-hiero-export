@@ -118,9 +118,13 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         if item.guid() in self._collatedItemsMap:
             item = self._collatedItemsMap[item.guid()]
 
-        #
-        # Copied from Base class. Cannot simply swap _item with item, because resolvedExportPath()
-        # will crash Hiero with wrong item.
+        return self._baseTaskStep(item)
+
+    def _baseTaskStep(self, item):
+        """
+        Copied from Base class. Cannot simply swap _item with item, because resolvedExportPath()
+        will crash Hiero with wrong item.
+        """
         
         # Write out the audio bounce down
         if isinstance(item, (Sequence, TrackItem)):
