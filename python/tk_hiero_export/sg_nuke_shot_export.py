@@ -21,7 +21,7 @@ from hiero.exporters import FnNukeShotExporter
 from hiero.exporters import FnNukeShotExporterUI
 from .collating_exporter import CollatedShotPreset
 
-import tank
+import sgtk
 from .base import ShotgunHieroObjectBase
 
 class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
@@ -116,13 +116,20 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
+    def startTask(self):
+        """ Run Task """
+        # call the publish data hook to allow for publish customization while _item is valid (unlike finishTask)
+        self._extra_publish_data = self.app.execute_hook(
+            "hook_get_extra_publish_data", task=self)
+
+        return FnNukeShotExporter.NukeShotExporter.startTask(self)
+
     def finishTask(self):
         """
         Finish Task
         """
         # run base class implementation
         FnNukeShotExporter.NukeShotExporter.finishTask(self)
-        
         # Don't create PublishedFiles for non-hero collated items
         if self._collate and not self._hero:
             return
@@ -154,8 +161,19 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
                 # continue without task
                 self.app.log_error("Invalid value for 'default_task_filter'")
 
+        publish_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
+
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
-        sg_publish = tank.util.register_publish(**args)
+        sg_publish = sgtk.util.register_publish(**args)
+        if self._extra_publish_data is not None:
+            self.app.log_debug("Updating Shotgun %s %s" % (publish_entity_type, str(self._extra_publish_data)))
+            self.app.shotgun.update(sg_publish["type"], sg_publish["id"], self._extra_publish_data)
+
+        # call the publish data hook to allow for publish customization.
+        extra_publish_data = self.app.execute_hook("hook_get_extra_publish_data", task=self)
+        if extra_publish_data is not None:
+            self.app.log_debug("Updating Shotgun %s %s" % (publish_entity_type, str(extra_publish_data)))
+            self.app.shotgun.update(sg_publish["type"], sg_publish["id"], extra_publish_data)
 
         # upload thumbnail for sequence
         self._upload_thumbnail_to_sg(sg_publish, self._thumbnail)
