@@ -14,7 +14,6 @@ from hiero.exporters import FnShotExporter
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter
 
-
 class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, CollatingExporter):
     """
     Ensures that Shots and Sequences exist in Shotgun
@@ -22,6 +21,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
     def __init__(self, initDict):
         FnShotExporter.ShotTask.__init__(self, initDict)
         CollatingExporter.__init__(self)
+        self._cut_order = None
 
     def taskStep(self):
         """
@@ -51,8 +51,13 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         cut_in = head_in + handles
         cut_out = tail_out - handles
 
+        # The cut order may have been set by the processor. Otherwise keep old behavior.
+        cut_order = self.app.shot_count + 1
+        if self._cut_order: 
+            cut_order = self._cut_order
+        
         # update the frame range
-        sg_shot["sg_cut_order"] = self.app.shot_count + 1
+        sg_shot["sg_cut_order"] = cut_order
         sg_shot["sg_head_in"] = head_in
         sg_shot["sg_cut_in"] = cut_in
         sg_shot["sg_cut_out"] = cut_out
