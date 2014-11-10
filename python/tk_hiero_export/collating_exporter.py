@@ -58,8 +58,8 @@ class CollatingExporter(object):
         """
         Trim In trackitem and it's linked audio items (since each video track is processed separately)
         """
-        trackItem.trimIn(value)
-        for item in trackItem.linkedItems(): 
+        trackitem.trimIn(value)
+        for item in trackitem.linkedItems(): 
             if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
                 item.trimIn(value)
 
@@ -67,8 +67,8 @@ class CollatingExporter(object):
         """
         Trim Out trackitem and it's linked audio items (since each video track is processed separately)
         """
-        trackItem.trimOut(value)
-        for item in trackItem.linkedItems(): 
+        trackitem.trimOut(value)
+        for item in trackitem.linkedItems(): 
             if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
                 item.trimOut(value)
 
