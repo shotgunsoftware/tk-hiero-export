@@ -32,6 +32,8 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         FnShotProcessor.ShotProcessor.__init__(self, preset, submission, synchronous)
         CollatingExporterUI.__init__(self)
 
+        self.app.execute_hook("hook_pre_shot_processor")
+
     def displayName(self):
         return "Shotgun Shot Processor"
 
@@ -42,6 +44,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         """
         Executing the export
         """
+
         # add a top level task to manage shotgun shots
         exportTemplate = self._exportTemplate.flatten()
         properties = self._preset.properties().get('shotgunShotCreateProperties', {})
