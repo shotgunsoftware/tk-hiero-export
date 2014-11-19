@@ -15,8 +15,11 @@ class HieroPreShotProcessor(Hook):
     """
     Allows clearing of caches prior to shot processing
     """
-    def execute(self, **kwargs):
+    def execute(self, processor, **kwargs):
         """
-        Allows clearing of caches prior to shot processing
+        Allows clearing of caches prior to shot processing. This is called just prior to export.
+
+        :param processor: Processor The is being used, in case distinguishing between
+                          differnt exports is needed.
         """
         pass

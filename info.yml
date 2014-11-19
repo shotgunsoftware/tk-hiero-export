@@ -115,7 +115,7 @@ configuration:
         type: hook
         description: "Called prior to starting shotgun's shot processor. It can be used
                       to clear out caches and do other specific initializations."
-        parameters: []
+        parameters: [processor]
         default_value: hiero_pre_shot_processor
 
     hook_resolve_custom_strings:

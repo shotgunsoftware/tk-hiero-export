@@ -32,7 +32,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         FnShotProcessor.ShotProcessor.__init__(self, preset, submission, synchronous)
         CollatingExporterUI.__init__(self)
 
-        self.app.execute_hook("hook_pre_shot_processor")
+        # Call pre processor hook here to make sure it happens pior to any 'hook_resolve_custom_strings'.
+        # The order if execution is basically [init processor, resolve user entries, startProcessing].
+        self.app.execute_hook("hook_pre_shot_processor", processor=self)
 
     def displayName(self):
         return "Shotgun Shot Processor"
