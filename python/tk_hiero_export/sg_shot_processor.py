@@ -34,7 +34,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # Call pre processor hook here to make sure it happens pior to any 'hook_resolve_custom_strings'.
         # The order if execution is basically [init processor, resolve user entries, startProcessing].
-        self.app.execute_hook("hook_pre_shot_processor", processor=self)
+        self.app.execute_hook("hook_pre_export", processor=self)
 
     def displayName(self):
         return "Shotgun Shot Processor"

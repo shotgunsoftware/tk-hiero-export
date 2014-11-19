@@ -11,7 +11,7 @@
 from sgtk import Hook
 
 
-class HieroPreShotProcessor(Hook):
+class HieroPreExport(Hook):
     """
     Allows clearing of caches prior to shot processing
     """
