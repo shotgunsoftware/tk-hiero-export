@@ -111,6 +111,13 @@ configuration:
         parameters: [item, data]
         default_value: hiero_get_shot
 
+    hook_pre_export:
+        type: hook
+        description: "Called prior to starting shotgun's shot processor. It can be used
+                      to clear out caches and do other specific initializations."
+        parameters: [processor]
+        default_value: hiero_pre_export
+
     hook_resolve_custom_strings:
         type: hook
         description: "Called when resolving custom items added to the Hiero resolver
