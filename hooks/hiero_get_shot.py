@@ -15,7 +15,7 @@ class HieroGetShot(Hook):
     """
     Return a Shotgun Shot dictionary for the given Hiero items
     """
-    def execute(self, item, data, **kwargs):
+    def execute(self, task, item, data, **kwargs):
         """
         Takes a hiero.core.TrackItem as input and returns a data dictionary for
         the shot to update the cut info for.
