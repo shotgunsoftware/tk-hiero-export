@@ -9,7 +9,7 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 from .base import ShotgunHieroObjectBase
-from .sg_shot_processor import ShotgunShotProcessor, ShotgunShotProcessorPreset 
+from .sg_shot_processor import ShotgunShotProcessor, ShotgunShotProcessorPreset, ShotgunShotProcessorUI
 from .shot_updater import ShotgunShotUpdater, ShotgunShotUpdaterPreset
 from .version_creator import ShotgunTranscodeExporterUI, ShotgunTranscodeExporter, ShotgunTranscodePreset
 from .sg_nuke_shot_export import ShotgunNukeShotExporterUI, ShotgunNukeShotExporter, ShotgunNukeShotPreset

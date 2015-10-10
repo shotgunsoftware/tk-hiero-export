@@ -15,7 +15,7 @@ from PySide import QtGui
 import hiero.core
 from hiero.core import FnExporterBase
 
-from hiero.exporters import FnShotProcessor
+from hiero.exporters import FnShotProcessor, FnShotProcessorUI
 
 from .base import ShotgunHieroObjectBase
 from .shot_updater import ShotgunShotUpdaterPreset
@@ -23,85 +23,23 @@ from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
-
-class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor, CollatingExporterUI):
+class ShotgunShotProcessorUI(ShotgunHieroObjectBase, FnShotProcessorUI.ShotProcessorUI, CollatingExporterUI):
     """
-    Add extra UI and hook functionality to the built in Shot processor.
+    Add extra UI to the built in Shot processor.
     """
-    def __init__(self, preset, submission=None, synchronous=False):
-        FnShotProcessor.ShotProcessor.__init__(self, preset, submission, synchronous)
+    def __init__(self, preset):
+        FnShotProcessorUI.ShotProcessorUI.__init__(self, preset)
         CollatingExporterUI.__init__(self)
 
-        # Call pre processor hook here to make sure it happens pior to any 'hook_resolve_custom_strings'.
-        # The order if execution is basically [init processor, resolve user entries, startProcessing].
-        self.app.execute_hook("hook_pre_export", processor=self)
-
     def displayName(self):
-        return "Shotgun Shot Processor"
+        return "Process as Shotgun Shots"
 
     def toolTip(self):
-        return "Process as Shots generates output on a per shot basis and logs it in Shotgun."
-
-    def startProcessing(self, exportItems):
-        """
-        Executing the export
-        """
-
-        # add a top level task to manage shotgun shots
-        exportTemplate = self._exportTemplate.flatten()
-        properties = self._preset.properties().get('shotgunShotCreateProperties', {})
-
-        # inject collate settings into Tasks where needed
-        collateTracks = properties.get('collateTracks', False)
-        collateShotNames = properties.get('collateShotNames', False)
-        for (itemPath, itemPreset) in exportTemplate:
-            if 'collateTracks' in itemPreset.properties():
-                itemPreset.properties()['collateTracks'] = collateTracks
-            if 'collateShotNames' in itemPreset.properties():
-                itemPreset.properties()['collateShotNames'] = collateShotNames
-
-        exportTemplate.insert(0, (".shotgun", ShotgunShotUpdaterPreset(".shotgun", properties)))
-        self._exportTemplate.restore(exportTemplate)
-
-        # tag app as first shot
-        self.app.shot_count = 0
-
-        # do the normal processing
-        FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
-
-        self._setCutOrder()
-
-        # get rid of our placeholder
-        exportTemplate.pop(0)
-        self._exportTemplate.restore(exportTemplate)
-
-    def _setCutOrder(self):
-        """
-        Set a proper time-based cut order on shot updater tasks.
-        Otherwise the cut order is entirely dependent on how tasks are
-        scheduled by the ShotProcessor.
-        """
-
-        tasks = []
-        for taskGroup in self._submission.children():
-            for task in taskGroup.children():
-                if isinstance(task, ShotgunShotUpdater):
-                    if task.isCollated():
-                        # For collating sequences, skip tasks that are not hero
-                        if task.isHero():
-                            tasks.append(task)
-                    else:
-                        # For non-collating sequences, add every task
-                        tasks.append(task)
-
-        tasks.sort(key=lambda task: task._item.timelineIn())
-        for i in range(0, len(tasks)):
-            # Cut order are 1-based
-            tasks[i]._cut_order = i + 1
+        return "Process as Shotgun Shots generates output on a per-shot basis and logs it in Shotgun."
 
     def populateUI(self, widget, exportItems, editMode=None):
         """
-        Create Settings UI
+        Create Settings UI.
         """
         # create a layout with custom top and bottom widgets
         master_layout = QtGui.QVBoxLayout(widget)
@@ -146,11 +84,11 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # add default settings from baseclass below
         default = QtGui.QWidget()
         master_layout.addWidget(default)
-        FnShotProcessor.ShotProcessor.populateUI(self, default, exportItems, editMode)
+        FnShotProcessorUI.ShotProcessorUI.populateUI(self, default, exportItems, editMode)
 
     def _build_tag_selector_widget(self, items, properties):
         """
-        Returns a QT widget which contains the tag
+        Returns a QT widget which contains the tag.
         """
         fields = ['code']
         filt = [['entity_type', 'is', 'Shot']]
@@ -256,6 +194,73 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         tags = [tag for tag in tags if "Nuke Project File" not in tag.name()]
         return tags
 
+class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor):
+    """
+    Adds hook functionality to the built in Shot processor.
+    """
+    def __init__(self, preset, submission=None, synchronous=False):
+        FnShotProcessor.ShotProcessor.__init__(self, preset, submission, synchronous)
+
+        # Call pre processor hook here to make sure it happens pior to any 'hook_resolve_custom_strings'.
+        # The order if execution is basically [init processor, resolve user entries, startProcessing].
+        self.app.execute_hook("hook_pre_export", processor=self)
+
+    def startProcessing(self, exportItems):
+        """
+        Executing the export
+        """
+
+        # add a top level task to manage shotgun shots
+        exportTemplate = self._exportTemplate.flatten()
+        properties = self._preset.properties().get('shotgunShotCreateProperties', {})
+
+        # inject collate settings into Tasks where needed
+        collateTracks = properties.get('collateTracks', False)
+        collateShotNames = properties.get('collateShotNames', False)
+        for (itemPath, itemPreset) in exportTemplate:
+            if 'collateTracks' in itemPreset.properties():
+                itemPreset.properties()['collateTracks'] = collateTracks
+            if 'collateShotNames' in itemPreset.properties():
+                itemPreset.properties()['collateShotNames'] = collateShotNames
+
+        exportTemplate.insert(0, (".shotgun", ShotgunShotUpdaterPreset(".shotgun", properties)))
+        self._exportTemplate.restore(exportTemplate)
+
+        # tag app as first shot
+        self.app.shot_count = 0
+
+        # do the normal processing
+        FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
+
+        self._setCutOrder()
+
+        # get rid of our placeholder
+        exportTemplate.pop(0)
+        self._exportTemplate.restore(exportTemplate)
+
+    def _setCutOrder(self):
+        """
+        Set a proper time-based cut order on shot updater tasks.
+        Otherwise the cut order is entirely dependent on how tasks are
+        scheduled by the ShotProcessor.
+        """
+
+        tasks = []
+        for taskGroup in self._submission.children():
+            for task in taskGroup.children():
+                if isinstance(task, ShotgunShotUpdater):
+                    if task.isCollated():
+                        # For collating sequences, skip tasks that are not hero
+                        if task.isHero():
+                            tasks.append(task)
+                    else:
+                        # For non-collating sequences, add every task
+                        tasks.append(task)
+
+        tasks.sort(key=lambda task: task._item.timelineIn())
+        for i in range(0, len(tasks)):
+            # Cut order are 1-based
+            tasks[i]._cut_order = i + 1
 
 class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessorPreset, CollatedShotPreset):
     """

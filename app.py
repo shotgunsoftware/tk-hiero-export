@@ -35,7 +35,7 @@ from hiero.exporters import FnNukeShotExporter
 # standard namespace, hack to get the right path in sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "python"))
 from tk_hiero_export import ShotgunShotUpdater
-from tk_hiero_export import ShotgunShotProcessor
+from tk_hiero_export import ShotgunShotProcessor, ShotgunShotProcessorUI
 from tk_hiero_export import ShotgunTranscodePreset
 from tk_hiero_export import ShotgunNukeShotPreset
 from tk_hiero_export import ShotgunAudioPreset
@@ -80,7 +80,7 @@ class HieroExport(Application):
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunTranscodePreset, ShotgunTranscodeExporterUI)
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunNukeShotPreset, ShotgunNukeShotExporterUI)
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunAudioPreset, ShotgunAudioExporterUI)
-        hiero.ui.taskUIRegistry.registerProcessorUI(ShotgunShotProcessorPreset, ShotgunShotProcessor)
+        hiero.ui.taskUIRegistry.registerProcessorUI(ShotgunShotProcessorPreset, ShotgunShotProcessorUI)
 
         # Add our default preset
         self._old_AddDefaultPresets_fn = hiero.core.taskRegistry._defaultPresets
