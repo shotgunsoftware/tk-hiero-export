@@ -9,7 +9,21 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 from .base import ShotgunHieroObjectBase
-from .sg_shot_processor import ShotgunShotProcessor, ShotgunShotProcessorPreset, ShotgunShotProcessorUI
+from .sg_shot_processor import ShotgunShotProcessorPreset
+
+# If we're in Hiero 9.0+ then the first import will work,
+# otherwise we will pull in the legacy shot processor.
+try:
+	from .sg_shot_processor import (
+		ShotgunShotProcessor,
+		ShotgunShotProcessorUI,
+		ShotgunShotProcessorPreset,
+	)
+except ImportError:
+	from .sg_shot_processor_legacy import LegacyShotgunShotProcessor as ShotgunShotProcessor
+	from .sg_shot_processor_legacy import LegacyShotgunShotProcessorPreset as ShotgunShotProcessorPreset
+	ShotgunShotProcessorUI = ShotgunShotProcessor
+
 from .shot_updater import ShotgunShotUpdater, ShotgunShotUpdaterPreset
 from .version_creator import ShotgunTranscodeExporterUI, ShotgunTranscodeExporter, ShotgunTranscodePreset
 from .sg_nuke_shot_export import ShotgunNukeShotExporterUI, ShotgunNukeShotExporter, ShotgunNukeShotPreset
