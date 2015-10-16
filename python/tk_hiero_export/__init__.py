@@ -9,7 +9,6 @@
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 from .base import ShotgunHieroObjectBase
-from .sg_shot_processor import ShotgunShotProcessorPreset
 
 # If we're in Hiero 9.0+ then the first import will work,
 # otherwise we will pull in the legacy shot processor.
