@@ -197,7 +197,7 @@ configuration:
         optional_fields: "*"
 
 # the engines that this app can operate in:
-supported_engines: [tk-hiero]
+supported_engines: [tk-hiero, tk-nuke]
 
 # the Shotgun fields that this app needs in order to operate correctly
 requires_shotgun_fields:

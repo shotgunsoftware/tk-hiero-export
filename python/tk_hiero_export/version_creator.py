@@ -101,6 +101,13 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         Override the default buildScript functionality to also output a temp movie
         file if needed for uploading to Shotgun
         """
+        # This is a bit of a hack to account for some changes to the
+        # transcode exporter that ships with Nuke/Hiero 9.0 compared
+        # to earlier versions of Hiero.
+        file_type = self._preset.properties()['file_type']
+        if file_type in ["mov", "ffmpeg"]:
+            self._preset.properties()[file_type]["encoder"] = "mov32"
+
         # Build the usual script
         FnTranscodeExporter.TranscodeExporter.buildScript(self)
 
@@ -108,7 +115,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         if not self._preset.properties()['create_version']:
             return
 
-        if self._preset.properties()['file_type'] in ["mov", "ffmpeg"]:
+        if file_type in ["mov", "ffmpeg"]:
             # already outputting a mov file, use that for upload
             self._quicktime_path = self.resolvedExportPath()
             self._temp_quicktime = False
@@ -133,8 +140,25 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             file_type: properties,
         })
 
-        mov_write_node = FnExternalRender.createWriteNode(self._quicktime_path,
-            preset, nodeName, framerate=framerate, projectsettings=self._projectSettings)
+        # Sadly Foundry changed the interface for createWriteNode() in 9.0,
+        # so we have to attempt the new way (project) and then fall back on
+        # the old way (projectsettings) if that fails.
+        try:
+            mov_write_node = FnExternalRender.createWriteNode(
+                self._quicktime_path,
+                preset,
+                nodeName,
+                framerate=framerate,
+                project=self._project,
+            )
+        except TypeError:
+            mov_write_node = FnExternalRender.createWriteNode(
+                self._quicktime_path,
+                preset,
+                nodeName,
+                framerate=framerate,
+                projectsettings=self._projectSettings,
+            )
 
         self._script.addNode(mov_write_node)
 

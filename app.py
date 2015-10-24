@@ -34,20 +34,24 @@ from hiero.exporters import FnNukeShotExporter
 # do not use tk import here, hiero needs the classes to be in their
 # standard namespace, hack to get the right path in sys.path
 sys.path.append(os.path.join(os.path.dirname(__file__), "python"))
-from tk_hiero_export import ShotgunShotUpdater
-from tk_hiero_export import ShotgunShotProcessor
-from tk_hiero_export import ShotgunTranscodePreset
-from tk_hiero_export import ShotgunNukeShotPreset
-from tk_hiero_export import ShotgunAudioPreset
-from tk_hiero_export import ShotgunShotUpdaterPreset
-from tk_hiero_export import ShotgunTranscodeExporter
-from tk_hiero_export import ShotgunNukeShotExporter
-from tk_hiero_export import ShotgunAudioExporter
-from tk_hiero_export import ShotgunShotProcessorPreset
-from tk_hiero_export import ShotgunTranscodeExporterUI
-from tk_hiero_export import ShotgunNukeShotExporterUI
-from tk_hiero_export import ShotgunAudioExporterUI
-from tk_hiero_export import ShotgunHieroObjectBase
+
+from tk_hiero_export import (
+    ShotgunShotProcessor,
+    ShotgunShotProcessorUI,
+    ShotgunShotUpdater,
+    ShotgunTranscodePreset,
+    ShotgunNukeShotPreset,
+    ShotgunAudioPreset,
+    ShotgunShotUpdaterPreset,
+    ShotgunTranscodeExporter,
+    ShotgunNukeShotExporter,
+    ShotgunAudioExporter,
+    ShotgunShotProcessorPreset,
+    ShotgunTranscodeExporterUI,
+    ShotgunNukeShotExporterUI,
+    ShotgunAudioExporterUI,
+    ShotgunHieroObjectBase,
+)
 sys.path.pop()
 
 # list keywords Hiero is using in its export substitution
@@ -80,7 +84,7 @@ class HieroExport(Application):
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunTranscodePreset, ShotgunTranscodeExporterUI)
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunNukeShotPreset, ShotgunNukeShotExporterUI)
         hiero.ui.taskUIRegistry.registerTaskUI(ShotgunAudioPreset, ShotgunAudioExporterUI)
-        hiero.ui.taskUIRegistry.registerProcessorUI(ShotgunShotProcessorPreset, ShotgunShotProcessor)
+        hiero.ui.taskUIRegistry.registerProcessorUI(ShotgunShotProcessorPreset, ShotgunShotProcessorUI)
 
         # Add our default preset
         self._old_AddDefaultPresets_fn = hiero.core.taskRegistry._defaultPresets
