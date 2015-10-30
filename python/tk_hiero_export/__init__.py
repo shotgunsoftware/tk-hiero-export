@@ -10,18 +10,11 @@
 
 from .base import ShotgunHieroObjectBase
 
-# If we're in Hiero 9.0+ then the first import will work,
-# otherwise we will pull in the legacy shot processor.
-try:
-	from .sg_shot_processor import (
-		ShotgunShotProcessor,
-		ShotgunShotProcessorUI,
-		ShotgunShotProcessorPreset,
-	)
-except ImportError:
-	from .sg_shot_processor_legacy import LegacyShotgunShotProcessor as ShotgunShotProcessor
-	from .sg_shot_processor_legacy import LegacyShotgunShotProcessorPreset as ShotgunShotProcessorPreset
-	ShotgunShotProcessorUI = ShotgunShotProcessor
+from .sg_shot_processor import (
+	ShotgunShotProcessor,
+	ShotgunShotProcessorUI,
+	ShotgunShotProcessorPreset,
+)
 
 from .shot_updater import ShotgunShotUpdater, ShotgunShotUpdaterPreset
 from .version_creator import ShotgunTranscodeExporterUI, ShotgunTranscodeExporter, ShotgunTranscodePreset
