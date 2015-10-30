@@ -15,7 +15,21 @@ from PySide import QtGui
 import hiero.core
 from hiero.core import FnExporterBase
 
-from hiero.exporters import FnShotProcessor, FnShotProcessorUI
+from hiero.exporters import FnShotProcessor
+
+# For Hiero versions prior to 9.0 the ShotProcessor class
+# contained both the execution and UI logic. That was split
+# into two classes in 9.0. To maintain backwards compatibility
+# but without duplicating code or breaking existing local
+# export presets we've split into separate UI and Processor
+# classes, but for the UI class we will fall back on using
+# the ShotProcessor as the base class in cases where we are
+# unable to import the separate ShotProcessorUI class that
+# was introduced in 9.0.
+try:
+    from hiero.exporters.FnShotProcessorUI import ShotProcessorUI
+except ImportError:
+    ShotProcessorUI = FnShotProcessor.ShotProcessor
 
 from .base import ShotgunHieroObjectBase
 from .shot_updater import ShotgunShotUpdaterPreset
@@ -23,12 +37,12 @@ from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
-class ShotgunShotProcessorUI(ShotgunHieroObjectBase, FnShotProcessorUI.ShotProcessorUI, CollatingExporterUI):
+class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingExporterUI):
     """
     Add extra UI to the built in Shot processor.
     """
     def __init__(self, preset):
-        FnShotProcessorUI.ShotProcessorUI.__init__(self, preset)
+        ShotProcessorUI.__init__(self, preset)
         CollatingExporterUI.__init__(self)
 
     def displayName(self):
@@ -84,7 +98,7 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, FnShotProcessorUI.ShotProce
         # add default settings from baseclass below
         default = QtGui.QWidget()
         master_layout.addWidget(default)
-        FnShotProcessorUI.ShotProcessorUI.populateUI(self, default, exportItems, editMode)
+        ShotProcessorUI.populateUI(self, default, exportItems, editMode)
 
     def _build_tag_selector_widget(self, items, properties):
         """
