@@ -155,6 +155,14 @@ configuration:
         parameters: [version_data, task]
         default_value: hiero_update_version_data
 
+    hook_post_version_creation:
+        type: hook
+        description: "Called after the Version entity is created. The hook is
+                     provided the new entity data dictionary which will include
+                     the ID number of the entity that was created."
+        parameters: [version_data]
+        default_value: hiero_post_version_creation
+
     hook_get_extra_publish_data:
         type: hook
         description: "Called before creating a PublishedFile in Shotgun for a transcode.
