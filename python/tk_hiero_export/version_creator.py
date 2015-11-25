@@ -321,6 +321,13 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 if self._temp_quicktime:
                     shutil.rmtree(os.path.dirname(self._quicktime_path))
 
+        # Post creation hook
+        ####################
+        self.app.execute_hook(
+            "hook_post_version_creation",
+            version_data=vers,
+        )
+
 
 class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset):
     """ Settings for the shotgun transcode step """
