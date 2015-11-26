@@ -13,6 +13,7 @@ import ast
 import sys
 import shutil
 import tempfile
+import inspect
 
 from PySide import QtGui
 from PySide import QtCore
@@ -140,26 +141,37 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             file_type: properties,
         })
 
-        # Sadly Foundry changed the interface for createWriteNode() in 9.0,
-        # so we have to attempt the new way (project) and then fall back on
-        # the old way (projectsettings) if that fails.
-        try:
-            mov_write_node = FnExternalRender.createWriteNode(
+        # Sadly Foundry has a habit of changing the interfaces of
+        # their Python classes out from under us, so now we're going
+        # to have to handle this the ugly way, via introspecting the
+        # arguments expected by the createWriteNode method.
+        arg_spec = inspect.getargspec(FnExternalRender.createWriteNode)
+        if "projectsettings" in arg_spec.args:
+            kwargs = dict(
+                path=self._quicktime_path,
+                preset=preset,
+                nodeName=nodeName,
+                framerate=framerate,
+                projectsettings=self._projectSettings,
+            )
+        elif "ctx" in arg_spec.args:
+            kwargs = dict(
+                ctx=self,
+                path=self._quicktime_path,
+                preset=preset,
+                nodeName=nodeName,
+                framerate=framerate,
+                project=self._project,
+            )
+        else:
+            kwargs = dict(
                 self._quicktime_path,
                 preset,
                 nodeName,
                 framerate=framerate,
                 project=self._project,
             )
-        except TypeError:
-            mov_write_node = FnExternalRender.createWriteNode(
-                self._quicktime_path,
-                preset,
-                nodeName,
-                framerate=framerate,
-                projectsettings=self._projectSettings,
-            )
-
+        mov_write_node = FnExternalRender.createWriteNode(**kwargs)
         self._script.addNode(mov_write_node)
 
     def sequenceName(self):
