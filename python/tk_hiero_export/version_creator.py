@@ -165,9 +165,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             )
         else:
             kwargs = dict(
-                self._quicktime_path,
-                preset,
-                nodeName,
+                path=self._quicktime_path,
+                preset=preset,
+                nodeName=nodeName,
                 framerate=framerate,
                 project=self._project,
             )
