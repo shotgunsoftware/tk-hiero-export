@@ -68,6 +68,13 @@ class HieroExport(Application):
         self.first_shot = False
         self._register_exporter()
 
+    @property
+    def context_change_allowed(self):
+        """
+        Specifies that context changes are allowed.
+        """
+        return True
+
     def _register_exporter(self):
         """
         Set up this app with the hiero exporter frameworks
