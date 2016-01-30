@@ -276,7 +276,15 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # figure out the thumbnail frame
         ##########################
         source = self._item.source()
-        self._thumbnail = source.thumbnail(source.posterFrame())
+
+        # If we can't get a thumbnail it isn't the end of the world.
+        # When we get to the upload we'll do nothing if we don't have
+        # anything to work with, which will result in the same result
+        # as if the thumbnail failed to upload.
+        try:
+            self._thumbnail = source.thumbnail(source.posterFrame())
+        except Exception:
+            pass
 
         return FnTranscodeExporter.TranscodeExporter.startTask(self)
 
@@ -314,7 +322,15 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self.app.shotgun.update(pub_data["type"], pub_data["id"], self._extra_publish_data)
 
         # upload thumbnail for publish
-        self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
+        if self._thumbnail:
+            self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
+        else:
+            self.app.log_debug(
+                "There was no thumbnail available for %s %s" % (
+                    published_file_entity_type,
+                    str(self._extra_publish_data)
+                )
+            )
 
         # create version
         ################
