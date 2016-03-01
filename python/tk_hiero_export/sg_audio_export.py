@@ -173,7 +173,7 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
 
         # Log usage metrics
         try:
-            self.app.log_metric("Create")
+            self.app.log_metric("Audio Export")
             self.app.engine.log_user_attribute_metric(
                 "%s version" % (self.app.name,),
                 self.app.version,

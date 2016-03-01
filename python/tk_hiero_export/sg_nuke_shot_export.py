@@ -180,7 +180,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 
         # Log usage metrics
         try:
-            self.app.log_metric("Create")
+            self.app.log_metric("Shot Export")
             self.app.engine.log_user_attribute_metric(
                 "%s version" % (self.app.name,),
                 self.app.version,

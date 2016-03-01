@@ -358,7 +358,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # Log usage metrics
         try:
-            self.app.log_metric("Create")
+            self.app.log_metric("Version Create")
             self.app.engine.log_user_attribute_metric(
                 "%s version" % (self.app.name,),
                 self.app.version,
