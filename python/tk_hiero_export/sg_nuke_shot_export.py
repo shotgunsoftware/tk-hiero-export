@@ -180,11 +180,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 
         # Log usage metrics
         try:
-            self.app.log_metric("Shot Export")
-            self.app.engine.log_user_attribute_metric(
-                "%s version" % (self.app.name,),
-                self.app.version,
-            )
+            self.app.log_metric("Shot Export", log_version=True)
         except:
             # ingore any errors. ex: metrics logging not supported
             pass
