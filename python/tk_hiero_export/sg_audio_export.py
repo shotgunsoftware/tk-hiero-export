@@ -171,6 +171,17 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         if self._do_publish:
             self._publish()
 
+        # Log usage metrics
+        try:
+            self.app.log_metric("Create")
+            self.app.engine.log_user_attribute_metric(
+                "%s version" % (self.app.name,),
+                self.app.version,
+            )
+        except:
+            # ingore any errors. ex: metrics logging not supported
+            pass
+
     def _publish(self):
         """
         Publish task output.

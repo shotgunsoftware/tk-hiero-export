@@ -178,6 +178,17 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         # upload thumbnail for sequence
         self._upload_thumbnail_to_sg(sg_publish, self._thumbnail)
 
+        # Log usage metrics
+        try:
+            self.app.log_metric("Create")
+            self.app.engine.log_user_attribute_metric(
+                "%s version" % (self.app.name,),
+                self.app.version,
+            )
+        except:
+            # ingore any errors. ex: metrics logging not supported
+            pass
+
     def _beforeNukeScriptWrite(self, script):
         """
         Add ShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to 
