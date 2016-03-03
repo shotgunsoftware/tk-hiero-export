@@ -356,6 +356,13 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             version_data=vers,
         )
 
+        # Log usage metrics
+        try:
+            self.app.log_metric("Transcode & Publish", log_version=True)
+        except:
+            # ingore any errors. ex: metrics logging not supported
+            pass
+
 
 class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset):
     """ Settings for the shotgun transcode step """
