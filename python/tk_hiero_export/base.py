@@ -72,7 +72,7 @@ class ShotgunHieroObjectBase(object):
             # the issue.
             try:
                 shutil.rmtree(thumbdir)
-            except:
+            except Exception:
                 self.parent.log_error("Error removing temporary thumbnail file, trying again.")
                 time.sleep(1.0)
                 shutil.rmtree(thumbdir)
