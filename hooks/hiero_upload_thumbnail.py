@@ -14,6 +14,7 @@ import math
 import shutil
 import tempfile
 import traceback
+import time
 
 from PySide import QtCore
 
@@ -62,4 +63,12 @@ class HieroUploadThumbnail(Hook):
             tb = traceback.format_exc()
             self.parent.log_debug(tb)
         finally:
-            shutil.rmtree(thumbdir)
+            # Sometimes Windows holds on to the temporary thumbnail file longer than expected which
+            # can cause an exception here. If we wait a second and try again, this usually solves
+            # the issue.
+            try:
+                shutil.rmtree(thumbdir)
+            except Exception:
+                self.parent.log_error("Error removing temporary thumbnail file, trying again.")
+                time.sleep(1.0)
+                shutil.rmtree(thumbdir)

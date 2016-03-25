@@ -11,6 +11,7 @@
 import os
 import sys
 import shutil
+import time
 
 from PySide import QtGui
 from PySide import QtCore
@@ -66,8 +67,15 @@ class ShotgunHieroObjectBase(object):
         except Exception, e:
             self.app.log_info("Thumbnail for %s %s (#%s) was not refreshed in Shotgun: %s" % (sg_entity['type'], sg_entity.get('name'), sg_entity['id'], e))
         finally:
-            shutil.rmtree(thumbdir)
-
+            # Sometimes Windows holds on to the temporary thumbnail file longer than expected which
+            # can cause an exception here. If we wait a second and try again, this usually solves
+            # the issue.
+            try:
+                shutil.rmtree(thumbdir)
+            except Exception:
+                self.parent.log_error("Error removing temporary thumbnail file, trying again.")
+                time.sleep(1.0)
+                shutil.rmtree(thumbdir)
 
 
 
