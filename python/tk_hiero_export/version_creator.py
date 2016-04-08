@@ -107,7 +107,8 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # to earlier versions of Hiero.
         file_type = self._preset.properties()['file_type']
         if file_type in ["mov", "ffmpeg"]:
-            self._preset.properties()[file_type]["encoder"] = "mov32"
+            if not self._preset.properties()[file_type].get("encoder"):
+                self._preset.properties()[file_type]["encoder"] = "mov32"
 
         # Build the usual script
         FnTranscodeExporter.TranscodeExporter.buildScript(self)

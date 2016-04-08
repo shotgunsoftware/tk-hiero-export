@@ -24,9 +24,9 @@ class HieroGetQuicktimeSettings(Hook):
         values.
         """
         if sys.platform.startswith("linux"):
-            file_type = "ffmpeg"
+            file_type = "mov"
             properties = {
-                "encoder": "mov32",
+                "encoder": "mov64",
                 "format": "MOV format (mov)",
                 "bitrate": 2000000,
             }
