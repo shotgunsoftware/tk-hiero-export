@@ -363,14 +363,19 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         #################################
         if vers and hasattr(self, '_cut_item_data'):
 
+            # a version was created and we have a cut item to update.
+
+            # just make sure the cut item data has an id which should imply that
+            # it was created in the db.
             if "id" in self._cut_item_data:
                 cut_item_id = self._cut_item_data["id"]
-                self.app.log_debug("Attaching version to cut item... ")
+
+                # update the Cut item with the newly uploaded version
                 self.app.shotgun.update("CutItem", cut_item_id,
                     {"version": vers})
-                self.app.log_debug("done!")
+                self.app.log_debug("Attached version to cut item.")
 
-                # upload a thumbnal for the cut item as well
+                # upload a thumbnail for the cut item as well
                 if self._thumbnail:
                     self._upload_thumbnail_to_sg(
                         {"type": "CutItem", "id": cut_item_id},

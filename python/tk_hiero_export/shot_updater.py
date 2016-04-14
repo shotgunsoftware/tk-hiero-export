@@ -25,8 +25,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
     def get_cut_item_data(self):
         """
-        Return some computed values for use when creating cut items or updating
-        a shot's cut fields.
+        Return some computed values for use when creating cut items.
         """
 
         # this is the head in/out of the source clip. For the cut item in SG,
@@ -141,7 +140,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         # commit the changes and update the thumbnail
         self.app.log_debug("Updating info for %s %s: %s" % (shot_type, shot_id, str(sg_shot)))
-        updated_shot = self.app.tank.shotgun.update(shot_type, shot_id, sg_shot)
+        self.app.tank.shotgun.update(shot_type, shot_id, sg_shot)
 
         # create the directory structure
         self.app.log_debug("Creating file system structure for %s %s..." % (shot_type, shot_id))

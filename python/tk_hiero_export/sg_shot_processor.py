@@ -107,7 +107,7 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
 
     def _build_cut_type_layout(self, properties):
         """
-        Returns a QComboBox with a list of cut types
+        Returns layout with a Label and QComboBox with a list of cut types.
         """
         tooltip = "What to populate in the `Type` field for this Cut in Shotgun"
 
@@ -354,6 +354,13 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             # Cut order is 1-based
             shot_updater_task._cut_order = i + 1
 
+        # if you're wondering why we looped over the tasks above only to bail
+        # out here if cuts support isn't available for the site, it's to
+        # maintain backward compatibility for updating the Shot entities with
+        # cut data which relies on setting `_cut_order` on those updater tasks.
+        # The we also use the above loops to get the tasks in cut order which
+        # will be used in `_processCuts` if the site has cut support.
+
         if not _cutsSupported(self.app.shotgun):
             # cuts not supported. all done here
             return
@@ -378,14 +385,15 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
     def _getCutData(self, hiero_sequence):
         """Returns a dict of cut data for the supplied hiero sequence."""
 
-        # get the parent entity for the Shot
+        # get the parent entity in SG that corresponds to the hiero sequence
         parent_entity = self.app.execute_hook(
             "hook_get_shot_parent",
             hiero_sequence=hiero_sequence,
             data=self.app.preprocess_data
         )
 
-        # first determine which revision number of the cut to create
+        # determine which revision number of the cut to create. look for an
+        # existing Cut with the sequence name with the same parent.
         sg = self.app.shotgun
         prev_cut = sg.find_one(
             "Cut",
@@ -394,20 +402,25 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             ["revision_number"],
             [{"field_name": "revision_number", "direction": "desc"}]
         )
+
         if prev_cut is None:
+            # no matching Cut, start out at version 1
             next_revision_number = 1
         else:
+            # match! use the next revision number
             next_revision_number = prev_cut["revision_number"] + 1
 
         self._app.log_debug(
             "The cut revision number will be %s." % (next_revision_number,))
 
-        # retrieve the cut type from the presets
+        # retrieve the cut type from the processor presets
         properties = self._preset.properties().get(
             'shotgunShotCreateProperties', {})
         cut_type = properties.get("sg_cut_type", "")
 
-        cut_data = {
+        # the bulk of the cut data. the rest will be populated as the individual
+        # shots are processed in the cut
+        return  {
             "project": self.app.context.project,
             "entity": parent_entity,
             "code": hiero_sequence.name(),
@@ -417,20 +430,18 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             "fps": hiero_sequence.framerate().toFloat(),
         }
 
-        return cut_data
-
     def _processCut(self, cut_related_tasks):
         """Collect data and create the Cut and CutItem entries for the tasks.
 
         We need to pre-create the Cut entity so that the CutItems can be
         parented to it. Ideally the CutItems would be created during the
         execution of the shot updater task, but we need the individual tasks to
-        build the complete Cut data. So we're creating all the CutItems before
-        the tasks are processed. We also need to associate the Versions created
-        during the transcode tasks with the corresponding CutItems. Pre
-        processing the CutItems allow us to attach the CutItem data to the
-        Transcode task so that it can update the item in SG after the version
-        is created.
+        build the complete Cut data (Cut in/out and duration). So we're
+        creating all the CutItems before the tasks are processed. We also need
+        to associate the Versions created during the transcode tasks with the
+        corresponding CutItems. Pre processing the CutItems allow us to attach
+        the CutItem data to the Transcode task so that it can update the item
+        in SG after the version is created.
         """
 
         # make sure the data cache is ready. this code may create entities in
@@ -438,31 +449,41 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         if not hasattr(self.app, "preprocess_data"):
             self.app.preprocess_data = {}
 
-        # get the hiero sequence from the first updater task's item
+        # get the hiero sequence from the first updater task's item. this would
+        # be the first item in the first tuple of the list of cut related tasks.
         hiero_sequence = cut_related_tasks[0][0]._item.sequence()
+
+        # the sequence fps, used to calculate timecodes for cut items
         fps = hiero_sequence.framerate().toFloat()
 
-        # populate the bulk of the cut data
+        # go ahead populate the bulk of the cut data. the first and last
+        # cut items will populate the cut's in/out points.
         cut_data = self._getCutData(hiero_sequence)
 
-        # calculate the cut duration while processing the individual tasks
+        # we'll also calculate the cut duration while processing the tasks
         cut_duration = 0
 
-        # will hold a list of cut item dictionaries that will be populated as
-        # the tasks are processed. these will be used to batch create the cut
+        # this will hold a list of cut item data dicts that will be populated
+        # as the tasks are processed. these will be used to batch create the cut
         # items at the end
         cut_item_data_list = []
 
         # process the tasks in order
-        for i in range(0, len(cut_related_tasks)):
-            (shot_updater_task, transcode_task) = cut_related_tasks[i]
+        for (shot_updater_task, transcode_task) in cut_related_tasks.items():
 
-            cut_order = i + 1
+            # cut order was populated by the calling method to update the
+            # Shot entity's cut info
+            cut_order = shot_updater_task._cut_order
 
             # this retrieves the basic cut information from the updater task.
+            # cut item in/out, cut item duration, edit in/out.
             cut_item_data = shot_updater_task.get_cut_item_data()
 
-            # translate some of the data to timecodes
+            # add the length of this item to the full cut duration
+            cut_duration += cut_item_data["cut_item_duration"]
+
+            # translate some of the cut item data into timecodes that will also
+            # be populated in the cut item
             tc_cut_item_in = self._timecode(cut_item_data["cut_item_in"], fps)
             tc_cut_item_out = self._timecode(cut_item_data["cut_item_out"], fps)
             tc_edit_in = self._timecode(cut_item_data["edit_in"], fps)
@@ -477,7 +498,8 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 data=self.app.preprocess_data,
             )
 
-            # update the cut item data with the timecodes and other fields
+            # update the cut item data with the shot, timecodes and other fields
+            # required
             cut_item_data.update({
                 "code": shot_updater_task.clipName(),
                 "project": self.app.context.project,
@@ -489,20 +511,16 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "timecode_edit_out": tc_edit_out,
             })
 
-            # add the populated cut item data to the list
+            # add the populated cut item data to the list for batching later
             cut_item_data_list.append(cut_item_data)
 
             if cut_order == 1:
-                # this is the first item in the cut,
+                # first item in the cut, set the cut's start timecode
                 cut_data["timecode_start"] = tc_edit_in
 
             if cut_order == len(cut_related_tasks):
+                # last item in the cut, set the cut's end timecode
                 cut_data["timecode_end"] = tc_edit_out
-
-            # add the length of this item to the cut duration
-            cut_duration += \
-                cut_item_data["cut_item_out"] - \
-                cut_item_data["cut_item_in"] + 1
 
         # all tasks processed, add the duration to the cut data
         cut_data["duration"] = cut_duration
@@ -510,14 +528,15 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # create the cut to get the id.
         sg = self.app.shotgun
         cut = sg.create("Cut", cut_data)
-        self._app.log_info("Created Cut in Shotgun: %s" % (cut,))
+        self._app.log_debug("Created Cut in Shotgun: %s" % (cut,))
+        self._app.log_info("Created Cut '%s' in Shotgun!" % (cut["code"],))
 
         # build a list of batch requests for the cut items
         batch_data = []
         for cut_item_data in cut_item_data_list:
 
             # make sure the cut items have a parent Cut
-            cut_item_data["cut"] = {"id": cut["id"], "type": cut["type"]}
+            cut_item_data["cut"] = {"id": cut["id"], "type": "Cut"}
 
             batch_data.append({
                 "request_type": "create",
@@ -526,22 +545,25 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             })
 
         # batch create the cut items
-        self.app.log_debug("Executing sg batch command for cut items....")
+        self.app.log_info("Creating CutItems in Shotgun...")
         cut_items = sg.batch(batch_data)
-        self._app.log_info("Created CutItems in Shotgun: %s" % (cut_items,))
-        self._app.log_debug("...done!")
+        self._app.log_info("Finished creating CutItems in Shotgun!")
+        self._app.log_debug("Created CutItems in Shotgun: %s" % (cut_items,))
 
         # attach the newly created cut items to their corresponding tasks.
         # the transcode task will update the cut item with the version
         # after it is created.
         for cut_item in cut_items:
             cut_order = cut_item["cut_order"]
+
+            # because these cut related tasks are in order, we can get the
+            # corresponding tasks for this cut item.
             (shot_updater_task, transcode_task) = cut_related_tasks[cut_order - 1]
 
             # dont' want to assume that there is an associated transcode task.
-            # if there is, attache the cut item data so that the version is
+            # if there is, attach the cut item data so that the version is
             # updated. If not, then we'll get a cut item without an associated
-            # version (cut info only in SG, no playable).
+            # version (cut info only in SG, nothing playable).
             if transcode_task:
                 transcode_task._cut_item_data = cut_item
 
