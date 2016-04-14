@@ -469,7 +469,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         cut_item_data_list = []
 
         # process the tasks in order
-        for (shot_updater_task, transcode_task) in cut_related_tasks.items():
+        for (shot_updater_task, transcode_task) in cut_related_tasks:
 
             # cut order was populated by the calling method to update the
             # Shot entity's cut info
