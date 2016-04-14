@@ -335,6 +335,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # create version
         ################
+        vers = None
         if self._preset.properties()['create_version']:
             if published_file_entity_type == "PublishedFile":
                 self._version_data["published_files"] = [pub_data]
@@ -352,10 +353,29 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # Post creation hook
         ####################
-        self.app.execute_hook(
-            "hook_post_version_creation",
-            version_data=vers,
-        )
+        if vers:
+            self.app.execute_hook(
+                "hook_post_version_creation",
+                version_data=vers,
+            )
+
+        # Update the cut item if possible
+        #################################
+        if vers and hasattr(self, '_cut_item_data'):
+
+            if "id" in self._cut_item_data:
+                cut_item_id = self._cut_item_data["id"]
+                self.app.log_debug("Attaching version to cut item... ")
+                self.app.shotgun.update("CutItem", cut_item_id,
+                    {"version": vers})
+                self.app.log_debug("done!")
+
+                # upload a thumbnal for the cut item as well
+                if self._thumbnail:
+                    self._upload_thumbnail_to_sg(
+                        {"type": "CutItem", "id": cut_item_id},
+                        self._thumbnail
+                    )
 
         # Log usage metrics
         try:
