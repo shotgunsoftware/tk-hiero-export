@@ -96,7 +96,7 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
         shotgun_layout.addWidget(collating_widget)
         CollatingExporterUI.populateUI(self, collating_widget, properties)
 
-        if _cutsSupported(self.app.shotgun):
+        if self._cutsSupported():
             cut_type_layout = self._build_cut_type_layout(properties)
             shotgun_layout.addLayout(cut_type_layout)
 
@@ -108,14 +108,17 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
     def _build_cut_type_layout(self, properties):
         """
         Returns layout with a Label and QComboBox with a list of cut types.
+
+        :param properties: A dict containing the 'sg_cut_type' preset
+        :return: QtGui.QLayout - for the cut type widget
         """
         tooltip = "What to populate in the `Type` field for this Cut in Shotgun"
 
         # ---- construct the widget
 
         # populate the list of cut types and default from the site schema
-        schema = self.app.shotgun.schema_field_read('Cut', 'sg_cut_type')
-        cut_types = schema['sg_cut_type']['properties']['valid_values']['value']
+        schema = self.app.shotgun.schema_field_read("Cut", "sg_cut_type")
+        cut_types = schema["sg_cut_type"]["properties"]["valid_values"]["value"]
 
         # make sure we have an empty item at the top
         cut_types.insert(0, "")
@@ -361,7 +364,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # The we also use the above loops to get the tasks in cut order which
         # will be used in `_processCuts` if the site has cut support.
 
-        if not _cutsSupported(self.app.shotgun):
+        if not self._cutsSupported():
             # cuts not supported. all done here
             return
 
@@ -383,7 +386,12 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             self.app.engine.clear_busy()
 
     def _getCutData(self, hiero_sequence):
-        """Returns a dict of cut data for the supplied hiero sequence."""
+        """
+        Returns a dict of cut data for the supplied hiero sequence.
+
+        :param hiero_sequence: `hiero.core.Sequence` object
+        :return: dict - cut data fields
+        """
 
         # get the parent entity in SG that corresponds to the hiero sequence
         parent_entity = self.app.execute_hook(
@@ -442,6 +450,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         corresponding CutItems. Pre processing the CutItems allow us to attach
         the CutItem data to the Transcode task so that it can update the item
         in SG after the version is created.
+
+        :param cut_related_tasks: A sorted list of tuples of the form:
+            (shot_updater_task, transcode_task)
         """
 
         # make sure the data cache is ready. this code may create entities in
@@ -530,6 +541,16 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         cut = sg.create("Cut", cut_data)
         self._app.log_debug("Created Cut in Shotgun: %s" % (cut,))
         self._app.log_info("Created Cut '%s' in Shotgun!" % (cut["code"],))
+
+        try:
+            # see if we can find a poster frame for the sequence
+            thumbnail = hiero_sequence.thumbnail(hiero_sequence.posterFrame())
+        except Exception:
+            self._app.log_debug("No thumbnail found for the 'Cut'.")
+            pass
+        else:
+            # found one, uplaod to sg for the cut
+            self._upload_thumbnail_to_sg(cut, thumbnail)
 
         # build a list of batch requests for the cut items
         batch_data = []
@@ -637,8 +658,4 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
                 lambda keyword, task:
                     self.app.execute_hook("hook_resolve_custom_strings", keyword=keyword, task=task)
             )
-
-def _cutsSupported(sg_connection):
-    """Returns True if the site has Cut support, False otherwise."""
-    return sg_connection.server_caps.version >= (6, 3, 13)
 

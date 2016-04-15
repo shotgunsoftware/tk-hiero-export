@@ -77,6 +77,10 @@ class ShotgunHieroObjectBase(object):
                 time.sleep(1.0)
                 shutil.rmtree(thumbdir)
 
+    def _cutsSupported(self):
+        """Returns True if the site has Cut support, False otherwise."""
+        return self.app.shotgun.server_caps.version >= (6, 3, 13)
+
 
 
 
