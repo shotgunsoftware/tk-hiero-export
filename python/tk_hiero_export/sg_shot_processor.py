@@ -467,6 +467,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # the sequence fps, used to calculate timecodes for cut items
         fps = hiero_sequence.framerate().toFloat()
 
+        # get whether sequence timecode is displayed in drop frame format
+        drop_frame = hiero_sequence.dropFrame()
+
         # go ahead populate the bulk of the cut data. the first and last
         # cut items will populate the cut's in/out points.
         cut_data = self._getCutData(hiero_sequence)
@@ -495,10 +498,10 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
             # translate some of the cut item data into timecodes that will also
             # be populated in the cut item
-            tc_cut_item_in = self._timecode(cut_item_data["cut_item_in"], fps)
-            tc_cut_item_out = self._timecode(cut_item_data["cut_item_out"], fps)
-            tc_edit_in = self._timecode(cut_item_data["edit_in"], fps)
-            tc_edit_out = self._timecode(cut_item_data["edit_out"], fps)
+            tc_cut_item_in = self._timecode(cut_item_data["cut_item_in"], fps, drop_frame)
+            tc_cut_item_out = self._timecode(cut_item_data["cut_item_out"], fps, drop_frame)
+            tc_edit_in = self._timecode(cut_item_data["edit_in"], fps, drop_frame)
+            tc_edit_out = self._timecode(cut_item_data["edit_out"], fps, drop_frame)
 
             # get the shot so that we have all we need for the cut item.
             # this may create the shot if it doesn't exist already
@@ -588,15 +591,20 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             if transcode_task:
                 transcode_task._cut_item_data = cut_item
 
-    def _timecode(self, frame, fps):
+    def _timecode(self, frame, fps, drop_frame=False):
         """Convenience wrapper to convert a given frame and fps to a timecode.
 
         :param frame: Frame number
         :param fps: Frames per seconds (float)
         :return: timecode string
         """
-        return hiero.core.Timecode.timeToString(frame, fps,
-            hiero.core.Timecode.kDisplayTimecode)
+
+        if drop_frame:
+            display_type = hiero.core.Timecode.kDisplayDropFrameTimecode
+        else:
+            display_type = hiero.core.Timecode.kDisplayTimecode
+
+        return hiero.core.Timecode.timeToString(frame, fps, display_type)
 
 
 class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessorPreset, CollatedShotPreset):
