@@ -111,19 +111,6 @@ configuration:
         parameters: [task, item, data]
         default_value: hiero_get_shot
 
-    hook_get_shot_parent:
-        type: hook
-        description: Called to retireve a Shotgun entity for the supplied Hiero
-                     sequence object. The default implementaiton returns a
-                     Sequence entity from SG (one will be created if it doesn't
-                     exist). This can be used in conjuction with the
-                     "shot_parent_field" and "shot_parent_entity" settings to
-                     customize how shots are organized on production. For
-                     episodic projects, this method might return an Episode
-                     entity for example.
-        parameters: [hiero_sequence, data]
-        default_value: hiero_get_shot_parent
-
     hook_pre_export:
         type: hook
         description: "Called prior to starting shotgun's shot processor. It can be used
@@ -230,3 +217,5 @@ description: "App that adds Shotgun awareness to Hiero's sequence export.  It
              paths for Nuke scripts and plates.  It also will use the tags to
              determine Shotgun Shot status and task templates to create/update
              the Shots in Shotgun."
+
+# XXX will require a version of core that supports the TankHookMethodDoesNotExist exception

@@ -283,7 +283,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # anything to work with, which will result in the same result
         # as if the thumbnail failed to upload.
         try:
-            self._thumbnail = source.thumbnail(source.posterFrame())
+            self._thumbnail = source.thumbnail(self._item.sourceIn())
         except Exception:
             pass
 

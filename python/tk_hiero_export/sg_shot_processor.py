@@ -38,6 +38,9 @@ from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
+from tank.errors import TankHookMethodDoesNotExist
+
+
 class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingExporterUI):
     """
     Add extra UI to the built in Shot processor.
@@ -370,12 +373,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # ---- at this point, we have the cut related tasks in order.
 
-        # Create the Cut and CutItem entries for this submission. This will be
-        # done in a batch call, so show the busy popup while this is going on.
-        # Otherwise, it may look like Hiero is hanging.
         self.app.engine.show_busy(
             "Preprocessing Sequence",
-            "Creating Cut and Cut Items in Shotgun ..."
+            "Creating Cut in Shotgun ..."
         )
 
         # wrap in a try/catch to make sure we can clear the popup at the end
@@ -393,12 +393,29 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         :return: dict - cut data fields
         """
 
-        # get the parent entity in SG that corresponds to the hiero sequence
-        parent_entity = self.app.execute_hook(
-            "hook_get_shot_parent",
-            hiero_sequence=hiero_sequence,
-            data=self.app.preprocess_data
-        )
+        parent_entity = None
+
+        try:
+            # get the parent entity in SG that corresponds to the hiero sequence
+            parent_entity = self.app.execute_hook_method(
+                "hook_get_shot",
+                "get_shot_parent",
+                hiero_sequence=hiero_sequence,
+                data=self.app.preprocess_data,
+            )
+        except TankHookMethodDoesNotExist, e:
+            # the method doesen't exist in the hook. the hook may have been
+            # overridden previously and not updated to include this method.
+            # this will imply a Cut stream without a parent entity. For now,
+            # we will log a warning and continue.
+            self.app.log_warning(
+                "The method 'get_shot_parent' could not be found in the "
+                "'hook_get_shot' hook. In order to properly link the "
+                "Cut entity in SG, you will need to implement this method "
+                "to return a Sequence, Episode, or some other entity "
+                "that corresponds to the Hiero sequence in your workflow."
+            )
+            pass
 
         # determine which revision number of the cut to create. look for an
         # existing Cut with the sequence name with the same parent.
@@ -442,14 +459,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         """Collect data and create the Cut and CutItem entries for the tasks.
 
         We need to pre-create the Cut entity so that the CutItems can be
-        parented to it. Ideally the CutItems would be created during the
-        execution of the shot updater task, but we need the individual tasks to
-        build the complete Cut data (Cut in/out and duration). So we're
-        creating all the CutItems before the tasks are processed. We also need
-        to associate the Versions created during the transcode tasks with the
-        corresponding CutItems. Pre processing the CutItems allow us to attach
-        the CutItem data to the Transcode task so that it can update the item
-        in SG after the version is created.
+        parented to it.
 
         :param cut_related_tasks: A sorted list of tuples of the form:
             (shot_updater_task, transcode_task)
@@ -477,9 +487,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # we'll also calculate the cut duration while processing the tasks
         cut_duration = 0
 
-        # this will hold a list of cut item data dicts that will be populated
-        # as the tasks are processed. these will be used to batch create the cut
-        # items at the end
+        # list of cut item data
         cut_item_data_list = []
 
         # process the tasks in order
@@ -510,6 +518,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 task=shot_updater_task,
                 item=shot_updater_task._item,
                 data=self.app.preprocess_data,
+                upload_thumbnail=False,
             )
 
             # update the cut item data with the shot, timecodes and other fields
@@ -525,16 +534,31 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "timecode_edit_out": tc_edit_out,
             })
 
-            # add the populated cut item data to the list for batching later
-            cut_item_data_list.append(cut_item_data)
+            # add the cut item data to each of the cut related tasks. they
+            # will be responsible for ensuring the cut item exists and updating
+            # any additional information
+            shot_updater_task._cut_item_data = cut_item_data
+
+            # dont' want to assume that there is an associated transcode task.
+            # if there is, attach the cut item data so that the version is
+            # updated. If not, then we'll get a cut item without an associated
+            # version (cut info only in SG, nothing playable).
+            if transcode_task:
+                transcode_task._cut_item_data = cut_item_data
 
             if cut_order == 1:
                 # first item in the cut, set the cut's start timecode
                 cut_data["timecode_start"] = tc_edit_in
 
+                # let the first shot_updater be responsible for uploading
+                # a thumbnail for the Cut
+                shot_updater_task._create_cut_thumbnail = True
+
             if cut_order == len(cut_related_tasks):
                 # last item in the cut, set the cut's end timecode
                 cut_data["timecode_end"] = tc_edit_out
+
+            cut_item_data_list.append(cut_item_data)
 
         # all tasks processed, add the duration to the cut data
         cut_data["duration"] = cut_duration
@@ -545,51 +569,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         self._app.log_debug("Created Cut in Shotgun: %s" % (cut,))
         self._app.log_info("Created Cut '%s' in Shotgun!" % (cut["code"],))
 
-        try:
-            # see if we can find a poster frame for the sequence
-            thumbnail = hiero_sequence.thumbnail(hiero_sequence.posterFrame())
-        except Exception:
-            self._app.log_debug("No thumbnail found for the 'Cut'.")
-            pass
-        else:
-            # found one, uplaod to sg for the cut
-            self._upload_thumbnail_to_sg(cut, thumbnail)
-
-        # build a list of batch requests for the cut items
-        batch_data = []
+        # make sure the cut item data dicts are updated with the cut info
         for cut_item_data in cut_item_data_list:
-
-            # make sure the cut items have a parent Cut
             cut_item_data["cut"] = {"id": cut["id"], "type": "Cut"}
-
-            batch_data.append({
-                "request_type": "create",
-                "entity_type": "CutItem",
-                "data": cut_item_data,
-            })
-
-        # batch create the cut items
-        self.app.log_info("Creating CutItems in Shotgun...")
-        cut_items = sg.batch(batch_data)
-        self._app.log_info("Finished creating CutItems in Shotgun!")
-        self._app.log_debug("Created CutItems in Shotgun: %s" % (cut_items,))
-
-        # attach the newly created cut items to their corresponding tasks.
-        # the transcode task will update the cut item with the version
-        # after it is created.
-        for cut_item in cut_items:
-            cut_order = cut_item["cut_order"]
-
-            # because these cut related tasks are in order, we can get the
-            # corresponding tasks for this cut item.
-            (shot_updater_task, transcode_task) = cut_related_tasks[cut_order - 1]
-
-            # dont' want to assume that there is an associated transcode task.
-            # if there is, attach the cut item data so that the version is
-            # updated. If not, then we'll get a cut item without an associated
-            # version (cut info only in SG, nothing playable).
-            if transcode_task:
-                transcode_task._cut_item_data = cut_item
 
     def _timecode(self, frame, fps, drop_frame=False):
         """Convenience wrapper to convert a given frame and fps to a timecode.

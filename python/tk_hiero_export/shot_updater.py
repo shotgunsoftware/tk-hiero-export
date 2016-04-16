@@ -152,6 +152,31 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # keep shot count
         self.app.shot_count += 1
 
+        cut = None
+        # create the CutItem with the data populated by the shot processor
+        if hasattr(self, '_cut_item_data'):
+            cut_item_data = self._cut_item_data
+            cut_item = self.app.tank.shotgun.create("CutItem", cut_item_data)
+            self.app.log_info("Created CutItem in Shotgun: %s" % (cut_item,))
+
+            # update the object's cut item data to include the new info
+            self._cut_item_data.update(cut_item)
+
+            cut = cut_item["cut"]
+
+        # see if this task has been designated to update the Cut thumbnail
+        if cut and hasattr(self, '_create_cut_thumbnail'):
+            hiero_sequence = self._item.sequence()
+            try:
+                # see if we can find a poster frame for the sequence
+                thumbnail = hiero_sequence.thumbnail(hiero_sequence.posterFrame())
+            except Exception:
+                self.app.log_debug("No thumbnail found for the 'Cut'.")
+                pass
+            else:
+                # found one, uplaod to sg for the cut
+                self._upload_thumbnail_to_sg(cut, thumbnail)
+
         # return false to indicate success
         return False
 
