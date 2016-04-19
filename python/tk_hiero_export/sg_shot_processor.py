@@ -166,8 +166,8 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
         Returns a QT widget which contains the tag.
         """
         fields = ['code']
-        filt = [['entity_type', 'is', 'Shot']]
-        templates = [t['code'] for t in self.app.shotgun.find('TaskTemplate', filt, fields=fields)]
+        filter = [['entity_type', 'is', 'Shot']]
+        templates = [t['code'] for t in self.app.shotgun.find('TaskTemplate', filter, fields=fields)]
 
         schema = self.app.shotgun.schema_field_read('Shot', 'sg_status_list')
         statuses = schema['sg_status_list']['properties']['valid_values']['value']
@@ -290,8 +290,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         properties = self._preset.properties().get('shotgunShotCreateProperties', {})
 
         # inject collate settings into Tasks where needed
-        collateTracks = properties.get('collateTracks', False)
-        collateShotNames = properties.get('collateShotNames', False)
+        (collateTracks, collateShotNames) = self._getCollateProperties()
         for (itemPath, itemPreset) in exportTemplate:
             if 'collateTracks' in itemPreset.properties():
                 itemPreset.properties()['collateTracks'] = collateTracks
@@ -404,6 +403,18 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             self._processCut(cut_related_tasks)
         finally:
             self.app.engine.clear_busy()
+
+    def _getCollateProperties(self):
+        """
+        Returns tuple with values for collateTracks collateShotNames settings.
+        """
+
+        properties = self._preset.properties().get('shotgunShotCreateProperties', {})
+
+        collateTracks = properties.get('collateTracks', False)
+        collateShotNames = properties.get('collateShotNames', False)
+
+        return (collateTracks, collateShotNames)
 
     def _getCutData(self, hiero_sequence):
         """

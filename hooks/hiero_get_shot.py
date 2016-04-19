@@ -30,13 +30,13 @@ class HieroGetShot(Hook):
 
         # grab shot from Shotgun
         sg = self.parent.shotgun
-        filt = [
+        filter = [
             ["project", "is", self.parent.context.project],
             [parent_field, "is", parent],
             ["code", "is", item.name()],
         ]
         fields = kwargs.get("fields", [])
-        shots = sg.find("Shot", filt, fields=fields)
+        shots = sg.find("Shot", filter, fields=fields)
         if len(shots) > 1:
             # can not handle multiple shots with the same name
             raise StandardError("Multiple shots named '%s' found", item.name())
@@ -86,7 +86,7 @@ class HieroGetShot(Hook):
 
         # parent not found in cache, grab it from Shotgun
         sg = self.parent.shotgun
-        filt = [
+        filter = [
             ["project", "is", self.parent.context.project],
             ["code", "is", hiero_sequence.name()],
         ]
@@ -94,7 +94,7 @@ class HieroGetShot(Hook):
         # the entity type of the parent.
         par_entity_type = "Sequence"
 
-        parents = sg.find(par_entity_type, filt)
+        parents = sg.find(par_entity_type, filter)
         if len(parents) > 1:
             # can not handle multiple parents with the same name
             raise StandardError(
