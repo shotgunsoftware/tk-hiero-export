@@ -18,7 +18,7 @@ class CollatingExporterUI(object):
         self._collateTimeProperty = None
         self._collateNameProperty = None
 
-    def populateUI(self, widget, properties=None):
+    def populateUI(self, widget, properties=None, cut_support=False):
         """returns a tuple of added uiProperties"""
         if properties is None:
             properties = self._preset.properties()
@@ -38,6 +38,18 @@ class CollatingExporterUI(object):
         label = "Collate Shot Name:"
         self._collateNameProperty = UIPropertyFactory.create(type(value), key=key, value=value, dictionary=properties, label=label, tooltip=collateShotNameToolTip)
         layout.addRow(label, self._collateNameProperty)
+
+        if cut_support:
+            cut_lbl = PySide.QtGui.QLabel(
+                "NOTE: Turning on collating will disable Cut/CutItem creation "
+                "in Shotgun."
+            )
+            color_role = PySide.QtGui.QPalette.WindowText
+            palette = widget.palette()
+            darker_color = palette.color(color_role).darker(150)
+            palette.setColor(color_role, darker_color)
+            cut_lbl.setPalette(palette)
+            layout.addRow(cut_lbl)
 
         widget.setLayout(layout)
         return (self._collateTimeProperty, self._collateNameProperty)

@@ -38,7 +38,7 @@ from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
-from tank.errors import TankHookMethodDoesNotExist
+from tank.errors import TankHookMethodDoesNotExistError
 
 
 class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingExporterUI):
@@ -97,7 +97,8 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
         # add collate options
         collating_widget = QtGui.QWidget()
         shotgun_layout.addWidget(collating_widget)
-        CollatingExporterUI.populateUI(self, collating_widget, properties)
+        CollatingExporterUI.populateUI(self, collating_widget, properties,
+            cut_support=self._cutsSupported())
 
         if self._cutsSupported():
             cut_type_layout = self._build_cut_type_layout(properties)
@@ -325,7 +326,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         for taskGroup in self._submission.children():
 
             # placeholders for the tasks we want to pre-process
-            (transcode_task, shot_updater_task) = (None, None)
+            (shot_updater_task, transcode_task) = (None, None)
 
             # look at all the tasks in the group and identify the shot updater
             # and transcode tasks.
@@ -345,12 +346,16 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 elif isinstance(task, ShotgunTranscodeExporter):
                     transcode_task = task
 
-            # add the pair of associated tasks to the list of cut related tasks
-            cut_related_tasks.append((shot_updater_task, transcode_task))
+            # if there's not shot updater task, then we don't process. this is
+            # likely due to collating and the task not being hero.
+            if shot_updater_task:
+                # add the associated tasks to the list of cut related tasks.
+                # transcode_task may be None.
+                cut_related_tasks.append((shot_updater_task, transcode_task))
 
         # sort the tasks based on their position in the timeline. this gives
         # us the cut order.
-        cut_related_tasks.sort(key=lambda tb: tb[0]._item.timelineIn())
+        cut_related_tasks.sort(key=lambda tasks: tasks[0]._item.timelineIn())
 
         # go ahead and populate the shot updater tasks with the cut order. this
         # is used to set the cut order on the Shot as it is created/updated.
@@ -369,6 +374,21 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         if not self._cutsSupported():
             # cuts not supported. all done here
+            self.app.log_info(
+                "No Cut support in this version of Shotgun. Not attempting to "
+                "create Cut or CutItem entries."
+            )
+            return
+
+        # collate complicates cut support for hiero. For now duck out at this
+        # point with a log msg. The user should be aware of this from the
+        # message in the collating preset UI.
+        (collateTracks, collateShotNames) = self._getCollateProperties()
+        if collateTracks or collateShotNames:
+            self.app.log_info(
+                "Cut support is ill defined for collating in Hiero. Not "
+                "attempting to create Cut or CutItem entries in Shotgun."
+            )
             return
 
         # ---- at this point, we have the cut related tasks in order.
@@ -402,8 +422,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "get_shot_parent",
                 hiero_sequence=hiero_sequence,
                 data=self.app.preprocess_data,
+                upload_thumbnail=False,
             )
-        except TankHookMethodDoesNotExist, e:
+        except TankHookMethodDoesNotExistError, e:
             # the method doesen't exist in the hook. the hook may have been
             # overridden previously and not updated to include this method.
             # this will imply a Cut stream without a parent entity. For now,
