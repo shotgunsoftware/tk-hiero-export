@@ -361,7 +361,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # Update the cut item if possible
         #################################
-        if vers and hasattr(self, '_cut_item_data'):
+        if vers and hasattr(self, "_cut_item_data"):
 
             # a version was created and we have a cut item to update.
 

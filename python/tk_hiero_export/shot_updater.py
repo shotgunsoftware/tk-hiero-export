@@ -154,7 +154,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         cut = None
         # create the CutItem with the data populated by the shot processor
-        if hasattr(self, '_cut_item_data'):
+        if hasattr(self, "_cut_item_data"):
             cut_item_data = self._cut_item_data
             cut_item = self.app.tank.shotgun.create("CutItem", cut_item_data)
             self.app.log_info("Created CutItem in Shotgun: %s" % (cut_item,))
@@ -165,7 +165,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             cut = cut_item["cut"]
 
         # see if this task has been designated to update the Cut thumbnail
-        if cut and hasattr(self, '_create_cut_thumbnail'):
+        if cut and hasattr(self, "_create_cut_thumbnail"):
             hiero_sequence = self._item.sequence()
             try:
                 # see if we can find a poster frame for the sequence

@@ -41,8 +41,7 @@ class CollatingExporterUI(object):
 
         if cut_support:
             cut_lbl = PySide.QtGui.QLabel(
-                "NOTE: Turning on collating will disable Cut/CutItem creation "
-                "in Shotgun."
+                "NOTE: Cuts in Shotgun are only created when collate is off."
             )
             color_role = PySide.QtGui.QPalette.WindowText
             palette = widget.palette()

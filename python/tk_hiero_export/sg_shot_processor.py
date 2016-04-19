@@ -409,10 +409,10 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         Returns tuple with values for collateTracks collateShotNames settings.
         """
 
-        properties = self._preset.properties().get('shotgunShotCreateProperties', {})
+        properties = self._preset.properties().get("shotgunShotCreateProperties", {})
 
-        collateTracks = properties.get('collateTracks', False)
-        collateShotNames = properties.get('collateShotNames', False)
+        collateTracks = properties.get("collateTracks", False)
+        collateShotNames = properties.get("collateShotNames", False)
 
         return (collateTracks, collateShotNames)
 
@@ -472,7 +472,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # retrieve the cut type from the processor presets
         properties = self._preset.properties().get(
-            'shotgunShotCreateProperties', {})
+            "shotgunShotCreateProperties", {})
         cut_type = properties.get("sg_cut_type", "")
 
         # the bulk of the cut data. the rest will be populated as the individual
@@ -482,7 +482,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             "entity": parent_entity,
             "code": hiero_sequence.name(),
             "sg_cut_type": cut_type,
-            "description": "Automatically created by the Hiero Shot exporter.",
+            "description": "",
             "revision_number": next_revision_number,
             "fps": hiero_sequence.framerate().toFloat(),
         }
