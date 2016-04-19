@@ -15,23 +15,28 @@ class HieroGetShot(Hook):
     """
     Return a Shotgun Shot dictionary for the given Hiero items
     """
+
     def execute(self, task, item, data, **kwargs):
         """
         Takes a hiero.core.TrackItem as input and returns a data dictionary for
         the shot to update the cut info for.
         """
-        # get the parent sequence for the Shot
-        sequence = self._get_sequence(item, data)
+
+        # get the parent entity for the Shot
+        parent = self.get_shot_parent(item.parentSequence(), data)
+
+        # shot parent field
+        parent_field = "sg_sequence"
 
         # grab shot from Shotgun
         sg = self.parent.shotgun
-        filt = [
+        filter = [
             ["project", "is", self.parent.context.project],
-            ["sg_sequence", "is", sequence],
+            [parent_field, "is", parent],
             ["code", "is", item.name()],
         ]
         fields = kwargs.get("fields", [])
-        shots = sg.find("Shot", filt, fields=fields)
+        shots = sg.find("Shot", filter, fields=fields)
         if len(shots) > 1:
             # can not handle multiple shots with the same name
             raise StandardError("Multiple shots named '%s' found", item.name())
@@ -39,7 +44,7 @@ class HieroGetShot(Hook):
             # create shot in shotgun
             shot_data = {
                 "code": item.name(),
-                "sg_sequence": sequence,
+                parent_field: parent,
                 "project": self.parent.context.project,
             }
             shot = sg.create("Shot", shot_data)
@@ -60,42 +65,66 @@ class HieroGetShot(Hook):
 
         return shot
 
-    def _get_sequence(self, item, data):
-        """Return the shotgun sequence for the given Hiero items"""
+    def get_shot_parent(self, hiero_sequence, data, **kwargs):
+        """
+        Given a Hiero sequence and data cache, return the corresponding entity
+        in Shotgun to serve as the parent for contained Shots.
+
+        :param hiero_sequence: A Hiero sequence object
+        :param data: A dictionary with cached parent data.
+
+        The data dict is typically the app's `preprocess_data` which maintains
+        the cache across invocations of this hook.
+        """
+
         # stick a lookup cache on the data object.
-        if "seq_cache" not in data:
-            data["seq_cache"] = {}
+        if "parent_cache" not in data:
+            data["parent_cache"] = {}
 
-        hiero_sequence = item.parentSequence()
-        if hiero_sequence.guid() in data["seq_cache"]:
-            return data["seq_cache"][hiero_sequence.guid()]
+        if hiero_sequence.guid() in data["parent_cache"]:
+            return data["parent_cache"][hiero_sequence.guid()]
 
-        # sequence not found in cache, grab it from Shotgun
+        # parent not found in cache, grab it from Shotgun
         sg = self.parent.shotgun
-        filt = [
+        filter = [
             ["project", "is", self.parent.context.project],
             ["code", "is", hiero_sequence.name()],
         ]
-        sequences = sg.find("Sequence", filt)
-        if len(sequences) > 1:
-            # can not handle multiple sequences with the same name
-            raise StandardError("Multiple sequences named '%s' found" % hiero_sequence.name())
 
-        if len(sequences) == 0:
-            # create the sequence in shotgun
-            seq_data = {
+        # the entity type of the parent.
+        par_entity_type = "Sequence"
+
+        parents = sg.find(par_entity_type, filter)
+        if len(parents) > 1:
+            # can not handle multiple parents with the same name
+            raise StandardError(
+                "Multiple %s entities named '%s' found" %
+                (par_entity_type, hiero_sequence.name())
+            )
+
+        if len(parents) == 0:
+            # create the parent in shotgun
+            par_data = {
                 "code": hiero_sequence.name(),
                 "project": self.parent.context.project,
             }
-            sequence = sg.create("Sequence", seq_data)
-            self.parent.log_info("Created Sequence in Shotgun: %s" % seq_data)
+            parent = sg.create(par_entity_type, par_data)
+            self.parent.log_info(
+                "Created %s in Shotgun: %s" % (par_entity_type, par_data))
         else:
-            sequence = sequences[0]
+            parent = parents[0]
 
-        # update the thumbnail for the sequence
-        self.parent.execute_hook("hook_upload_thumbnail", entity=sequence, source=hiero_sequence, item=None)
+        # update the thumbnail for the parent
+        upload_thumbnail = kwargs.get("upload_thumbnail", True)
+        if upload_thumbnail:
+            self.parent.execute_hook(
+                "hook_upload_thumbnail",
+                entity=parent,
+                source=hiero_sequence,
+                item=None
+            )
 
         # cache the results
-        data["seq_cache"][hiero_sequence.guid()] = sequence
+        data["parent_cache"][hiero_sequence.guid()] = parent
 
-        return sequence
+        return parent

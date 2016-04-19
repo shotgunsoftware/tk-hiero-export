@@ -283,7 +283,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # anything to work with, which will result in the same result
         # as if the thumbnail failed to upload.
         try:
-            self._thumbnail = source.thumbnail(source.posterFrame())
+            self._thumbnail = source.thumbnail(self._item.sourceIn())
         except Exception:
             pass
 
@@ -335,6 +335,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # create version
         ################
+        vers = None
         if self._preset.properties()['create_version']:
             if published_file_entity_type == "PublishedFile":
                 self._version_data["published_files"] = [pub_data]
@@ -352,10 +353,34 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # Post creation hook
         ####################
-        self.app.execute_hook(
-            "hook_post_version_creation",
-            version_data=vers,
-        )
+        if vers:
+            self.app.execute_hook(
+                "hook_post_version_creation",
+                version_data=vers,
+            )
+
+        # Update the cut item if possible
+        #################################
+        if vers and hasattr(self, "_cut_item_data"):
+
+            # a version was created and we have a cut item to update.
+
+            # just make sure the cut item data has an id which should imply that
+            # it was created in the db.
+            if "id" in self._cut_item_data:
+                cut_item_id = self._cut_item_data["id"]
+
+                # update the Cut item with the newly uploaded version
+                self.app.shotgun.update("CutItem", cut_item_id,
+                    {"version": vers})
+                self.app.log_debug("Attached version to cut item.")
+
+                # upload a thumbnail for the cut item as well
+                if self._thumbnail:
+                    self._upload_thumbnail_to_sg(
+                        {"type": "CutItem", "id": cut_item_id},
+                        self._thumbnail
+                    )
 
         # Log usage metrics
         try:
