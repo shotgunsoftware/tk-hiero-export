@@ -79,7 +79,7 @@ class ShotgunHieroObjectBase(object):
 
     def _cutsSupported(self):
         """Returns True if the site has Cut support, False otherwise."""
-        return self.app.shotgun.server_caps.version >= (6, 3, 13)
+        return self.app.shotgun.server_caps.version >= (7, 0, 0)
 
 
 
