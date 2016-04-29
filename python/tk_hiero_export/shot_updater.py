@@ -23,22 +23,31 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         CollatingExporter.__init__(self)
         self._cut_order = None
 
-    def get_cut_item_data(self):
+    def get_cut_item_data(self, cut_length=True):
         """
         Return some computed values for use when creating cut items.
+
+        :param cut_length: True if cut in/out should be based on the cut length,
+            otherwise the in/out will be based on the length of the entire clip.
         """
 
-        # this is the head in/out of the source clip. For the cut item in SG,
-        # we need to translate this to the exported version's frames
-        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
+        source_in = int(self._item.sourceIn())
+        source_out = int(self._item.sourceOut())
 
-        # the handles as specified in the export UI
-        handles = self._cutHandles if self._cutHandles is not None else 0
+        if cut_length:
 
-        # the in/out of the exported version. assume start at 0, then calculate
-        # based on the handles and the length of the clip
-        cut_in = handles
-        cut_out = tail_out - head_in - handles
+            # the handles as specified in the export UI
+            handles = self._cutHandles if self._cutHandles is not None else 0
+
+            # the in/out of the exported version. assume start at 0, then calculate
+            # based on the handles and the length of the clip
+            cut_in = handles
+            cut_out = handles + (source_out - source_in)
+
+        else:
+            # exporting the full clip.
+            cut_in = source_in
+            cut_out = source_out
 
         # determine the edit in/out which includes the sequence start
         edit_in = self._item.timelineIn()

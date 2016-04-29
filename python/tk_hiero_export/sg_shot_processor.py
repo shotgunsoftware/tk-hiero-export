@@ -522,6 +522,10 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # list of cut item data
         cut_item_data_list = []
 
+        # if set, only exporting the cut portion of the source clip. If false,
+        # the export will be the full clip
+        cut_length = self._preset.properties()["cutLength"]
+
         # process the tasks in order
         for (shot_updater_task, transcode_task) in cut_related_tasks:
 
@@ -531,7 +535,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
             # this retrieves the basic cut information from the updater task.
             # cut item in/out, cut item duration, edit in/out.
-            cut_item_data = shot_updater_task.get_cut_item_data()
+            cut_item_data = shot_updater_task.get_cut_item_data(cut_length)
 
             # add the length of this item to the full cut duration
             cut_duration += cut_item_data["cut_item_duration"]
