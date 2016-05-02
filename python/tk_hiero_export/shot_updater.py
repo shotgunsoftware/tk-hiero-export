@@ -39,10 +39,28 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             # the handles as specified in the export UI
             handles = self._cutHandles if self._cutHandles is not None else 0
 
-            # the in/out of the exported version. assume start at 0, then calculate
-            # based on the handles and the length of the clip
-            cut_in = handles
-            cut_out = handles + (source_out - source_in)
+            if handles > source_in:
+                # the source in point is within the specified handles. this is
+                # handled differently in different versions of hiero
+
+                try:
+                    import nuke
+                except ImportError:
+                    # nuke failed to import. must be using a version of hiero
+                    # prior to 9.0 (nuke). this version of hiero will write
+                    # black frames to disk to account for the handles.
+                    cut_in = handles
+                else:
+                    # newer version of hiero does not write black frames to
+                    # to account for handles not available in the source. the
+                    # cut in should be the source in.
+                    cut_in = source_in
+            else:
+                # there is enough room in the source for the specified handles.
+                cut_in = handles
+
+            # calculate the out based on the in and the duration
+            cut_out = cut_in + (source_out - source_in)
 
         else:
             # exporting the full clip.
