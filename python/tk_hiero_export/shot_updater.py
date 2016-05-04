@@ -23,51 +23,46 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         CollatingExporter.__init__(self)
         self._cut_order = None
 
-    def get_cut_item_data(self, cut_length=True):
+    def get_cut_item_data(self):
         """
         Return some computed values for use when creating cut items.
+
+        The values correspond to the exported version created on disk.
 
         :param cut_length: True if cut in/out should be based on the cut length,
             otherwise the in/out will be based on the length of the entire clip.
         """
 
+        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
+        handles = self._cutHandles if self._cutHandles is not None else 0
+        in_handle = handles
+        out_handle = handles
+
         source_in = int(self._item.sourceIn())
         source_out = int(self._item.sourceOut())
 
-        if cut_length:
+        duration = source_out - source_in
 
-            # the handles as specified in the export UI
-            handles = self._cutHandles if self._cutHandles is not None else 0
+        if head_in < in_handle:
+            # the head in point is within the specified handles. this is
+            # handled differently in different versions of hiero. in versions
+            # that will write black frames, the head in/out returned above will
+            # encompass the full in/out
+            if not self._will_write_black_frames():
+                # no black frames written, the in/out should be correct.
+                # but the start handle is limited by the head in value
+                in_handle = head_in
 
-            if handles > source_in:
-                # the source in point is within the specified handles. this is
-                # handled differently in different versions of hiero
-
-                try:
-                    import nuke
-                except ImportError:
-                    # nuke failed to import. must be using a version of hiero
-                    # prior to 9.0 (nuke). this version of hiero will write
-                    # black frames to disk to account for the handles.
-                    cut_in = handles
-                else:
-                    # newer version of hiero does not write black frames to
-                    # to account for handles not available in the source. the
-                    # cut in should be the source in.
-                    cut_in = source_in
-            else:
-                # there is enough room in the source for the specified handles.
-                cut_in = handles
-
-            # calculate the out based on the in and the duration
-            cut_out = cut_in + (source_out - source_in)
-
+        # "cut_length" is a boolean set on the updater by the shot processor.
+        # it signifies whether the transcode task will write the cut length
+        # to disk (True) or if it will write the full source to disk (False)
+        if hasattr(self, "_cut_length") and self._cut_length:
+            cut_in = in_handle
+            cut_out = in_handle + duration
         else:
-            # exporting the full clip.
             cut_in = source_in
             cut_out = source_out
 
-        # determine the edit in/out which includes the sequence start
         edit_in = self._item.timelineIn()
         edit_out = self._item.timelineOut()
 
@@ -76,18 +71,35 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             edit_in += self._startFrame
             edit_out += self._startFrame
         else:
-            # use the start time from the hiero sequence
+            # use the starttime from the hiero sequence
             seq = self._item.sequence()
             edit_in += seq.timecodeStart()
             edit_out += seq.timecodeStart()
+
+        cut_duration = cut_out - cut_in + 1
+        edit_duration = edit_out - edit_in + 1
+
+        if cut_duration != edit_duration:
+            self.app.log_warning(
+                "It looks like the shot %s has a retime applied. SG cuts do "
+                "not support retimes." % (self.clipName(),)
+            )
+
+        head_in = cut_in - in_handle
+        tail_out = cut_out + out_handle
+        working_duration = tail_out - head_in + 1
 
         # return the computed cut information
         return {
             "cut_item_in": cut_in,
             "cut_item_out": cut_out,
-            "cut_item_duration": cut_out - cut_in + 1,
+            "cut_item_duration": cut_duration,
             "edit_in": edit_in,
             "edit_out": edit_out,
+            "edit_duration": edit_duration,
+            "head_in": head_in,
+            "tail_out": tail_out,
+            "working_duration": working_duration,
         }
 
     def taskStep(self):
@@ -112,15 +124,6 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         shot_type = sg_shot['type']
         del sg_shot['type']
 
-        # get cut info.
-        # NOTE: this cut data pre-dates the cut support with SG 6.3.13 and is
-        # specific to the Shot entity. This information may not match the
-        # information found in the Shot's CutItems.
-        handles = self._cutHandles if self._cutHandles is not None else 0
-        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
-        cut_in = head_in + handles
-        cut_out = tail_out - handles
-
         # The cut order may have been set by the processor. Otherwise keep old behavior.
         cut_order = self.app.shot_count + 1
         if self._cut_order:
@@ -128,12 +131,16 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         # update the frame range
         sg_shot["sg_cut_order"] = cut_order
-        sg_shot["sg_head_in"] = head_in
-        sg_shot["sg_cut_in"] = cut_in
-        sg_shot["sg_cut_out"] = cut_out
-        sg_shot["sg_tail_out"] = tail_out
-        sg_shot["sg_cut_duration"] = cut_out - cut_in + 1
-        sg_shot["sg_working_duration"] = tail_out - head_in + 1
+
+        # update the cut item data
+        cut_item_data = self.get_cut_item_data()
+
+        sg_shot["sg_cut_in"] = cut_item_data["cut_item_in"]
+        sg_shot["sg_cut_out"] = cut_item_data["cut_item_out"]
+        sg_shot["sg_head_in"] = cut_item_data["head_in"]
+        sg_shot["sg_tail_out"] = cut_item_data["tail_out"]
+        sg_shot["sg_cut_duration"] = cut_item_data["cut_item_duration"]
+        sg_shot["sg_working_duration"] = cut_item_data["working_duration"]
 
         # get status from the hiero tags
         status = None
@@ -206,6 +213,33 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         # return false to indicate success
         return False
+
+    def _will_write_black_frames(self):
+        """
+        Return True if this version of Hiero will write black frames to account
+        for the handles. False otherwise.
+
+        Hiero versions have different behavior when it comes to writing frames
+        to disk to account for handles without corresponding source material.
+        Older versions (prior to nuke studio) will write black frames into the
+        exported clip while newer versions will not.
+        """
+
+        if not hasattr(self, "_black_frames"):
+
+            try:
+                import nuke
+            except ImportError:
+                # nuke failed to import. must be using a version of hiero
+                # prior to 9.0 (nuke). this version of hiero will write
+                # black frames to disk to account for the handles.
+                self._black_frames = True
+            else:
+                # newer version of hiero does not write black frames to
+                # to account for handles not available in the source.
+                self._black_frames = False
+
+        return self._black_frames
 
 
 class ShotgunShotUpdaterPreset(ShotgunHieroObjectBase, hiero.core.TaskPresetBase):

@@ -533,9 +533,17 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             # Shot entity's cut info
             cut_order = shot_updater_task._cut_order
 
+            # make the shot updater tasks aware of whether only the cut length
+            # portion of the source clip is being exported or the full clip
+            shot_updater_task._cut_length = cut_length
+
             # this retrieves the basic cut information from the updater task.
             # cut item in/out, cut item duration, edit in/out.
-            cut_item_data = shot_updater_task.get_cut_item_data(cut_length)
+            cut_item_data = shot_updater_task.get_cut_item_data()
+
+            # clean out the unnecessary fields used by the shot updater
+            for field in ["edit_duration", "head_in", "tail_out", "working_duration"]:
+                del cut_item_data[field]
 
             # add the length of this item to the full cut duration
             cut_duration += cut_item_data["cut_item_duration"]
