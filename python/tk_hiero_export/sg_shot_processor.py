@@ -572,10 +572,10 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "project": self.app.context.project,
                 "shot": {"id": shot["id"], "type": "Shot"},
                 "cut_order": cut_order,
-                "timecode_cut_item_in": tc_cut_item_in,
-                "timecode_cut_item_out": tc_cut_item_out,
-                "timecode_edit_in": tc_edit_in,
-                "timecode_edit_out": tc_edit_out,
+                "timecode_cut_item_in_text": tc_cut_item_in,
+                "timecode_cut_item_out_text": tc_cut_item_out,
+                "timecode_edit_in_text": tc_edit_in,
+                "timecode_edit_out_text": tc_edit_out,
             })
 
             # add the cut item data to each of the cut related tasks. they
@@ -592,7 +592,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
             if cut_order == 1:
                 # first item in the cut, set the cut's start timecode
-                cut_data["timecode_start"] = tc_edit_in
+                cut_data["timecode_start_text"] = tc_edit_in
 
                 # let the first shot_updater be responsible for uploading
                 # a thumbnail for the Cut
@@ -600,7 +600,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
             if cut_order == len(cut_related_tasks):
                 # last item in the cut, set the cut's end timecode
-                cut_data["timecode_end"] = tc_edit_out
+                cut_data["timecode_end_text"] = tc_edit_out
 
             cut_item_data_list.append(cut_item_data)
 
