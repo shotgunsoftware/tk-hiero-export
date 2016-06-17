@@ -36,7 +36,6 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
         handles = self._cutHandles if self._cutHandles is not None else 0
         in_handle = handles
-        out_handle = handles
 
         source_in = int(self._item.sourceIn())
         source_out = int(self._item.sourceOut())
@@ -85,8 +84,6 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 "not support retimes." % (self.clipName(),)
             )
 
-        head_in = cut_in - in_handle
-        tail_out = cut_out + out_handle
         working_duration = tail_out - head_in + 1
 
         # return the computed cut information
@@ -134,11 +131,32 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         # update the cut item data
         cut_item_data = self.get_cut_item_data()
+        handles = self._cutHandles if self._cutHandles is not None else 0
 
-        sg_shot["sg_cut_in"] = cut_item_data["cut_item_in"]
-        sg_shot["sg_cut_out"] = cut_item_data["cut_item_out"]
-        sg_shot["sg_head_in"] = cut_item_data["head_in"]
-        sg_shot["sg_tail_out"] = cut_item_data["tail_out"]
+        head_in = cut_item_data["head_in"]
+        tail_out = cut_item_data["tail_out"]
+
+        # this conditional calculates the cut in/out to match previous versions
+        # of the app (< v0.3.4). we made the mistake of using the cut item
+        # values here calculated for SG 7.0+, but that produced results that
+        # clients didn't expect.
+        if self._startFrame:
+            # custom start frame. calculate the values
+            cut_in = head_in + handles
+            cut_out = cut_in + cut_item_data["cut_item_duration"] - 1
+
+            # the expected tail out value seems to be incorrect from Hiero in
+            # this scenario. calculate it based on the above value.
+            tail_out = cut_out + handles
+        else:
+            # use the values from the Hiero timeline
+            cut_in = self._item.timelineIn()
+            cut_out = self._item.timelineOut()
+
+        sg_shot["sg_cut_in"] = cut_in
+        sg_shot["sg_cut_out"] = cut_out
+        sg_shot["sg_head_in"] = head_in
+        sg_shot["sg_tail_out"] = tail_out
         sg_shot["sg_cut_duration"] = cut_item_data["cut_item_duration"]
         sg_shot["sg_working_duration"] = cut_item_data["working_duration"]
 
