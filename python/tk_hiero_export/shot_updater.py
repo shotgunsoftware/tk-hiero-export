@@ -65,7 +65,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         edit_in = self._item.timelineIn()
         edit_out = self._item.timelineOut()
 
-        if self._startFrame:
+        if self._startFrame is not None:
             # a custom start frame was specified
             edit_in += self._startFrame
             edit_out += self._startFrame
@@ -129,36 +129,27 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # update the frame range
         sg_shot["sg_cut_order"] = cut_order
 
-        # update the cut item data
-        cut_item_data = self.get_cut_item_data()
+        # get cut info
         handles = self._cutHandles if self._cutHandles is not None else 0
+        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
 
-        head_in = cut_item_data["head_in"]
-        tail_out = cut_item_data["tail_out"]
+        source_in = int(self._item.sourceIn())
 
-        # this conditional calculates the cut in/out to match previous versions
-        # of the app (< v0.3.4). we made the mistake of using the cut item
-        # values here calculated for SG 7.0+, but that produced results that
-        # clients didn't expect.
-        if self._startFrame:
-            # custom start frame. calculate the values
-            cut_in = head_in + handles
-            cut_out = cut_in + cut_item_data["cut_item_duration"] - 1
-
-            # the expected tail out value seems to be incorrect from Hiero in
-            # this scenario. calculate it based on the above value.
-            tail_out = cut_out + handles
+        # account for not enough frames at the head
+        if source_in <= handles:
+            cut_in = head_in
         else:
-            # use the values from the Hiero timeline
-            cut_in = self._item.timelineIn()
-            cut_out = self._item.timelineOut()
+            cut_in = head_in + handles
 
+        cut_out = tail_out - handles
+
+        # update the frame range
+        sg_shot["sg_head_in"] = head_in
         sg_shot["sg_cut_in"] = cut_in
         sg_shot["sg_cut_out"] = cut_out
-        sg_shot["sg_head_in"] = head_in
         sg_shot["sg_tail_out"] = tail_out
-        sg_shot["sg_cut_duration"] = cut_item_data["cut_item_duration"]
-        sg_shot["sg_working_duration"] = cut_item_data["working_duration"]
+        sg_shot["sg_cut_duration"] = cut_out - cut_in + 1
+        sg_shot["sg_working_duration"] = tail_out - head_in + 1
 
         # get status from the hiero tags
         status = None
