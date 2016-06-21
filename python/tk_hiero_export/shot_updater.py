@@ -28,9 +28,6 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         Return some computed values for use when creating cut items.
 
         The values correspond to the exported version created on disk.
-
-        :param cut_length: True if cut in/out should be based on the cut length,
-            otherwise the in/out will be based on the length of the entire clip.
         """
 
         (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
@@ -42,15 +39,15 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         duration = source_out - source_in
 
-        if head_in < in_handle:
-            # the head in point is within the specified handles. this is
+        if source_in < in_handle:
+            # the source in point is within the specified handles. this is
             # handled differently in different versions of hiero. in versions
             # that will write black frames, the head in/out returned above will
             # encompass the full in/out
             if not self._will_write_black_frames():
                 # no black frames written, the in/out should be correct.
-                # but the start handle is limited by the head in value
-                in_handle = head_in
+                # but the start handle is limited by the in value
+                in_handle = source_in
 
         # "cut_length" is a boolean set on the updater by the shot processor.
         # it signifies whether the transcode task will write the cut length
