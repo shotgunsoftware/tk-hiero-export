@@ -126,27 +126,18 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # update the frame range
         sg_shot["sg_cut_order"] = cut_order
 
-        # get cut info
-        handles = self._cutHandles if self._cutHandles is not None else 0
-        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
+        # get the cut item data and set the corresponding values for the shot
+        # entity
+        cut_data = self.get_cut_item_data()
 
-        source_in = int(self._item.sourceIn())
-
-        # account for not enough frames at the head
-        if source_in <= handles:
-            cut_in = head_in
-        else:
-            cut_in = head_in + handles
-
-        cut_out = tail_out - handles
-
+        # TODO: test. make sure no regressions like #37048 & #37541
         # update the frame range
-        sg_shot["sg_head_in"] = head_in
-        sg_shot["sg_cut_in"] = cut_in
-        sg_shot["sg_cut_out"] = cut_out
-        sg_shot["sg_tail_out"] = tail_out
-        sg_shot["sg_cut_duration"] = cut_out - cut_in + 1
-        sg_shot["sg_working_duration"] = tail_out - head_in + 1
+        sg_shot["sg_head_in"] = cut_data["head_in"]
+        sg_shot["sg_cut_in"] = cut_data["cut_item_in"]
+        sg_shot["sg_cut_out"] = cut_data["cut_item_out"]
+        sg_shot["sg_tail_out"] = cut_data["tail_out]"]
+        sg_shot["sg_cut_duration"] = cut_data["cut_item_duration"]
+        sg_shot["sg_working_duration"] = cut_data["working_duration"]
 
         # get status from the hiero tags
         status = None
