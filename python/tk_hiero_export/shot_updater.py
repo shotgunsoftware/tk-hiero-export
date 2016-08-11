@@ -129,16 +129,24 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # get cut info
         handles = self._cutHandles if self._cutHandles is not None else 0
         (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
+        in_handle = handles
 
         source_in = int(self._item.sourceIn())
+        source_out = int(self._item.sourceOut())
 
-        # account for not enough frames at the head
-        if source_in <= handles:
-            cut_in = head_in
+        # not enough frames for the handle
+        if source_in < in_handle:
+            in_handle = 0
+
+        # "cut_length" is a boolean set on the updater by the shot processor.
+        # it signifies whether the transcode task will write the cut length
+        # to disk (True) or if it will write the full source to disk (False)
+        if hasattr(self, "_cut_length") and self._cut_length:
+            cut_in = head_in + in_handle
+            cut_out = tail_out - handles
         else:
-            cut_in = head_in + handles
-
-        cut_out = tail_out - handles
+            cut_in = source_in
+            cut_out = source_out
 
         # update the frame range
         sg_shot["sg_head_in"] = head_in
