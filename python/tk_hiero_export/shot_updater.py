@@ -148,6 +148,15 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             cut_in = source_in
             cut_out = source_out
 
+            if self._startFrame is not None:
+                # technically, i think this is wrong. but for consistency with
+                # the legacy Shot entity, adjust the cut in/out for the custom
+                # start frame. head in/out includes the custom start frame
+                # already, which also seems wrong. but this seems to be what the
+                # clients expect.
+                cut_in += self._startFrame
+                cut_out += self._startFrame
+
         # update the frame range
         sg_shot["sg_head_in"] = head_in
         sg_shot["sg_cut_in"] = cut_in
