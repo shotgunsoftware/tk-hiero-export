@@ -30,7 +30,6 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         The values correspond to the exported version created on disk.
         """
 
-        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
         handles = self._cutHandles if self._cutHandles is not None else 0
         in_handle = handles
 
@@ -53,9 +52,14 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # it signifies whether the transcode task will write the cut length
         # to disk (True) or if it will write the full source to disk (False)
         if hasattr(self, "_cut_length") and self._cut_length:
+            (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
             cut_in = in_handle
             cut_out = in_handle + duration
         else:
+            # don't account for custom start frame (head/tail will be full
+            # source in/out
+            (head_in, tail_out) = self.collatedOutputRange(clampToSource=False,
+                adjustForCustomStart=False)
             cut_in = source_in
             cut_out = source_out
 
@@ -130,22 +134,29 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         cut_info = self.get_cut_item_data()
 
         head_in = cut_info["head_in"]
+        tail_out = cut_info["tail_out"]
         cut_in = cut_info["cut_item_in"]
         cut_out = cut_info["cut_item_out"]
 
         if self._startFrame is not None:
-            # this seems wrong, but apparently it's the legacy behavior.
-            # adjust the cut in/out for custom start frame. the head in/out
-            # already account for this (which also seems wrong), so just use
-            # those values to calculate.
-            cut_in =  head_in + cut_in
-            cut_out = head_in + cut_out
+            # do some hackery to account for a custom start frame. this seems
+            # wrong, but is what clients expect.
+            if hasattr(self, "_cut_length") and self._cut_length:
+                # adjust the cut in/out based on the head_in which has the
+                # custom start frame calculated in already
+                cut_in += head_in
+                cut_out += head_in
+            else:
+                # offset the cut in/out based on the custom start frame
+                offset = self._startFrame - cut_in
+                cut_in = self._startFrame
+                cut_out += offset
 
         # update the frame range
         sg_shot["sg_head_in"] = head_in
         sg_shot["sg_cut_in"] = cut_in
         sg_shot["sg_cut_out"] = cut_out
-        sg_shot["sg_tail_out"] = cut_info["tail_out"]
+        sg_shot["sg_tail_out"] = tail_out
         sg_shot["sg_cut_duration"] = cut_info["cut_item_duration"]
         sg_shot["sg_working_duration"] = cut_info["working_duration"]
 

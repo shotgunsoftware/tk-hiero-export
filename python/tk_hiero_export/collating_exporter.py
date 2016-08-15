@@ -276,14 +276,15 @@ class CollatingExporter(object):
     def finishTask(self):
         self._parentSequence = None
 
-    def collatedOutputRange(self, ignoreHandles=False, ignoreRetimes=True, clampToSource=True):
+    def collatedOutputRange(self, ignoreHandles=False, ignoreRetimes=True, clampToSource=True, adjustForCustomStart=True):
         """Returns the output file range (as tuple) for this task, if applicable"""
         start = 0
         end  = 0
 
         if isinstance(self._item, hiero.core.Sequence) or self._collate:
             start, end = 0, self._item.duration() - 1
-            if self._startFrame is not None:
+
+            if adjustForCustomStart and self._startFrame is not None:
                 start += self._startFrame
                 end += self._startFrame
 
@@ -311,7 +312,7 @@ class CollatingExporter(object):
             end = int(math.ceil(end))
 
             # Offset by custom start time
-            if self._startFrame is not None:
+            if adjustForCustomStart and self._startFrame is not None:
                 end = self._startFrame + (end - start)
                 start = self._startFrame
 
