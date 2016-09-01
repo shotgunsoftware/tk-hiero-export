@@ -154,7 +154,7 @@ class CollatingExporter(object):
             # This flag indicates that an explicit start frame has been specified
             # To make sure that when the shot is expanded to include handles this is still the first
             # frame, here we offset the start frame by the in-handle size
-            if properties["collateCustomStart"]:
+            if properties["collateCustomStart"] and self._cutHandles is not None:
                 self._startFrame += self._cutHandles
 
             # The offset required to shift the timeline position to the custom start frame.
@@ -182,7 +182,7 @@ class CollatingExporter(object):
                 for tag in parentTrack.tags():
                     trackClone.addTag(hiero.core.Tag(tag))
 
-            trackItemClone = trackitem.clone()
+            trackItemClone = trackitem.copy()
             self._collatedItemsMap[trackitem.guid()] = trackItemClone
             
             # Copy audio for track item
@@ -201,7 +201,7 @@ class CollatingExporter(object):
                         for tag in audioParentTrack.tags():
                             audioTrackClone.addTag(hiero.core.Tag(tag))
                     
-                    audioItemClone = item.clone()
+                    audioItemClone = item.copy()
                     trackItemClone.link(audioItemClone)
 
                     self._collatedItemsMap[item.guid()] = audioItemClone
@@ -259,7 +259,7 @@ class CollatingExporter(object):
         self._parentSequence = self._sequence
 
         # Need to use the sequence clone here, otherwise audio becomes silent for unknown reasons.
-        self._sequence = newSequence.clone()
+        self._sequence = newSequence.copy()
 
     def isCollated(self):
         return self._collate
