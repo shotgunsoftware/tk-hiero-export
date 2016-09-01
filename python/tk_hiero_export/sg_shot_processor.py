@@ -324,16 +324,12 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # iterate over the tasks groups to be executed
         for taskGroup in self._submission.children():
 
-            print "TASK GROUP: " + str(taskGroup)
-
             # placeholders for the tasks we want to pre-process
             (shot_updater_task, transcode_task) = (None, None)
 
             # look at all the tasks in the group and identify the shot updater
             # and transcode tasks.
             for task in taskGroup.children():
-
-                print "  TASK: " + str(task)
 
                 # shot updater
                 if isinstance(task, ShotgunShotUpdater):

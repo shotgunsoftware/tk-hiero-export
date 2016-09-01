@@ -182,7 +182,7 @@ class CollatingExporter(object):
                 for tag in parentTrack.tags():
                     trackClone.addTag(hiero.core.Tag(tag))
 
-            trackItemClone = trackitem.copy()
+            trackItemClone = _clone_item(trackitem)
             self._collatedItemsMap[trackitem.guid()] = trackItemClone
             
             # Copy audio for track item
@@ -201,7 +201,7 @@ class CollatingExporter(object):
                         for tag in audioParentTrack.tags():
                             audioTrackClone.addTag(hiero.core.Tag(tag))
                     
-                    audioItemClone = item.copy()
+                    audioItemClone = _clone_item(item)
                     trackItemClone.link(audioItemClone)
 
                     self._collatedItemsMap[item.guid()] = audioItemClone
@@ -259,7 +259,7 @@ class CollatingExporter(object):
         self._parentSequence = self._sequence
 
         # Need to use the sequence clone here, otherwise audio becomes silent for unknown reasons.
-        self._sequence = newSequence.copy()
+        self._sequence = _clone_item(newSequence)
 
     def isCollated(self):
         return self._collate
@@ -317,6 +317,20 @@ class CollatingExporter(object):
                 start = self._startFrame
 
         return (start, end)
+
+
+def _clone_item(item):
+    """
+    Older versions of hiero use clone() but its deprecated in nukestudio in
+    favor of copy().
+
+    Use the appropriate method to clone the item.
+    """
+
+    if hasattr(item, "copy"):
+        return item.copy()
+    else:
+        return item.clone()
 
 
 class CollatedShotPreset(object):
