@@ -57,7 +57,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             cut_out = in_handle + duration
         else:
             # don't account for custom start frame (head/tail will be full
-            # source in/out
+            # source in/out)
             cut_in = source_in
             cut_out = source_out
 
@@ -135,11 +135,19 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         tail_out = cut_info["tail_out"]
         cut_in = cut_info["cut_item_in"]
         cut_out = cut_info["cut_item_out"]
+        working_duration = cut_info["working_duration"]
 
         if self._startFrame is not None:
             # account for custom start frame
             cut_in += self._startFrame
             cut_out += self._startFrame
+
+        if hasattr(self, "_cut_length") and self._cut_length:
+            # getting wonky values for head/tail with cut length.
+            # calculate the values based on the cut +/- handles
+            handles = self._cutHandles if self._cutHandles is not None else 0
+            head_in = max(cut_in - handles, 0)
+            tail_out = head_in + working_duration - 1
 
         # update the frame range
         sg_shot["sg_head_in"] = head_in
@@ -147,7 +155,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         sg_shot["sg_cut_out"] = cut_out
         sg_shot["sg_tail_out"] = tail_out
         sg_shot["sg_cut_duration"] = cut_info["cut_item_duration"]
-        sg_shot["sg_working_duration"] = cut_info["working_duration"]
+        sg_shot["sg_working_duration"] = working_duration
 
         # get status from the hiero tags
         status = None
