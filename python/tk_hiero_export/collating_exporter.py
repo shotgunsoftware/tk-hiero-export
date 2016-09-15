@@ -321,7 +321,7 @@ class CollatingExporter(object):
 
 def _clone_item(item):
     """
-    Older versions of hiero use clone() but its deprecated in nukestudio in
+    Older versions of hiero use clone() but it's deprecated in nukestudio in
     favor of copy().
 
     Use the appropriate method to clone the item.
