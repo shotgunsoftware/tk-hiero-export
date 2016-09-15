@@ -185,6 +185,24 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             # ingore any errors. ex: metrics logging not supported
             pass
 
+    def isExportingItem(self, item):
+        """
+        This method overrides the default method added to the base class in
+        Nuke 10. The base class returns ``True`` for all items found in the
+        list of collated items. This prevents unnecessary exports for those items
+        since non-SG workflows only collate into the exported nuke script of the
+        first exported track item. For SG workflows, we still export versions
+        for collated tracks and link them back to the hero shot. So we need to
+        do our own culling of tasks in the shot processor. So we return ``False``
+        unless the item is the current item.
+        """
+
+        # Return true if this is the main item for this task, or it's in the list of collated items.
+        if item == self._item:
+            return True
+        else:
+            return False
+
     def _beforeNukeScriptWrite(self, script):
         """
         Add ShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to 
