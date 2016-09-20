@@ -303,8 +303,16 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # tag app as first shot
         self.app.shot_count = 0
 
+        # need to temporarily monkey patch the internal hiero check so that our
+        # preview quicktime is generated. See the notes in the method being
+        # called for more info.
+        self._override_frame_server_check()
+
         # do the normal processing
         FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
+
+        # restore the monkey patched hiero method
+        self._restore_frame_server_check()
 
         # get rid of our placeholder
         exportTemplate.pop(0)
@@ -486,6 +494,68 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             "revision_number": next_revision_number,
             "fps": hiero_sequence.framerate().toFloat(),
         }
+
+    def _override_frame_server_check(self):
+        """
+        This method temporarily monkey patches the hiero method that checks
+        whether or not the frame server is running.
+
+        We monkey patch this to allow our preview quicktimes created in the
+        transcode task to continue to be uploaded when doing individual frame
+        exports. In previous versions of Hiero, the .nk script was always
+        executed as a LocalNukeRenderTask. As of Hiero 10, a new task type is
+        used for frame exports called FrameServerRenderTask. This task type
+        renders frames in an individual frame context within Nuke and therefore
+        our quicktime write node never runs. Thus no quicktime upload for the
+        SG Version and no thumbnail.
+
+        By overriding this method and forcing a value of ``False``, we trick
+        the Hiero shot processor internals into thinking that there is no frame
+        server running and cause it to use the fallback LocalNukeRenderTask
+        which does what we need.
+
+        This fix is a work around and given time we might consider a better
+        solution. That might include separating the preview quicktime
+        generation into a separate .nk script and transcode task.
+        """
+
+        try:
+            # import the module containing the method to override
+            import hiero.ui.nuke_bridge.FnNsFrameServer
+
+            # keep a handle on the real method
+            self._real_frame_server_check = hiero.ui.nuke_bridge.FnNsFrameServer.isServerRunning
+
+            # override the real method to always return False. i.e. The frame
+            # server is not running.
+            hiero.ui.nuke_bridge.FnNsFrameServer.isServerRunning = lambda t=1: False
+        except Exception, e:
+            # log a debug message in case something happens.
+            self._app.log_debug(
+                "Unable to override the frame server check. If exporting individual "
+                "frames, this may prevent the upload of a quicktime to SG."
+            )
+
+    def _restore_frame_server_check(self):
+        """
+        Restoring the original method monkey patched in the method above.
+
+        See the notes there for more details.
+        """
+
+        if not hasattr(self, '_real_frame_server_check'):
+            # no need to restore because we couldn't monkey patch above.
+            return
+
+        try:
+            import hiero.ui.nuke_bridge.FnNsFrameServer
+
+            # restore the real method
+            hiero.ui.nuke_bridge.FnNsFrameServer.isServerRunning = self._real_frame_server_check
+        except Exception, e:
+            # unable to restore. likely associated with a failure to monkey
+            # patch. no need to log another message.
+            pass
 
     def _processCut(self, cut_related_tasks):
         """Collect data and create the Cut and CutItem entries for the tasks.
