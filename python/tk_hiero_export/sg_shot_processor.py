@@ -303,9 +303,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # tag app as first shot
         self.app.shot_count = 0
 
-        # exporting frames. need to temporarily monkey patch the internal
-        # hiero check so that our preview quicktime is generated. See the
-        # notes in the method being called for more info.
+        # need to temporarily monkey patch the internal hiero check so that our
+        # preview quicktime is generated. See the notes in the method being
+        # called for more info.
         self._override_frame_server_check()
 
         # do the normal processing
