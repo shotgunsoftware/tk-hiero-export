@@ -31,8 +31,10 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         """
 
         (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
+
         handles = self._cutHandles if self._cutHandles is not None else 0
         in_handle = handles
+        out_handle = handles
 
         source_in = int(self._item.sourceIn())
         source_out = int(self._item.sourceOut())
@@ -52,7 +54,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # "cut_length" is a boolean set on the updater by the shot processor.
         # it signifies whether the transcode task will write the cut length
         # to disk (True) or if it will write the full source to disk (False)
-        if hasattr(self, "_cut_length") and self._cut_length:
+        if self.is_cut_length_export():
             cut_in = in_handle
             cut_out = in_handle + duration
         else:
@@ -85,8 +87,15 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         working_duration = tail_out - head_in + 1
 
+        if self.isCollated():
+            # undo the offset that is automatically added when collating
+            head_in -= self.HEAD_ROOM_OFFSET
+            tail_out -= self.HEAD_ROOM_OFFSET
+
         # return the computed cut information
         return {
+            "in_handle": in_handle,
+            "out_handle": out_handle,
             "cut_item_in": cut_in,
             "cut_item_out": cut_out,
             "cut_item_duration": cut_duration,
@@ -131,30 +140,76 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # get cut info
         cut_info = self.get_cut_item_data()
 
+        in_handle = cut_info["in_handle"]
+        out_handle = cut_info["out_handle"]
         head_in = cut_info["head_in"]
         tail_out = cut_info["tail_out"]
         cut_in = cut_info["cut_item_in"]
         cut_out = cut_info["cut_item_out"]
-        working_duration = cut_info["working_duration"]
 
-        if self._startFrame is not None:
-            # account for custom start frame
-            cut_in += self._startFrame
-            cut_out += self._startFrame
+        if self.isCollated():
 
-        if hasattr(self, "_cut_length") and self._cut_length:
-            # getting wonky values for head/tail with cut length.
-            # calculate the values based on the cut +/- handles
-            handles = self._cutHandles if self._cutHandles is not None else 0
-            head_in = max(cut_in - handles, 0)
-            tail_out = head_in + working_duration - 1
+            # collatedOutputRange() doesn't appear to return the expected
+            # values when collate is turned on. there was a change in behavior
+            # in later versions of Hiero whereby black frames were no longer
+            # exported to account for missing handles. The calculations in our
+            # collate code do not handle the new behavior yet.
+
+            # this is the legacy calculation but will not be accurate for Hiero
+            # 10.
+            cut_in = head_in + in_handle
+            cut_out = tail_out - out_handle
+
+            if self.is_cut_length_export():
+                # TODO: handle this case when the collate code is fixed
+                pass
+            else:
+                # with clip length, we can work around the issue because there
+                # are no handles and we're exporting the full frame range.
+                # the head/in out values should be the first and last frames of
+                # the source, but they're actually the values we need for the
+                # collated cut in/out.
+                #
+                # In addition, Hiero crashes when trying to collate with a
+                # custom start frame. so this will only work for source start
+                # frame.
+
+                # ensure head/tail match the entire clip (clip length export)
+                head_in = 0
+                tail_out = self._clip.duration() - 1
+
+                if self._startFrame is not None:
+                    # account for a custom start frame
+                    head_in += self._startFrame
+                    tail_out += self._startFrame
+        else:
+
+            # regular export. we can deduce the proper values based on the
+            # values we have
+
+            if self.is_cut_length_export():
+                # cut length is the typical export. we can fall back to the
+                # legacy calculation which seems to be valid.
+                cut_in = head_in + in_handle
+                cut_out = tail_out - out_handle
+            else:
+                # for clip length exports, the head/tail should already be the
+                # full source range. we just need to account for the custom
+                # start frame to match what Hiero writes to disk.
+                if self._startFrame is not None:
+                    cut_in += self._startFrame
+                    cut_out += self._startFrame
+
+        # calculate the duration values now that the ins/outs are set
+        cut_duration = cut_out - cut_in + 1
+        working_duration = tail_out - head_in + 1
 
         # update the frame range
         sg_shot["sg_head_in"] = head_in
         sg_shot["sg_cut_in"] = cut_in
         sg_shot["sg_cut_out"] = cut_out
         sg_shot["sg_tail_out"] = tail_out
-        sg_shot["sg_cut_duration"] = cut_info["cut_item_duration"]
+        sg_shot["sg_cut_duration"] = cut_duration
         sg_shot["sg_working_duration"] = working_duration
 
         # get status from the hiero tags
@@ -229,32 +284,13 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # return false to indicate success
         return False
 
-    def _will_write_black_frames(self):
+    def is_cut_length_export(self):
         """
-        Return True if this version of Hiero will write black frames to account
-        for the handles. False otherwise.
+        Returns ``True`` if this task has the "Cut Length" option checked.
 
-        Hiero versions have different behavior when it comes to writing frames
-        to disk to account for handles without corresponding source material.
-        Older versions (prior to nuke studio) will write black frames into the
-        exported clip while newer versions will not.
+        This is set by the shot processor.
         """
-
-        if not hasattr(self, "_black_frames"):
-
-            try:
-                import nuke
-            except ImportError:
-                # nuke failed to import. must be using a version of hiero
-                # prior to 9.0 (nuke). this version of hiero will write
-                # black frames to disk to account for the handles.
-                self._black_frames = True
-            else:
-                # newer version of hiero does not write black frames to
-                # to account for handles not available in the source.
-                self._black_frames = False
-
-        return self._black_frames
+        return hasattr(self, "_cut_length") and self._cut_length
 
 
 class ShotgunShotUpdaterPreset(ShotgunHieroObjectBase, hiero.core.TaskPresetBase):

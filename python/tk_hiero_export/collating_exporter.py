@@ -159,7 +159,7 @@ class CollatingExporter(object):
 
             # The offset required to shift the timeline position to the custom start frame.
             offset = self._startFrame - self._item.timelineIn()
-        
+
         sequenceIn, sequenceOut = sys.maxint, 0
         for trackitem in self._collatedItems:
             if trackitem.timelineIn() <= sequenceIn:
@@ -317,6 +317,33 @@ class CollatingExporter(object):
                 start = self._startFrame
 
         return (start, end)
+
+    def _will_write_black_frames(self):
+        """
+        Return True if this version of Hiero will write black frames to account
+        for the handles. False otherwise.
+
+        Hiero versions have different behavior when it comes to writing frames
+        to disk to account for handles without corresponding source material.
+        Older versions (prior to nuke studio) will write black frames into the
+        exported clip while newer versions will not.
+        """
+
+        if not hasattr(self, "_black_frames"):
+
+            try:
+                import nuke
+            except ImportError:
+                # nuke failed to import. must be using a version of hiero
+                # prior to 9.0 (nuke). this version of hiero will write
+                # black frames to disk to account for the handles.
+                self._black_frames = True
+            else:
+                # newer version of hiero does not write black frames to
+                # to account for handles not available in the source.
+                self._black_frames = False
+
+        return self._black_frames
 
 
 def _clone_item(item):

@@ -324,6 +324,10 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # do the normal pre processing as defined in the base class
         FnShotProcessor.ShotProcessor.processTaskPreQueue(self)
 
+        # if set, only exporting the cut portion of the source clip. If false,
+        # the export will be the full clip
+        cut_length = self._preset.properties()["cutLength"]
+
         # we'll keep a list of tuples of associated transcode and shot updater
         # tasks. later we'll attach cut related information to these tasks that
         # they can use during execution
@@ -348,6 +352,11 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                     else:
                         # For non-collating sequences, add every task
                         shot_updater_task = task
+
+                if shot_updater_task:
+                    # make the shot updater tasks aware of whether only the cut length
+                    # portion of the source clip is being exported or the full clip
+                    shot_updater_task._cut_length = cut_length
 
                 # transcode
                 elif isinstance(task, ShotgunTranscodeExporter):
@@ -543,15 +552,12 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         See the notes there for more details.
         """
 
-        if not hasattr(self, '_real_frame_server_check'):
-            # no need to restore because we couldn't monkey patch above.
-            return
-
         try:
             import hiero.ui.nuke_bridge.FnNsFrameServer
+            real_fs_check = self._real_frame_server_check
 
             # restore the real method
-            hiero.ui.nuke_bridge.FnNsFrameServer.isServerRunning = self._real_frame_server_check
+            hiero.ui.nuke_bridge.FnNsFrameServer.isServerRunning = real_fs_check
         except Exception, e:
             # unable to restore. likely associated with a failure to monkey
             # patch. no need to log another message.
@@ -592,10 +598,6 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # list of cut item data
         cut_item_data_list = []
 
-        # if set, only exporting the cut portion of the source clip. If false,
-        # the export will be the full clip
-        cut_length = self._preset.properties()["cutLength"]
-
         # process the tasks in order
         for (shot_updater_task, transcode_task) in cut_related_tasks:
 
@@ -603,16 +605,12 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             # Shot entity's cut info
             cut_order = shot_updater_task._cut_order
 
-            # make the shot updater tasks aware of whether only the cut length
-            # portion of the source clip is being exported or the full clip
-            shot_updater_task._cut_length = cut_length
-
             # this retrieves the basic cut information from the updater task.
             # cut item in/out, cut item duration, edit in/out.
             cut_item_data = shot_updater_task.get_cut_item_data()
 
             # clean out the unnecessary fields used by the shot updater
-            for field in ["edit_duration", "head_in", "tail_out", "working_duration"]:
+            for field in ["edit_duration", "head_in", "tail_out", "working_duration", "in_handle", "out_handle"]:
                 del cut_item_data[field]
 
             # add the length of this item to the full cut duration
