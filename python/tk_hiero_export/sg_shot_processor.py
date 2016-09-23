@@ -543,15 +543,12 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         See the notes there for more details.
         """
 
-        if not hasattr(self, '_real_frame_server_check'):
-            # no need to restore because we couldn't monkey patch above.
-            return
-
         try:
             import hiero.ui.nuke_bridge.FnNsFrameServer
+            real_fs_check = self._real_frame_server_check
 
             # restore the real method
-            hiero.ui.nuke_bridge.FnNsFrameServer.isServerRunning = self._real_frame_server_check
+            hiero.ui.nuke_bridge.FnNsFrameServer.isServerRunning = real_fs_check
         except Exception, e:
             # unable to restore. likely associated with a failure to monkey
             # patch. no need to log another message.
