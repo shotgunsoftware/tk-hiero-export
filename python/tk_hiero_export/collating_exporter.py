@@ -326,7 +326,7 @@ class CollatingExporter(object):
         This code runs in later versions of Hiero with access to the nuke api.
         """
 
-        # TODO: This code was copied in from Hiero 10 source. The previous code
+        # TODO: This code was pulled in from Hiero 10 source. The previous code
         # used to build the collate sequence had support for audio collation
         # as well. We need to add that code here and test to make sure it is
         # working as expected.

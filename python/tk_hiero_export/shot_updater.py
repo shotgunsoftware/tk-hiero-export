@@ -148,7 +148,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         cut_in = cut_info["cut_item_in"]
         cut_out = cut_info["cut_item_out"]
 
-        self.app.log_debug("Calculated head/tail: %s, %s" % (head_in, tail_out))
+        self.app.log_debug("Head/Tail from Hiero: %s, %s" % (head_in, tail_out))
 
         if self.isCollated():
 
