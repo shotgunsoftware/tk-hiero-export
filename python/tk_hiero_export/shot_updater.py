@@ -46,7 +46,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             # handled differently in different versions of hiero. in versions
             # that will write black frames, the head in/out returned above will
             # encompass the full in/out
-            if not self._will_write_black_frames():
+            if not self._has_nuke_backend():
                 # no black frames written, the in/out should be correct.
                 # but the start handle is limited by the in value
                 in_handle = source_in
@@ -87,8 +87,9 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         working_duration = tail_out - head_in + 1
 
-        if self.isCollated():
-            # undo the offset that is automatically added when collating
+        if not self._has_nuke_backend() and self.isCollated():
+            # undo the offset that is automatically added when collating.
+            # this is only required in older versions of hiero
             head_in -= self.HEAD_ROOM_OFFSET
             tail_out -= self.HEAD_ROOM_OFFSET
 
@@ -147,34 +148,29 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         cut_in = cut_info["cut_item_in"]
         cut_out = cut_info["cut_item_out"]
 
+        # XXX does this work for old hiero?
+        # XXX add metric log for collate
+
         if self.isCollated():
 
-            # collatedOutputRange() doesn't appear to return the expected
-            # values when collate is turned on. there was a change in behavior
-            # in later versions of Hiero whereby black frames were no longer
-            # exported to account for missing handles. The calculations in our
-            # collate code do not handle the new behavior yet.
-
-            # this is the legacy calculation but will not be accurate for Hiero
-            # 10.
+            # The updated collate logic copied from the Hiero 10 source gives
+            # us fairly reasonable values for head/tail. We can deduce the
+            # cut in/out form those by factoring the in/out handles.
             cut_in = head_in + in_handle
             cut_out = tail_out - out_handle
 
             if self.is_cut_length_export():
-                # TODO: handle this case when the collate code is fixed
-                pass
+                # nothing to do here. the default calculation above is enough.
+                self.app.log_debug("Exporting... collated, cut length.")
             else:
-                # with clip length, we can work around the issue because there
-                # are no handles and we're exporting the full frame range.
-                # the head/in out values should be the first and last frames of
-                # the source, but they're actually the values we need for the
-                # collated cut in/out.
-                #
+                self.app.log_debug("Exporting... collated, clip length.")
                 # In addition, Hiero crashes when trying to collate with a
                 # custom start frame. so this will only work for source start
                 # frame.
 
-                # ensure head/tail match the entire clip (clip length export)
+                # the head/in out values should be the first and last frames of
+                # the source, but they're not. ensure head/tail match the entire
+                # clip (clip length export)
                 head_in = 0
                 tail_out = self._clip.duration() - 1
 
@@ -183,16 +179,17 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                     head_in += self._startFrame
                     tail_out += self._startFrame
         else:
-
             # regular export. we can deduce the proper values based on the
             # values we have
 
             if self.is_cut_length_export():
+                self.app.log_debug("Exporting... cut length.")
                 # cut length is the typical export. we can fall back to the
                 # legacy calculation which seems to be valid.
                 cut_in = head_in + in_handle
                 cut_out = tail_out - out_handle
             else:
+                self.app.log_debug("Exporting... clip length.")
                 # for clip length exports, the head/tail should already be the
                 # full source range. we just need to account for the custom
                 # start frame to match what Hiero writes to disk.
