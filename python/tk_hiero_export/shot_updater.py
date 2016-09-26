@@ -46,7 +46,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             # handled differently in different versions of hiero. in versions
             # that will write black frames, the head in/out returned above will
             # encompass the full in/out
-            if not self._has_nuke_backend():
+            if self._has_nuke_backend():
                 # no black frames written, the in/out should be correct.
                 # but the start handle is limited by the in value
                 in_handle = source_in
@@ -148,23 +148,31 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         cut_in = cut_info["cut_item_in"]
         cut_out = cut_info["cut_item_out"]
 
-        # XXX does this work for old hiero?
-        # XXX add metric log for collate
+        self.app.log_debug("Calculated head/tail: %s, %s" % (head_in, tail_out))
 
         if self.isCollated():
 
-            # The updated collate logic copied from the Hiero 10 source gives
-            # us fairly reasonable values for head/tail. We can deduce the
-            # cut in/out form those by factoring the in/out handles.
+            # The collate logic gives us fairly reasonable values for head/tail.
+            # We can deduce the cut in/out from those by factoring the in/out
+            # handles.
             cut_in = head_in + in_handle
             cut_out = tail_out - out_handle
 
             if self.is_cut_length_export():
                 # nothing to do here. the default calculation above is enough.
                 self.app.log_debug("Exporting... collated, cut length.")
+
+                # Log cut length collate metric
+                try:
+                    self.app.log_metric("Collate/Cut Length", log_version=True)
+                except:
+                    # ingore any errors. ex: metrics logging not supported
+                    pass
+
             else:
                 self.app.log_debug("Exporting... collated, clip length.")
-                # In addition, Hiero crashes when trying to collate with a
+
+                # NOTE: Hiero crashes when trying to collate with a
                 # custom start frame. so this will only work for source start
                 # frame.
 
@@ -175,9 +183,18 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 tail_out = self._clip.duration() - 1
 
                 if self._startFrame is not None:
-                    # account for a custom start frame
+                    # account for a custom start frame if/when collate works on
+                    # custom start frame.
                     head_in += self._startFrame
                     tail_out += self._startFrame
+
+                # Log clip length collate metric
+                try:
+                    self.app.log_metric("Collate/Clip Length", log_version=True)
+                except:
+                    # ingore any errors. ex: metrics logging not supported
+                    pass
+
         else:
             # regular export. we can deduce the proper values based on the
             # values we have
