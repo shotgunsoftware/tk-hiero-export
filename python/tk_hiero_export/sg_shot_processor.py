@@ -352,15 +352,14 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                     else:
                         # For non-collating sequences, add every task
                         shot_updater_task = task
+                # transcode
+                elif isinstance(task, ShotgunTranscodeExporter):
+                    transcode_task = task
 
                 if shot_updater_task:
                     # make the shot updater tasks aware of whether only the cut length
                     # portion of the source clip is being exported or the full clip
                     shot_updater_task._cut_length = cut_length
-
-                # transcode
-                elif isinstance(task, ShotgunTranscodeExporter):
-                    transcode_task = task
 
             # if there's not shot updater task, then we don't process. this is
             # likely due to collating and the task not being hero.
