@@ -35,7 +35,9 @@ class HieroGetShot(Hook):
             [parent_field, "is", parent],
             ["code", "is", item.name()],
         ]
-        fields = kwargs.get("fields", [])
+
+        # default the return fields to None to use the python-api default
+        fields = kwargs.get("fields", None)
         shots = sg.find("Shot", filter, fields=fields)
         if len(shots) > 1:
             # can not handle multiple shots with the same name
@@ -47,7 +49,7 @@ class HieroGetShot(Hook):
                 parent_field: parent,
                 "project": self.parent.context.project,
             }
-            shot = sg.create("Shot", shot_data)
+            shot = sg.create("Shot", shot_data, return_fields=fields)
             self.parent.log_info("Created Shot in Shotgun: %s" % shot_data)
         else:
             shot = shots[0]
