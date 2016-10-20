@@ -63,18 +63,19 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             cut_in = source_in
             cut_out = source_out
 
+        # get the edit in/out points from the timeline
         edit_in = self._item.timelineIn()
         edit_out = self._item.timelineOut()
 
+        # account for custom start code in the hiero timeline
+        seq = self._item.sequence()
+        edit_in += seq.timecodeStart()
+        edit_out += seq.timecodeStart()
+
         if self._startFrame is not None:
             # a custom start frame was specified
-            edit_in += self._startFrame
-            edit_out += self._startFrame
-        else:
-            # use the starttime from the hiero sequence
-            seq = self._item.sequence()
-            edit_in += seq.timecodeStart()
-            edit_out += seq.timecodeStart()
+            cut_in += self._startFrame
+            cut_out += self._startFrame
 
         cut_duration = cut_out - cut_in + 1
         edit_duration = edit_out - edit_in + 1
@@ -206,13 +207,8 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 cut_in = head_in + in_handle
                 cut_out = tail_out - out_handle
             else:
+                # the cut in/out should already be correct here. just log
                 self.app.log_debug("Exporting... clip length.")
-                # for clip length exports, the head/tail should already be the
-                # full source range. we just need to account for the custom
-                # start frame to match what Hiero writes to disk.
-                if self._startFrame is not None:
-                    cut_in += self._startFrame
-                    cut_out += self._startFrame
 
         # calculate the duration values now that the ins/outs are set
         cut_duration = cut_out - cut_in + 1

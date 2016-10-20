@@ -225,8 +225,19 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         else:
             item = self._item
 
-        # store the shot for use in finishTask
-        self._sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=item, data=self.app.preprocess_data)
+        # store the shot for use in finishTask. query the head/tail values set
+        # on the shot updater task so that we can set those values on the
+        # Version created later.
+        self._sg_shot = self.app.execute_hook(
+            "hook_get_shot",
+            task=self,
+            item=item,
+            data=self.app.preprocess_data,
+            fields=[
+                "sg_head_in",
+                "sg_tail_out"
+            ]
+        )
 
         # populate the data dictionary for our Version while the item is still valid
         ##############################
@@ -252,6 +263,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             file_name = os.path.splitext(file_name)[0]
             file_name = file_name.capitalize()
 
+            # use the head/tail to populate frame first/last/range fields on
+            # the Version
+            head_in = self._sg_shot["sg_head_in"]
+            tail_out = self._sg_shot["sg_tail_out"]
+
             self._version_data = {
                 "user": sg_current_user,
                 "created_by": sg_current_user,
@@ -259,6 +275,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 "project": self.app.context.project,
                 "sg_path_to_movie": self._resolved_export_path,
                 "code": file_name,
+                "sg_first_frame": head_in,
+                "sg_last_frame": tail_out,
+                "frame_range": "%s-%s" % (head_in, tail_out),
             }
 
             if self._sg_task is not None:
