@@ -63,8 +63,14 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             cut_in = source_in
             cut_out = source_out
 
+        # get the edit in/out points from the timeline
         edit_in = self._item.timelineIn()
         edit_out = self._item.timelineOut()
+
+        # account for custom start code in the hiero timeline
+        seq = self._item.sequence()
+        edit_in += seq.timecodeStart()
+        edit_out += seq.timecodeStart()
 
         if self._startFrame is not None:
             # a custom start frame was specified
