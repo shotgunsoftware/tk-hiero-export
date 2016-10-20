@@ -212,7 +212,7 @@ requires_shotgun_fields:
 
 # More verbose description of this item
 display_name: "Shotgun Export"
-description: "App that adds Shotgun awareness to Hiero's sequence export.  It
+description: "App that adds Shotgun awareness to Nuke Studio's sequence export.  It
              adds a new processor that will use the configuration to determine
              paths for Nuke scripts and plates.  It also will use the tags to
              determine Shotgun Shot status and task templates to create/update
