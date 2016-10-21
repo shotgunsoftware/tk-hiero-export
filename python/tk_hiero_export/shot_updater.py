@@ -36,32 +36,42 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         in_handle = handles
         out_handle = handles
 
+        # get the frame offset specified in the export options
+        startFrame = self._startFrame or 0
+
+        # these are the source in/out frames. we'll use them to determine if we
+        # have enough frames to account for the handles. versions of
+        # hiero/nukestudio handle missing handles differently
         source_in = int(self._item.sourceIn())
         source_out = int(self._item.sourceOut())
 
-        duration = source_out - source_in
+        if self._has_nuke_backend() and source_in < in_handle:
+            # newer versions of the hiero/nukestudio. no black frames will be
+            # written to disk for the head when not enough source for the in
+            # handle. the in/out should be correct. but the start handle is
+            # limited by the in value. the source in point is within the
+            # specified handles.
+            in_handle = source_in
 
-        if source_in < in_handle:
-            # the source in point is within the specified handles. this is
-            # handled differently in different versions of hiero. in versions
-            # that will write black frames, the head in/out returned above will
-            # encompass the full in/out
-            if self._has_nuke_backend():
-                # no black frames written, the in/out should be correct.
-                # but the start handle is limited by the in value
-                in_handle = source_in
+            # NOTE: even new versions of hiero/nukestudio will write black
+            # frames for insuffient tail handles. so we don't need to account
+            # for that case here.
 
         # "cut_length" is a boolean set on the updater by the shot processor.
         # it signifies whether the transcode task will write the cut length
         # to disk (True) or if it will write the full source to disk (False)
         if self.is_cut_length_export():
-            cut_in = in_handle
-            cut_out = in_handle + duration
+            cut_in = head_in + in_handle
+            cut_out = tail_out - out_handle
         else:
             # don't account for custom start frame (head/tail will be full
             # source in/out)
             cut_in = source_in
             cut_out = source_out
+
+            # account for any custom start frame
+            cut_in += startFrame
+            cut_out += startFrame
 
         # get the edit in/out points from the timeline
         edit_in = self._item.timelineIn()
@@ -71,11 +81,6 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         seq = self._item.sequence()
         edit_in += seq.timecodeStart()
         edit_out += seq.timecodeStart()
-
-        if self._startFrame is not None:
-            # a custom start frame was specified
-            cut_in += self._startFrame
-            cut_out += self._startFrame
 
         cut_duration = cut_out - cut_in + 1
         edit_duration = edit_out - edit_in + 1
@@ -96,8 +101,6 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         # return the computed cut information
         return {
-            "in_handle": in_handle,
-            "out_handle": out_handle,
             "cut_item_in": cut_in,
             "cut_item_out": cut_out,
             "cut_item_duration": cut_duration,
@@ -142,22 +145,12 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # get cut info
         cut_info = self.get_cut_item_data()
 
-        in_handle = cut_info["in_handle"]
-        out_handle = cut_info["out_handle"]
         head_in = cut_info["head_in"]
         tail_out = cut_info["tail_out"]
-        cut_in = cut_info["cut_item_in"]
-        cut_out = cut_info["cut_item_out"]
 
         self.app.log_debug("Head/Tail from Hiero: %s, %s" % (head_in, tail_out))
 
         if self.isCollated():
-
-            # The collate logic gives us fairly reasonable values for head/tail.
-            # We can deduce the cut in/out from those by factoring the in/out
-            # handles.
-            cut_in = head_in + in_handle
-            cut_out = tail_out - out_handle
 
             if self.is_cut_length_export():
                 # nothing to do here. the default calculation above is enough.
@@ -183,11 +176,13 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 head_in = 0
                 tail_out = self._clip.duration() - 1
 
-                if self._startFrame is not None:
-                    # account for a custom start frame if/when collate works on
-                    # custom start frame.
-                    head_in += self._startFrame
-                    tail_out += self._startFrame
+                # get the frame offset specified in the export options
+                startFrame = self._startFrame or 0
+
+                # account for a custom start frame if/when clip length collate
+                # works on custom start frame.
+                head_in += startFrame
+                tail_out += startFrame
 
                 # Log clip length collate metric
                 try:
@@ -197,30 +192,20 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                     pass
 
         else:
-            # regular export. we can deduce the proper values based on the
-            # values we have
-
+            # regular export. values we have are good. just log it
             if self.is_cut_length_export():
                 self.app.log_debug("Exporting... cut length.")
-                # cut length is the typical export. we can fall back to the
-                # legacy calculation which seems to be valid.
-                cut_in = head_in + in_handle
-                cut_out = tail_out - out_handle
             else:
                 # the cut in/out should already be correct here. just log
                 self.app.log_debug("Exporting... clip length.")
 
-        # calculate the duration values now that the ins/outs are set
-        cut_duration = cut_out - cut_in + 1
-        working_duration = tail_out - head_in + 1
-
         # update the frame range
         sg_shot["sg_head_in"] = head_in
-        sg_shot["sg_cut_in"] = cut_in
-        sg_shot["sg_cut_out"] = cut_out
+        sg_shot["sg_cut_in"] = cut_info["cut_item_in"]
+        sg_shot["sg_cut_out"] = cut_info["cut_item_out"]
         sg_shot["sg_tail_out"] = tail_out
-        sg_shot["sg_cut_duration"] = cut_duration
-        sg_shot["sg_working_duration"] = working_duration
+        sg_shot["sg_cut_duration"] = cut_info["cut_item_duration"]
+        sg_shot["sg_working_duration"] = cut_info["working_duration"]
 
         # get status from the hiero tags
         status = None

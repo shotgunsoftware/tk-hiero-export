@@ -609,7 +609,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             cut_item_data = shot_updater_task.get_cut_item_data()
 
             # clean out the unnecessary fields used by the shot updater
-            for field in ["edit_duration", "head_in", "tail_out", "working_duration", "in_handle", "out_handle"]:
+            for field in ["edit_duration", "head_in", "tail_out", "working_duration"]:
                 del cut_item_data[field]
 
             # add the length of this item to the full cut duration
