@@ -23,6 +23,7 @@ class HieroGetQuicktimeSettings(Hook):
         write node and the second item is a dictionary of knob names and
         values.
         """
+
         if sys.platform.startswith("linux"):
             file_type = "mov"
             properties = {
@@ -33,7 +34,7 @@ class HieroGetQuicktimeSettings(Hook):
         else:
             file_type = "mov"
             properties = {
-                "encoder": "mov32",
+                "encoder": self.parent.get_default_encoder_name(),
                 "codec": "avc1\tH.264",
                 "quality": 3,
                 "settingsString": "H.264, High Quality",

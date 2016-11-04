@@ -75,6 +75,36 @@ class HieroExport(Application):
         """
         return True
 
+    def get_default_encoder_name(self):
+        """Returns the default encoder for use in quicktime generation.
+
+        The value returned is dependent on the platform and the version of
+        Hiero/NukeStudio being used.
+
+        The "mov32" encoder does not work in newer versions of Hiero/NukeStudio
+        (10.0v2 or greater) where there is no dependency on the Qt desktop
+        application.
+
+        :return: The name of the default encoder to use for this platform
+            and version of Hiero/NukeStudio
+        :rtype: str
+        """
+
+        if sys.platform.startswith("linux"):
+            encoder_name = "mov64"
+        else:
+            encoder_name = "mov32"
+            try:
+                import nuke
+                if nuke.NUKE_VERSION_MAJOR >= 10 and nuke.NUKE_VERSION_RELEASE > 1:
+                    # newer version of nuke without access to desktop Qt
+                    encoder_name = "mov64"
+            except ImportError:
+                # can't import nuke. older version of Hiero
+                pass
+
+        return encoder_name
+
     def _register_exporter(self):
         """
         Set up this app with the hiero exporter frameworks
