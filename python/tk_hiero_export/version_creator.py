@@ -102,13 +102,15 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         Override the default buildScript functionality to also output a temp movie
         file if needed for uploading to Shotgun
         """
+
         # This is a bit of a hack to account for some changes to the
         # transcode exporter that ships with Nuke/Hiero 9.0 compared
         # to earlier versions of Hiero.
         file_type = self._preset.properties()['file_type']
         if file_type in ["mov", "ffmpeg"]:
             if not self._preset.properties()[file_type].get("encoder"):
-                self._preset.properties()[file_type]["encoder"] = "mov32"
+                encoder_name = self.app.get_default_encoder_name()
+                self._preset.properties()[file_type]["encoder"] = encoder_name
 
         # Build the usual script
         FnTranscodeExporter.TranscodeExporter.buildScript(self)
@@ -137,6 +139,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # insert the write node to generate the quicktime
         file_type, properties = self.app.execute_hook("hook_get_quicktime_settings", for_shotgun=True)
+        self.app.log_info("Transcode quicktime settings: %s" % (properties,))
         preset.properties().update({
             "file_type": file_type,
             file_type: properties,
