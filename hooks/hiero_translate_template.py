@@ -57,7 +57,7 @@ class HieroTranslateTemplate(Hook):
         # simple string to string replacement
         # the nuke script name is hard coded to ensure a valid template
         if output_type == 'script':
-            template_str = template_str.replace('{name}', 'hiero')
+            template_str = template_str.replace('{name}', 'scene')
 
         for (orig, repl) in mapping.iteritems():
             template_str = template_str.replace(orig, repl)
