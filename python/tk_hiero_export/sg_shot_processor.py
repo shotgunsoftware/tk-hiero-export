@@ -55,12 +55,21 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
     def toolTip(self):
         return "Process as Shotgun Shots generates output on a per-shot basis and logs it in Shotgun."
 
-    def populateUI(self, widget, exportItems, editMode=None):
+    def populateUI(self, *args, **kwargs):
         """
         Create Settings UI.
         """
+
+        # NOTE:
+        # This method's signature changed in NukeStudio/Hiero 10.5v1. So
+        # we account for it by parsing the args.
+        if self.app.get_nuke_version_tuple() >= (10, 5, 1):
+            (widget, taskUIWidget, exportItems) = args
+        else:
+            (widget, exportItems, editMode) = args
+
         # create a layout with custom top and bottom widgets
-        master_layout = QtGui.QVBoxLayout(widget)
+        master_layout = QtGui.QHBoxLayout(widget)
         master_layout.setContentsMargins(0, 0, 0, 0)
 
         # add group box for shotgun stuff
@@ -70,14 +79,18 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
 
         # create some helpful text
         header_text = QtGui.QLabel()
-        header_text.setText("""<big>Welcome to the Shotgun Shot Export!</big>
-                      <p>When you are using the Shotgun Shot Processor, Shots and Sequences in<br>
-                      Shotgun will be created based on your Hiero Project. Existing Shots will<br>
-                      be updated with the latest cut lengths. Quicktimes for each shot will be <br>
-                      sent to Screening Room for review when you use the special Shotgun <br>
-                      Transcode plugin - all included and ready to go in the default preset.<br>&nbsp;
-                      </p>
-                      """)
+        header_text.setWordWrap(True)
+        header_text.setText(
+            """
+            <big>Welcome to the Shotgun Shot Export!</big>
+            <p>When you are using the Shotgun Shot Processor, Shots and Sequences in
+            Shotgun will be created based on your Hiero Project. Existing Shots will
+            be updated with the latest cut lengths. Quicktimes for each shot will be
+            sent to Screening Room for review when you use the special Shotgun
+            Transcode plugin - all included and ready to go in the default preset.
+            </p>
+            """
+        )
         shotgun_layout.addWidget(header_text)
 
         # make space for the spreadsheet
@@ -104,10 +117,18 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
             cut_type_layout = self._build_cut_type_layout(properties)
             shotgun_layout.addLayout(cut_type_layout)
 
+        shotgun_layout.addStretch()
+
         # add default settings from baseclass below
         default = QtGui.QWidget()
         master_layout.addWidget(default)
-        ShotProcessorUI.populateUI(self, default, exportItems, editMode)
+
+        # As noted above, the signature for this method changed in 10.5v1 so we
+        # must account for it when calling the base class.
+        if self.app.get_nuke_version_tuple() >= (10, 5, 1):
+            ShotProcessorUI.populateUI(self, default, taskUIWidget, exportItems)
+        else:
+            ShotProcessorUI.populateUI(self, default, exportItems, editMode)
 
     def _build_cut_type_layout(self, properties):
         """
@@ -280,10 +301,16 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # The order if execution is basically [init processor, resolve user entries, startProcessing].
         self.app.execute_hook("hook_pre_export", processor=self)
 
-    def startProcessing(self, exportItems):
+    def startProcessing(self, exportItems, preview=False):
         """
         Executing the export
         """
+
+        # In 10.5v1, the preview option was added. If True, then the export
+        # dialog just needs a list of all the tasks that will run. Since we're
+        # not adding tasks here, simply return the base class list.
+        if self.app.get_nuke_version_tuple() >= (10, 5, 1) and preview:
+            return FnShotProcessor.ShotProcessor.startProcessing(self, exportItems, preview)
 
         # add a top level task to manage shotgun shots
         exportTemplate = self._exportTemplate.flatten()
@@ -308,8 +335,11 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # called for more info.
         self._override_frame_server_check()
 
-        # do the normal processing
-        FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
+        # startProcessing()'s signature changed in NukeStudio/Hiero 10.5v1.
+        if self.app.get_nuke_version_tuple() >= (10, 5, 1):
+            FnShotProcessor.ShotProcessor.startProcessing(self, exportItems, preview)
+        else:
+            FnShotProcessor.ShotProcessor.startProcessing(self, exportItems)
 
         # restore the monkey patched hiero method
         self._restore_frame_server_check()
@@ -759,4 +789,14 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
                 lambda keyword, task:
                     self.app.execute_hook("hook_resolve_custom_strings", keyword=keyword, task=task)
             )
+
+    def isValid(self):
+        """
+        This method was introduced into the base class in NukeStudio/Hiero
+        10.5v1. The base class implementation requires each exporter have at
+        least one write node. Returning the True value expected allows
+        our exports to continue since we populate the write node automatically
+        during the export.
+        """
+        return (True, "")
 

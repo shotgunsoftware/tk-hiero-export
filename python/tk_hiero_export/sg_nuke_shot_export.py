@@ -58,7 +58,29 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
         self._toolkit_list.setModel(self._toolkit_model)
         self._toolkit_model.dataChanged.connect(self.toolkitPresetChanged)
 
-        layout.insertRow(0, "Shotgun Write Nodes:", self._toolkit_list)
+        form_layout = None
+
+        # The layout type changed in 10.5v1. Prior to 10.5v1, the widget's
+        # layout was a QFormLayout. Post 10.5v1, the layout is a QVBoxLayout
+        # that contains a form layout where the UI should be inserted.
+        if self.app.get_nuke_version_tuple() >= (10, 5, 1):
+            # QVBoxLayout. Find the QFormLayout within. we'll assume it is the
+            # first one we find.
+            for child in layout.children():
+                if isinstance(child, QtGui.QFormLayout):
+                    # found a form layout
+                    form_layout = child
+                    break
+        else:
+            form_layout = layout
+
+        if form_layout:
+            form_layout.insertRow(0, "Shotgun Write Nodes:", self._toolkit_list)
+        else:
+            self.app.log_error(
+                "Unable to find the expected UI layout to display the list of "
+                "Shotgun Write Nodes in the export dialog."
+            )
 
     def toolkitPresetChanged(self, topLeft, bottomRight):
         self._preset.properties()["toolkitWriteNodes"] = []

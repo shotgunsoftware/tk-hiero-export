@@ -105,6 +105,25 @@ class HieroExport(Application):
 
         return encoder_name
 
+    def get_nuke_version_tuple(self):
+        """
+        Returns a tuple of the nuke version for comparing against using python's
+        handy tuple comparison.
+
+        Usage example::
+
+            # see if the current version is >= Nuke 10.5v1
+            if app.get_nuke_version_tuple() >= (10, 5, 1):
+                ...
+        """
+
+        import nuke
+        return (
+            nuke.NUKE_VERSION_MAJOR,
+            nuke.NUKE_VERSION_MINOR,
+            nuke.NUKE_VERSION_RELEASE
+        )
+
     def _register_exporter(self):
         """
         Set up this app with the hiero exporter frameworks
@@ -199,3 +218,4 @@ class HieroExport(Application):
                             "or adjust the hook that converts a template to a hiero export "
                             "path to convert these fields into fixed strings or hiero "
                             "substitution tokens." % (template_str, ",".join(key_names) ) )
+

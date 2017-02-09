@@ -49,19 +49,20 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
         self._preset._properties["create_version"] = create_version
 
     def populateUI(self, widget, exportTemplate):
-        # create a layout with custom top and bottom widgets
-        layout = QtGui.QVBoxLayout(widget)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(9)
+
+        # prior to 10.5v1, this method created the layout. in 10.5v1 and later,
+        # the widget already has a layout
+        if self.app.get_nuke_version_tuple() >= (10, 5, 1):
+            layout = widget.layout()
+        else:
+            # create a layout with custom top and bottom widgets
+            layout = QtGui.QVBoxLayout(widget)
+            layout.setContentsMargins(0, 0, 0, 0)
+            layout.setSpacing(9)
 
         top = QtGui.QWidget()
-        middle = QtGui.QWidget()
-        bottom = QtGui.QWidget()
-        layout.addWidget(top)
-        layout.addWidget(middle)
-        layout.addWidget(bottom)
 
-        top_layout = QtGui.QVBoxLayout(top)
+        top_layout = QtGui.QVBoxLayout()
         top_layout.setContentsMargins(9, 0, 9, 0)
         create_version_checkbox = QtGui.QCheckBox("Create Shotgun Version", widget)
         create_version_checkbox.setToolTip(
@@ -69,17 +70,30 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
             "If the output format is not a quicktime, then\n"
             "a quicktime will be created.  The quicktime will\n"
             "be uploaded to Shotgun as Screening Room media."
-            )
+        )
+
         create_version_checkbox.setCheckState(QtCore.Qt.Checked)
         if not self._preset._properties.get("create_version", True):
             create_version_checkbox.setCheckState(QtCore.Qt.Unchecked)
         create_version_checkbox.stateChanged.connect(self.create_version_changed)
         top_layout.addWidget(create_version_checkbox)
 
+        top.setLayout(top_layout)
+
+        middle = QtGui.QWidget()
+
+        # prior to 10.5v1, the layout was set in the base class. in 10.5v1, the
+        # base class expects the widget to already have a layout.
+        if self.app.get_nuke_version_tuple() >= (10, 5, 1):
+            middle.setLayout(QtGui.QVBoxLayout())
+
         # populate the middle with the standard layout
         FnTranscodeExporterUI.TranscodeExporterUI.populateUI(self, middle, exportTemplate)
 
-        layout = QtGui.QVBoxLayout(top)
+        layout.addWidget(top)
+        layout.addWidget(middle)
+
+
 
 
 class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodeExporter, CollatingExporter):
