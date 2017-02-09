@@ -69,7 +69,7 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
             (widget, exportItems, editMode) = args
 
         # create a layout with custom top and bottom widgets
-        master_layout = QtGui.QVBoxLayout(widget)
+        master_layout = QtGui.QHBoxLayout(widget)
         master_layout.setContentsMargins(0, 0, 0, 0)
 
         # add group box for shotgun stuff
@@ -79,14 +79,18 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
 
         # create some helpful text
         header_text = QtGui.QLabel()
-        header_text.setText("""<big>Welcome to the Shotgun Shot Export!</big>
-                      <p>When you are using the Shotgun Shot Processor, Shots and Sequences in<br>
-                      Shotgun will be created based on your Hiero Project. Existing Shots will<br>
-                      be updated with the latest cut lengths. Quicktimes for each shot will be <br>
-                      sent to Screening Room for review when you use the special Shotgun <br>
-                      Transcode plugin - all included and ready to go in the default preset.<br>&nbsp;
-                      </p>
-                      """)
+        header_text.setWordWrap(True)
+        header_text.setText(
+            """
+            <big>Welcome to the Shotgun Shot Export!</big>
+            <p>When you are using the Shotgun Shot Processor, Shots and Sequences in
+            Shotgun will be created based on your Hiero Project. Existing Shots will
+            be updated with the latest cut lengths. Quicktimes for each shot will be
+            sent to Screening Room for review when you use the special Shotgun
+            Transcode plugin - all included and ready to go in the default preset.
+            </p>
+            """
+        )
         shotgun_layout.addWidget(header_text)
 
         # make space for the spreadsheet
@@ -112,6 +116,8 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
         if self._cutsSupported():
             cut_type_layout = self._build_cut_type_layout(properties)
             shotgun_layout.addLayout(cut_type_layout)
+
+        shotgun_layout.addStretch()
 
         # add default settings from baseclass below
         default = QtGui.QWidget()
