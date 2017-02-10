@@ -82,16 +82,18 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
         header_text.setWordWrap(True)
         header_text.setText(
             """
-            <big>Welcome to the Shotgun Shot Export!</big>
-            <p>When you are using the Shotgun Shot Processor, Shots and Sequences in
-            Shotgun will be created based on your Hiero Project. Existing Shots will
-            be updated with the latest cut lengths. Quicktimes for each shot will be
-            sent to Screening Room for review when you use the special Shotgun
-            Transcode plugin - all included and ready to go in the default preset.
+            <big>Welcome to the Shotgun Shot Exporter!</big>
+            <p>When you are using the Shotgun Shot Processor, Shots and
+            Sequences in Shotgun will be created based on the curent timeline.
+            Existing Shots will be updated with the latest cut lengths.
+            Quicktimes for each shot will be reviewable in the Media app when
+            you use the special Shotgun Transcode plugin - all included and
+            ready to go in the default preset.
             </p>
             """
         )
         shotgun_layout.addWidget(header_text)
+        shotgun_layout.addSpacing(8)
 
         # make space for the spreadsheet
         spreadsheet_widget = QtGui.QWidget()
