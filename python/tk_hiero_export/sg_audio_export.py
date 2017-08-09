@@ -13,13 +13,12 @@ import os
 import sys
 import ast
 
-from PySide import QtGui
-from PySide import QtCore
-
 from hiero.exporters import FnAudioExportTask
 from hiero.exporters import FnAudioExportUI
 
 import sgtk
+from sgtk.platform.qt import QtGui, QtCore
+
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter, CollatedShotPreset
 

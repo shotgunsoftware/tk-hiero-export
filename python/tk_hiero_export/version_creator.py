@@ -15,9 +15,6 @@ import shutil
 import tempfile
 import inspect
 
-from PySide import QtGui
-from PySide import QtCore
-
 from hiero.exporters import FnExternalRender
 from hiero.exporters import FnTranscodeExporter
 from hiero.exporters import FnTranscodeExporterUI
@@ -28,6 +25,7 @@ from hiero.core import *
 
 import tank
 import sgtk.util
+from sgtk.platform.qt import QtGui, QtCore
 
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter, CollatedShotPreset

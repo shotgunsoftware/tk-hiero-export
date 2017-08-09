@@ -13,14 +13,13 @@ import sys
 import shutil
 import time
 
-from PySide import QtGui
-from PySide import QtCore
-
 import hiero.core
 from hiero.exporters import FnShotExporter
 from hiero.exporters import FnShotProcessor
 from hiero.exporters import FnTranscodeExporter
+
 import tank
+from tank.platform.qt import QtGui, QtCore
 
 
 class ShotgunHieroObjectBase(object):

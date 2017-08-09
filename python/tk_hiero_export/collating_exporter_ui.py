@@ -8,7 +8,8 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import PySide
+import sgtk
+from sgtk.platform.qt import QtGui, QtCore
 
 from hiero.ui.FnUIProperty import UIPropertyFactory
 
@@ -23,7 +24,7 @@ class CollatingExporterUI(object):
         if properties is None:
             properties = self._preset.properties()
 
-        layout = PySide.QtGui.QFormLayout()
+        layout = QtGui.QFormLayout()
 
         collateTracksToolTip = """Enable this to include other shots which overlap the sequence time of each shot within the script. Cannot be enabled when Read Node overrides are set."""
         key = "collateTracks"
@@ -40,10 +41,10 @@ class CollatingExporterUI(object):
         layout.addRow(label, self._collateNameProperty)
 
         if cut_support:
-            cut_lbl = PySide.QtGui.QLabel(
+            cut_lbl = QtGui.QLabel(
                 "NOTE: Cuts in Shotgun are only created when collate is off."
             )
-            color_role = PySide.QtGui.QPalette.WindowText
+            color_role = QtGui.QPalette.WindowText
             palette = widget.palette()
             darker_color = palette.color(color_role).darker(150)
             palette.setColor(color_role, darker_color)
@@ -54,13 +55,13 @@ class CollatingExporterUI(object):
         return (self._collateTimeProperty, self._collateNameProperty)
 
     def getCollateTime(self):
-        return (self._collateTimeProperty._widget.checkState() == PySide.QtCore.Qt.Checked)
+        return (self._collateTimeProperty._widget.checkState() == QtCore.Qt.Checked)
     def setCollateTime(self, value):
         self._collateTimeProperty._widget.setChecked(value)
     collateTime = property(getCollateTime, setCollateTime)
 
     def getCollateName(self):
-        return (self._collateNameProperty._widget.checkState() == PySide.QtCore.Qt.Checked)
+        return (self._collateNameProperty._widget.checkState() == QtCore.Qt.Checked)
     def setCollateName(self, value):
         self._collateNameProperty._widget.setChecked(value)
     collateName = property(getCollateName, setCollateName)

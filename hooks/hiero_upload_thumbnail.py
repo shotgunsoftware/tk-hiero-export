@@ -16,8 +16,7 @@ import tempfile
 import traceback
 import time
 
-from PySide import QtCore
-
+from tank.platform.qt import QtCore
 from tank import Hook
 import tank.templatekey
 

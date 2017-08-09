@@ -10,7 +10,8 @@
 
 import itertools
 
-from PySide import QtGui
+import sgtk
+from sgtk.platform.qt import QtGui
 
 import hiero.core
 from hiero.core import FnExporterBase

@@ -13,15 +13,14 @@ import os
 import sys
 import ast
 
-from PySide import QtGui
-from PySide import QtCore
-
 from hiero.core import nuke
 from hiero.exporters import FnNukeShotExporter
 from hiero.exporters import FnNukeShotExporterUI
 from .collating_exporter import CollatedShotPreset
 
 import sgtk
+from sgtk.platform.qt import QtGui, QtCore
+
 from .base import ShotgunHieroObjectBase
 
 class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
