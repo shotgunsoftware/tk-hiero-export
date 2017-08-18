@@ -23,8 +23,9 @@ class HieroGetQuicktimeSettings(Hook):
         write node and the second item is a dictionary of knob names and
         values.
         """
+        import nuke
 
-        if sys.platform.startswith("linux"):
+        if sys.platform.startswith("linux") and nuke.NUKE_VERSION_MAJOR < 11:
             file_type = "mov"
             properties = {
                 "encoder": "mov64",
