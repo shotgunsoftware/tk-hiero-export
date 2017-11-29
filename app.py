@@ -53,11 +53,40 @@ from tk_hiero_export import (
 sys.path.pop()
 
 # list keywords Hiero is using in its export substitution
-HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event",
-                               "ext", "filebase", "fileext", "filehead",
-                               "filename", "filepadding", "fullbinpath", "fullday", "fullmonth",
-                               "MM", "month", "project", "projectroot", "sequence", "shot", 
-                               "tk_version", "track", "user", "version", "YY", "YYYY"]
+HIERO_SUBSTITUTION_KEYWORDS = [
+    "DD",
+    "MM",
+    "YYYY",
+    "YY",
+    "_nameindex",
+    "ampm",
+    "clip",
+    "day",
+    "event",
+    "filebase",
+    "fileext",
+    "filehead",
+    "filename",
+    "filepadding",
+    "filepath",
+    "fullday",
+    "fullmonth",
+    "hierotemp",
+    "hour12",
+    "hour24",
+    "minute",
+    "month",
+    "projectroot",
+    "project",
+    "second",
+    "sequence",
+    "shot",
+    "timestamp",
+    "tk_version",
+    "track",
+    "user",
+    "version",
+]
 
 
 class HieroExport(Application):
