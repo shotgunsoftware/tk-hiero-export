@@ -76,6 +76,11 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
         create_version_checkbox.stateChanged.connect(self.create_version_changed)
         top_layout.addWidget(create_version_checkbox)
 
+        # UI Hook
+        # ===========================
+        self.app.execute_hook("hook_customize_export_ui", layout=top_layout, ui_object=self)
+        # ===========================
+
         top.setLayout(top_layout)
 
         middle = QtGui.QWidget()
@@ -435,3 +440,11 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
         self._properties["create_version"] = True
 
         self.properties().update(properties)
+
+        #  UI Hook
+        # ==============================
+        custom_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
+                                                         preset=self,
+                                                         )
+        self.properties().update(custom_properties)
+        # ==============================
