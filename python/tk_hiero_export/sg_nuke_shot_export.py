@@ -261,12 +261,14 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
 
         #  UI Hook
         # ==============================
-        custom_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
-                                                         preset=self,
-                                                         )
-        self.properties().update(custom_properties)
+        custom_default_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
+                                                                 preset=self,
+                                                                 )
+        self.properties().update(custom_default_properties)
+
+        self.properties().update(properties)
         # # ==============================
-        
+
         if "toolkitWriteNodes" in properties:
             # already taken care of by loading the preset
             return

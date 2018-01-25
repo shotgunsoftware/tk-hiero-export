@@ -225,8 +225,10 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
 
         #  UI Hook
         # ==============================
-        custom_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
-                                                         preset=self,
-                                                         )
-        self.properties().update(custom_properties)
+        default_custom_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
+                                                                 preset=self,
+                                                                 )
+        self.properties().update(default_custom_properties)
+
+        self.properties().update(properties)
         # ==============================
