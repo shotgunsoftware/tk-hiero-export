@@ -34,6 +34,17 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
         self._displayName = "Shotgun Audio Export"
         self._taskType = ShotgunAudioExporter
 
+    #  UI Hook
+    # ==============================
+    def populateUI(self, widget, exportTemplate):
+        FnAudioExportUI.AudioExportUI.populateUI(self, widget, exportTemplate)
+
+        layout = widget.layout()
+
+        self.app.execute_hook("hook_customize_export_ui", layout=layout, ui_object=self)
+    # ==============================
+
+
 class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask, CollatingExporter):
     """
     Create Audio object and send to Shotgun
@@ -211,3 +222,13 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
         FnAudioExportTask.AudioExportPreset.__init__(self, name, properties)
         self._parentType = ShotgunAudioExporter
         CollatedShotPreset.__init__(self, self.properties())
+
+        #  UI Hook
+        # ==============================
+        default_custom_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
+                                                                 preset=self,
+                                                                 )
+        self.properties().update(default_custom_properties)
+
+        self.properties().update(properties)
+        # ==============================

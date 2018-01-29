@@ -81,6 +81,11 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
                 "Shotgun Write Nodes in the export dialog."
             )
 
+        #  UI Hook
+        # ===========================
+        self.app.execute_hook("hook_customize_export_ui", layout=layout, ui_object=self)
+        # ===========================
+
     def toolkitPresetChanged(self, topLeft, bottomRight):
         self._preset.properties()["toolkitWriteNodes"] = []
         preset = self._preset.properties()["toolkitWriteNodes"]
@@ -253,7 +258,17 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
         FnNukeShotExporter.NukeShotPreset.__init__(self, name, properties)
         self._parentType = ShotgunNukeShotExporter
         CollatedShotPreset.__init__(self, self.properties())
-        
+
+        #  UI Hook
+        # ==============================
+        custom_default_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
+                                                                 preset=self,
+                                                                 )
+        self.properties().update(custom_default_properties)
+
+        self.properties().update(properties)
+        # # ==============================
+
         if "toolkitWriteNodes" in properties:
             # already taken care of by loading the preset
             return

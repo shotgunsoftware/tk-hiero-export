@@ -215,13 +215,28 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 # the cut in/out should already be correct here. just log
                 self.app.log_debug("Exporting... clip length.")
 
-        # update the frame range
-        sg_shot["sg_head_in"] = head_in
-        sg_shot["sg_cut_in"] = cut_in
-        sg_shot["sg_cut_out"] = cut_out
-        sg_shot["sg_tail_out"] = tail_out
-        sg_shot["sg_cut_duration"] = cut_duration
-        sg_shot["sg_working_duration"] = working_duration
+        # CBSD Customization
+        # ===========================
+        # # update the frame range
+        # sg_shot["sg_head_in"] = head_in
+        # sg_shot["sg_cut_in"] = cut_in
+        # sg_shot["sg_cut_out"] = cut_out
+        # sg_shot["sg_tail_out"] = tail_out
+        # sg_shot["sg_cut_duration"] = cut_duration
+        # sg_shot["sg_working_duration"] = working_duration
+        if self._preset.properties()['updateSgHeadIn']:
+            sg_shot["sg_head_in"] = head_in
+        if self._preset.properties()['updateSgCutIn']:
+            sg_shot["sg_cut_in"] = cut_in
+        if self._preset.properties()['updateSgCutOut']:
+            sg_shot["sg_cut_out"] = cut_out
+        if self._preset.properties()['updateSgTailOut']:
+            sg_shot["sg_tail_out"] = tail_out
+        if self._preset.properties()['updateSgCutDuration']:
+            sg_shot["sg_cut_duration"] = cut_duration
+        if self._preset.properties()['updateSgWorkingDuration']:
+            sg_shot["sg_working_duration"] = working_duration
+        # ===========================
 
         # get status from the hiero tags
         status = None
@@ -257,9 +272,15 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         self.app.log_debug("Updating info for %s %s: %s" % (shot_type, shot_id, str(sg_shot)))
         self.app.tank.shotgun.update(shot_type, shot_id, sg_shot)
 
-        # create the directory structure
-        self.app.log_debug("Creating file system structure for %s %s..." % (shot_type, shot_id))
-        self.app.tank.create_filesystem_structure(shot_type, [shot_id])
+        # CBSD Customization
+        # ===========================
+        # # create the directory structure
+        # self.app.log_debug("Creating file system structure for %s %s..." % (shot_type, shot_id))
+        # self.app.tank.create_filesystem_structure(shot_type, [shot_id])
+        if self._preset.properties()['tkCreateFilesystemStructure']:
+            self.app.log_debug("Creating file system structure for %s %s..." % (shot_type, shot_id))
+            self.app.tank.create_filesystem_structure(shot_type, [shot_id])
+        # ===========================
 
         # return without error
         self.app.log_info("Updated %s %s" % (shot_type, self.shotName()))
@@ -269,7 +290,13 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
 
         cut = None
         # create the CutItem with the data populated by the shot processor
-        if hasattr(self, "_cut_item_data"):
+
+        # CBSD Customization
+        # ===========================
+        # if hasattr(self, "_cut_item_data"):
+        if hasattr(self, "_cut_item_data") and self._preset.properties()['sgCreateCut']:
+            # ===========================
+
             cut_item_data = self._cut_item_data
             cut_item = self.app.tank.shotgun.create("CutItem", cut_item_data)
             self.app.log_info("Created CutItem in Shotgun: %s" % (cut_item,))

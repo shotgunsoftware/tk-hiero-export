@@ -172,6 +172,15 @@ configuration:
         parameters: [task]
         default_value: hiero_get_extra_publish_data
 
+    #  UI Hook
+    # ==============================
+    hook_customize_export_ui:
+        type: hook
+        description: "UI Customization testing for CBS Digital"
+        parameters: [layout, ui_object]
+        default_value: hiero_customize_export_ui
+    # ==============================
+
     # paths
     template_plate_path:
         type: template

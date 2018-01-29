@@ -18,6 +18,7 @@ from hiero.core import FnExporterBase
 
 from hiero.exporters import FnShotProcessor
 
+
 # For Hiero versions prior to 9.0 the ShotProcessor class
 # contained both the execution and UI logic. That was split
 # into two classes in 9.0. To maintain backwards compatibility
@@ -119,6 +120,11 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
         if self._cutsSupported():
             cut_type_layout = self._build_cut_type_layout(properties)
             shotgun_layout.addLayout(cut_type_layout)
+
+        #  UI Hook
+        # ===========================
+        self.app.execute_hook("hook_customize_export_ui", layout=shotgun_layout, ui_object=self)
+        # ===========================
 
         shotgun_layout.addStretch()
 
@@ -321,11 +327,47 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # inject collate settings into Tasks where needed
         (collateTracks, collateShotNames) = self._getCollateProperties()
+
+        # CBSD Customization
+        # ===========================
+        (
+            updateSgHeadIn,
+            updateSgCutIn,
+            updateSgCutOut,
+            updateSgTailOut,
+            updateSgCutDuration,
+            updateSgWorkingDuration,
+            tkCreateFilesystemStructure,
+            sgCreateCut,
+
+        ) = self._getShotUpdaterOptions()
+        # ===========================
+
         for (itemPath, itemPreset) in exportTemplate:
             if 'collateTracks' in itemPreset.properties():
                 itemPreset.properties()['collateTracks'] = collateTracks
             if 'collateShotNames' in itemPreset.properties():
                 itemPreset.properties()['collateShotNames'] = collateShotNames
+
+            # CBSD Customization
+            # ===========================
+            if "updateSgHeadIn" in itemPreset.properties():
+                itemPreset.properties()['updateSgHeadIn'] = updateSgHeadIn
+            if "updateSgCutIn" in itemPreset.properties():
+                itemPreset.properties()['updateSgCutIn'] = updateSgCutIn
+            if "updateSgCutOut" in itemPreset.properties():
+                itemPreset.properties()['updateSgCutOut'] = updateSgCutOut
+            if "updateSgTailOut" in itemPreset.properties():
+                itemPreset.properties()['updateSgTailOut'] = updateSgTailOut
+            if "updateSgCutDuration" in itemPreset.properties():
+                itemPreset.properties()['updateSgCutDuration'] = updateSgCutDuration
+            if "updateSgWorkingDuration" in itemPreset.properties():
+                itemPreset.properties()['updateSgWorkingDuration'] = updateSgWorkingDuration
+            if "tkCreateFilesystemStructure" in itemPreset.properties():
+                itemPreset.properties()['tkCreateFilesystemStructure'] = tkCreateFilesystemStructure
+            if "sgCreateCut" in itemPreset.properties():
+                itemPreset.properties()['sgCreateCut'] = sgCreateCut
+            # ===========================
 
         exportTemplate.insert(0, (".shotgun", ShotgunShotUpdaterPreset(".shotgun", properties)))
         self._exportTemplate.restore(exportTemplate)
@@ -432,6 +474,15 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # point with a log msg. The user should be aware of this from the
         # message in the collating preset UI.
         (collateTracks, collateShotNames) = self._getCollateProperties()
+
+        # CBSD Customization
+        # ===========================
+        sgCreateCut = self._getCreateCutProperty()
+        if not sgCreateCut:
+            self.app.log_info("Create Cut option in the ShotgunShotProcessorUI is deactivated. Skipping cut Creation.")
+            return
+        # ===========================
+
         if collateTracks or collateShotNames:
             self.app.log_info(
                 "Cut support is ill defined for collating in Hiero. Not "
@@ -452,6 +503,17 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             self._processCut(cut_related_tasks)
         finally:
             self.app.engine.clear_busy()
+
+    # CBSD Customization
+    # ===========================
+    def _getCreateCutProperty(self):
+        """Return the setting for whether to create a cut."""
+        properties = self._preset.properties().get("shotgunShotCreateProperties", {})
+
+        sgCreateCut = properties.get("sgCreateCut", True)
+
+        return sgCreateCut
+    # ===========================
 
     def _getCollateProperties(self):
         """
@@ -535,6 +597,34 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             "revision_number": next_revision_number,
             "fps": hiero_sequence.framerate().toFloat(),
         }
+
+    # CBSD Customization
+    # ===========================
+    def _getShotUpdaterOptions(self):
+
+        properties = self._preset.properties().get("shotgunShotCreateProperties", {})
+
+        updateSgHeadIn = properties.get("updateSgHeadIn", True)
+        updateSgCutIn = properties.get("updateSgCutIn", True)
+        updateSgCutOut = properties.get("updateSgCutOut", True)
+        updateSgTailOut = properties.get("updateSgTailOut", True)
+        updateSgCutDuration = properties.get("updateSgCutDuration", True)
+        updateSgWorkingDuration = properties.get("updateSgWorkingDuration", True)
+        tkCreateFilesystemStructure = properties.get("tkCreateFilesystemStructure", True)
+        sgCreateCut = properties.get("sgCreateCut", True)
+
+        return (
+            updateSgHeadIn,
+            updateSgCutIn,
+            updateSgCutOut,
+            updateSgTailOut,
+            updateSgCutDuration,
+            updateSgWorkingDuration,
+            tkCreateFilesystemStructure,
+            sgCreateCut,
+        )
+
+    # ===========================
 
     def _override_frame_server_check(self):
         """
@@ -767,6 +857,14 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
 
         # holds the cut type to use when creating Cut entires in SG
         default_properties["sg_cut_type"] = ""
+
+        #  UI Hook
+        # ==============================
+        custom_properties = self.app.execute_hook_method("hook_customize_export_ui", "initialize_properties",
+                                                         preset=self,
+                                                         )
+        default_properties.update(custom_properties)
+        # ==============================
 
         # finally, update the properties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})
