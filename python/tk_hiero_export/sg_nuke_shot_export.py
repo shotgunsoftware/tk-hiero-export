@@ -81,6 +81,18 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
                 "Shotgun Write Nodes in the export dialog."
             )
 
+        # Handle any custom widget work the user did via the custom_export_ui
+        # hook.
+        custom_widget = self._get_custom_widget(
+            parent=widget,
+            create_method="create_nuke_shot_exporter_widget",
+            get_method="get_nuke_shot_exporter_ui_properties",
+            set_method="set_nuke_shot_exporter_ui_properties",
+        )
+
+        if custom_widget is not None:
+            layout.addWidget(custom_widget)
+
     def toolkitPresetChanged(self, topLeft, bottomRight):
         self._preset.properties()["toolkitWriteNodes"] = []
         preset = self._preset.properties()["toolkitWriteNodes"]
@@ -265,3 +277,11 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
             name = "Toolkit Node: %s (\"%s\")" % (node['name'], node['channel'])
             toolkit_write_nodes.append(name)
         self.properties()["toolkitWriteNodes"] = toolkit_write_nodes
+
+        # Handle custom properties from the preset_properties hook.
+        self.properties().update(
+            self.app.execute_hook_method(
+                "hook_preset_properties",
+                "get_nuke_shot_exporter_preset_properties",
+            )
+        )

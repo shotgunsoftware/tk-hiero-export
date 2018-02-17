@@ -91,6 +91,17 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
         layout.addWidget(top)
         layout.addWidget(middle)
 
+        # Handle any custom widget work the user did via the custom_export_ui
+        # hook.
+        custom_widget = self._get_custom_widget(
+            parent=widget,
+            create_method="create_transcode_exporter_widget",
+            get_method="get_transcode_exporter_ui_properties",
+            set_method="set_transcode_exporter_ui_properties",
+        )
+
+        if custom_widget is not None:
+            layout.addWidget(custom_widget)
 
 
 
@@ -433,5 +444,13 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
 
         # set default values
         self._properties["create_version"] = True
+
+        # Handle custom properties from the preset_properties hook.
+        default_properties.update(
+            self.app.execute_hook_method(
+                "hook_preset_properties",
+                "get_transcode_exporter_preset_properties",
+            )
+        )
 
         self.properties().update(properties)

@@ -133,6 +133,18 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
         else:
             ShotProcessorUI.populateUI(self, default, exportItems, editMode)
 
+        # Handle any custom widget work the user did via the custom_export_ui
+        # hook.
+        custom_widget = self._get_custom_widget(
+            parent=widget,
+            create_method="create_shot_processor_widget",
+            get_method="get_shot_processor_ui_properties",
+            set_method="set_shot_processor_ui_properties",
+        )
+
+        if custom_widget is not None:
+            layout.addWidget(custom_widget)
+
     def _build_cut_type_layout(self, properties):
         """
         Returns layout with a Label and QComboBox with a list of cut types.
@@ -767,6 +779,14 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
 
         # holds the cut type to use when creating Cut entires in SG
         default_properties["sg_cut_type"] = ""
+
+        # Handle custom properties from the preset_properties hook.
+        default_properties.update(
+            self.app.execute_hook_method(
+                "hook_preset_properties",
+                "get_shot_processor_preset_properties",
+            )
+        )
 
         # finally, update the properties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})

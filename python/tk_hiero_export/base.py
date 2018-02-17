@@ -12,11 +12,13 @@ import os
 import sys
 import shutil
 import time
+import collections
 
 import hiero.core
 from hiero.exporters import FnShotExporter
 from hiero.exporters import FnShotProcessor
 from hiero.exporters import FnTranscodeExporter
+from hiero.ui.FnUIProperty import UIPropertyFactory
 
 import tank
 from tank.platform.qt import QtGui, QtCore
@@ -26,6 +28,9 @@ class ShotgunHieroObjectBase(object):
     """Base class to make the Hiero classes app aware."""
     _app = None
 
+    def __init__(self, *args, **kwargs):
+        self._custom_properties = None
+
     @classmethod
     def setApp(cls, app):
         cls._app = app
@@ -33,6 +38,43 @@ class ShotgunHieroObjectBase(object):
     @property
     def app(self):
         return self._app
+
+    def _get_custom_widget(self, parent, create_method, get_method, set_method):
+        """
+
+        """
+        hook_widget = self.app.execute_hook_method(
+            "hook_customize_export_ui",
+            create_method,
+            parent=parent,
+        )
+
+        custom_properties = collections.OrderedDict()
+
+        if hook_widget is not None:
+            hook_ui_properties = self.app.execute_hook_method(
+                "hook_customize_export_ui",
+                get_method,
+            )
+
+            for prop_data in hook_ui_properties:
+                custom_properties[prop_data["label"]] = UIPropertyFactory.create(
+                    prop_data["type"],
+                    key=prop_data["key"],
+                    value=prop_data["value"],
+                    dictionary=self._preset.properties,
+                    tooltip=prop_data["tooltip"],
+                )
+
+            self._custom_properties = custom_properties
+            self.app.execute_hook_method(
+                "hook_customize_export_ui",
+                set_method,
+                widget=hook_widget,
+                properties=custom_properties,
+            )
+
+        return hook_widget
 
     def _formatTkVersionString(self, hiero_version_str):
         """Reformat the Hiero version string to the tk format.
