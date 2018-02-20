@@ -278,10 +278,9 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
             toolkit_write_nodes.append(name)
         self.properties()["toolkitWriteNodes"] = toolkit_write_nodes
 
-        # Handle custom properties from the preset_properties hook.
-        self.properties().update(
-            self.app.execute_hook_method(
-                "hook_preset_properties",
-                "get_nuke_shot_exporter_preset_properties",
-            )
-        )
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_nuke_shot_exporter_ui_properties"
+        ) or []
+
+        self.properties().update({d["key"]: d["value"] for d in custom_properties})

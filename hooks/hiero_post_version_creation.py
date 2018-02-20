@@ -24,6 +24,8 @@ class HieroPostVersionCreation(HookBaseClass):
 
 		Example version_data:
 
+		.. code-block:: python
+
 			{'code': 'Scene_v031_abc',
 			 'created_by': {'id': 39, 'name': 'Jeff Beeland', 'type': 'HumanUser'},
 			 'entity': {'id': 1166, 'name': 'ABC', 'type': 'Shot'},

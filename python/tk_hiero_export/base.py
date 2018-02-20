@@ -28,9 +28,6 @@ class ShotgunHieroObjectBase(object):
     """Base class to make the Hiero classes app aware."""
     _app = None
 
-    def __init__(self, *args, **kwargs):
-        self._custom_properties = None
-
     @classmethod
     def setApp(cls, app):
         cls._app = app
@@ -39,39 +36,80 @@ class ShotgunHieroObjectBase(object):
     def app(self):
         return self._app
 
-    def _get_custom_widget(self, parent, create_method, get_method, set_method):
+    def _get_custom_properties(self, get_method):
         """
 
         """
-        hook_widget = self.app.execute_hook_method(
-            "hook_customize_export_ui",
-            create_method,
-            parent=parent,
-        )
+        # This base class isn't intended to be run through an __init__ since
+        # it's utility container used as part of a mixin. Little backwards
+        # here, but if we don't have a cache location for these property
+        # definitions we can just create it here before moving on.
+        if not hasattr(self, "_custom_property_definitions"):
+            self._custom_property_definitions = dict()
 
-        custom_properties = collections.OrderedDict()
-
-        if hook_widget is not None:
-            hook_ui_properties = self.app.execute_hook_method(
+        # We key off of the method name since we allow for different
+        # properties and custom widgets per exporter type.
+        if get_method not in self._custom_property_definitions:
+            self._custom_property_definitions[get_method] = self.app.execute_hook_method(
                 "hook_customize_export_ui",
                 get_method,
             )
 
+        return self._custom_property_definitions[get_method]
+
+    def _get_custom_widget(self, parent, create_method, get_method, set_method, properties=None):
+        """
+
+        """
+        properties = properties or self._preset.properties()
+        hook_name = "hook_customize_export_ui"
+        hook_widget = self.app.execute_hook_method(
+            hook_name,
+            create_method,
+            parent_widget=parent,
+        )
+
+        if hook_widget is not None:
+            hook_ui_properties = self._get_custom_properties(get_method)
+
+            # This base class isn't intended to be run through an __init__ since
+            # it's utility container class used as part of a mixin. Little backwards
+            # here, but if we don't have a cache location for these properties
+            # we can just create it here before moving on.
+            if not hasattr(self, "_custom_properties"):
+                self._custom_properties = dict()
+
+            # We're only adding these property objects to a property in order
+            # to protect them from garbage collections. We'll key it off of the
+            # hook get method name since you'll end up with different property
+            # objects per exporter type.
+            #
+            # Caching using an OrderedDict because we want to maintain the property
+            # order as defined in the hook's get properties method. This means that
+            # the programmer can define the properties in the order that they want
+            # them to appear in a Qt layout and just iterate over what we give them
+            # in the set properties hook method. NOTE: OrderedDict is Python 2.7+,
+            # but that's safe here because we only support Hiero/NS versions that
+            # come bundled with 2.7.
+            cache = self._custom_properties.setdefault(
+                get_method,
+                collections.OrderedDict(),
+            )
+
             for prop_data in hook_ui_properties:
-                custom_properties[prop_data["label"]] = UIPropertyFactory.create(
+                cache[prop_data["label"]] = UIPropertyFactory.create(
                     prop_data["type"],
                     key=prop_data["key"],
                     value=prop_data["value"],
-                    dictionary=self._preset.properties,
+                    dictionary=properties,
                     tooltip=prop_data["tooltip"],
                 )
 
-            self._custom_properties = custom_properties
             self.app.execute_hook_method(
-                "hook_customize_export_ui",
+                hook_name,
                 set_method,
                 widget=hook_widget,
-                properties=custom_properties,
+                properties=self._custom_properties[get_method],
             )
 
         return hook_widget

@@ -140,6 +140,7 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
             create_method="create_shot_processor_widget",
             get_method="get_shot_processor_ui_properties",
             set_method="set_shot_processor_ui_properties",
+            properties=self._preset.properties()["shotgunShotCreateProperties"],
         )
 
         if custom_widget is not None:
@@ -339,6 +340,31 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             if 'collateShotNames' in itemPreset.properties():
                 itemPreset.properties()['collateShotNames'] = collateShotNames
 
+            # We need to pull any custom properties that were added to the
+            # preset and get their current value, adding them to the item's
+            # properties.
+            custom_properties = self._get_custom_properties(
+                get_method="get_shot_processor_ui_properties",
+            )
+            sg_shot_properties = self._preset.properties().get(
+                "shotgunShotCreateProperties",
+                dict(),
+            )
+            self.app.logger.warning("PROPS TO BE INJECTED: %s" % sg_shot_properties)
+            for property_data in custom_properties:
+                key = property_data["key"]
+
+                # If we don't have the current value for the property in the
+                # shot processor preset, or the item's preset doesn't contain
+                # the property, we move on without altering the item's properties.
+                if key not in sg_shot_properties or key not in itemPreset.properties():
+                    continue
+
+                # Replace the default value that's in the item preset properties
+                # right now with the current value from the shot processor preset,
+                # which will reflect what the user set in the UI prior to exporting.
+                itemPreset.properties()[key] = sg_shot_properties[key]
+
         exportTemplate.insert(0, (".shotgun", ShotgunShotUpdaterPreset(".shotgun", properties)))
         self._exportTemplate.restore(exportTemplate)
 
@@ -438,6 +464,23 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "No Cut support in this version of Shotgun. Not attempting to "
                 "create Cut or CutItem entries."
             )
+            return
+
+        # We give the hook method the opportunity to determine whether we'll
+        # continue with updating the Cut entity. Passing in the shot creation
+        # properties from the preset will allow programmers to customize this
+        # behavior based on any custom properties they've added to the preset
+        # through the customize_export_ui hook methods.
+        allow_cut_updates = self.app.execute_hook_method(
+            "hook_update_cuts",
+            "allow_cut_updates",
+            preset_properties=self._preset.properties().get(
+                "shotgunShotCreateProperties",
+                dict(),
+            ),
+        )
+
+        if not allow_cut_updates:
             return
 
         # collate complicates cut support for hiero. For now duck out at this
@@ -780,13 +823,12 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
         # holds the cut type to use when creating Cut entires in SG
         default_properties["sg_cut_type"] = ""
 
-        # Handle custom properties from the preset_properties hook.
-        default_properties.update(
-            self.app.execute_hook_method(
-                "hook_preset_properties",
-                "get_shot_processor_preset_properties",
-            )
-        )
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_shot_processor_ui_properties"
+        ) or []
+
+        default_properties.update({d["key"]: d["value"] for d in custom_properties})
 
         # finally, update the properties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})

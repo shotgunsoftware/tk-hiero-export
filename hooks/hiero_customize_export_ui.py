@@ -12,7 +12,6 @@
 # ===========================
 
 import sgtk
-import hiero
 
 from sgtk.platform.qt import QtGui
 
@@ -21,202 +20,257 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class HieroCustomizeExportUI(HookBaseClass):
     """
-
+    This class defines methods that can be used to customize the UI of the various
+    Shotgun-related exporters. Each processor has its own set of create/get/set
+    methods, allowing for customizable UI elements for each type of export.
     """
-    def create_shot_processor_widget(self, parent):
+    def create_shot_processor_widget(self, parent_widget):
         """
+        Builds and returns a custom widget to be embedded in the parent exporter.
+        If a custom widget is returned by this method, it will be added to the
+        parent exporter's layout.
 
+        Example Implementation:
+
+        .. code-block:: python
+
+            widget = QtGui.QGroupBox("My Custom Properties", parent_widget)
+            widget.setLayout(QtGui.QFormLayout())
+            return widget
+
+        :param parent_widget: The parent widget.
+
+        :returns: A custom widget.
         """
-        # return None
-
-        widget = QtGui.QWidget(parent)
-        widget.setLayout(QtGui.QFormLayout())
-        return widget
+        return None
 
     def get_shot_processor_ui_properties(self):
         """
-        [
-            dict(
-                label=str,
-                key=str,
-                value=property_value,
-                type=property_type # Usually == type(value)
-                tooltip=str,
-            ),
-            ...
-        ]
-        """
-        # return []
+        Gets a list of property dictionaries describing the custom properties
+        required by the custom widget. This method will only be run if the
+        associated create widget hook method returns a widget. The dictionaries
+        will be turned into property widgets by the app before being passed to
+        the associated set properties hook method. The order that the dictionaries
+        are returned by this method is maintained when they are passed to the
+        associated set hook method.
 
-        return [
-            dict(
-                label="Create Cut:",
-                key="sgCreateCut",
-                value=True,
-                type=bool,
-                tooltip="Create a Cut and CutItems in Shotgun...",
-            ),
-            dict(
-                label="Head In:",
-                key="updateSgHeadIn",
-                value=True,
-                type=bool,
-                tooltip="Update 'sg_head_in' on the Shot entity.",
-            ),
-            dict(
-                label="Cut In:",
-                key="updateSgCutIn",
-                value=True,
-                type=bool,
-                tooltip="Update 'sg_cut_in' on the Shot entity.",
-            ),
-            dict(
-                label="Cut Out:",
-                key="updateSgCutOut",
-                value=True,
-                type=bool,
-                tooltip="Update 'sg_cut_out' on the Shot entity.",
-            ),
-            dict(
-                label="Tail Out:",
-                key="updateSgTailOut",
-                value=True,
-                type=bool,
-                tooltip="Update 'sg_tail_out' on the Shot entity.",
-            ),
-            dict(
-                label="Cut Duration:",
-                key="updateSgCutDuration",
-                value=True,
-                type=bool,
-                tooltip="Update 'sg_cut_duration' on the Shot entity.",
-            ),
-            dict(
-                label="Working Duration:",
-                key="updateSgWorkingDuration",
-                value=True,
-                type=bool,
-                tooltip="Update 'sg_working_duration' on the Shot entity.",
-            ),
-            dict(
-                label="Create Folders:",
-                key="tkCreateFilesystemStructure",
-                value=True,
-                type=bool,
-                tooltip="Run the Toolkit 'Create Folders' command for the Shot entity.",
-            ),
-        ]
+        Example Return Data:
+
+        .. code-block:: python
+
+            [
+                dict(
+                    label=label_str,
+                    key=key_str,
+                    value=property_value,
+                    type=property_type # Usually == type(value)
+                    tooltip=tooltip_str,
+                ),
+            ]
+
+        Example Implementation:
+
+        .. code-block:: python
+
+            return [
+                dict(
+                    label="Create Cut:",
+                    key="sgCreateCut",
+                    value=True,
+                    type=bool,
+                    tooltip="Create a Cut and CutItems in Shotgun...",
+                ),
+                dict(
+                    label="Head In:",
+                    key="updateSgHeadIn",
+                    value=True,
+                    type=bool,
+                    tooltip="Update 'sg_head_in' on the Shot entity.",
+                ),
+            ]
+
+        :returns: A list of dictionaries.
+        :rtype: list
+        """
+        return []
 
     def set_shot_processor_ui_properties(self, widget, properties):
         """
-        :param widget: The Qt widget that was created by the
-            create_shot_processor_widget hook method.
-        :param OrderedDict properties: A dict containing hiero.ui.FnUIProperty
+        Sets any custom properties described by get_shot_processor_ui_properties
+        on the custom widget returned by create_shot_processor_widget. This method
+        will only be called if the create method is implemented to return a custom
+        widget. The order of the properties within the dictionary passed in is the
+        same as the order they're returned in the get properties hook method.
+
+        Example Implementation:
+
+        .. code-block:: python
+
+            layout = widget.layout()
+            for label, prop in properties.iteritems():
+                layout.addRow(label, prop)
+
+        :param widget: The Qt widget that was created by the associated create
+            widget hook method.
+        :param OrderedDict properties: A dict containing property widget
             objects, keyed by label, that were constructed from the data
-            built by the get_shot_processor_ui_properties hook method.
+            built by the associated get properties hook method.
         """
-        # return
-
-        layout = widget.layout()
-
-        for label, prop in properties.iteritems():
-            if label == "Create Cut:":
-                layout.addRow(create_cut, properties[create_cut])
-                layout.addRow(QtGui.QLabel("--- Frame Ranges ---"))
-                continue
-
-            layout.addRow(label, prop)
+        return
 
     def create_transcode_exporter_widget(self, parent):
         """
+        Builds and returns a custom widget to be embedded in the parent exporter.
+        If a custom widget is returned by this method, it will be added to the
+        parent exporter's layout.
 
+        .. note:: See the :meth:`create_shot_processor_widget` method for
+            more detailed documentation.
+
+        :param parent_widget: The parent widget.
+
+        :returns: A custom widget.
         """
         return None
 
     def get_transcode_exporter_ui_properties(self):
         """
-        [
-            dict(
-                label=str,
-                key=str,
-                value=property_value,
-                type=property_type # Usually == type(value)
-                tooltip=str,
-            ),
-            ...
-        ]
+        Gets a list of property dictionaries describing the custom properties
+        required by the custom widget. This method will only be run if the
+        associated create widget hook method returns a widget. The dictionaries
+        will be turned into property widgets by the app before being passed to
+        the associated set properties hook method. The order that the dictionaries
+        are returned by this method is maintained when they are passed to the
+        associated set hook method.
+
+        .. note:: See the :meth:`get_shot_processor_ui_properties` method for
+            more detailed documentation.
+
+        :returns: A list of dictionaries.
+        :rtype: list
         """
         return []
 
     def set_transcode_exporter_ui_properties(self, widget, properties):
         """
-        :param widget: The Qt widget that was created by the
-            create_transcode_exporter_widget hook method.
-        :param OrderedDict properties: A dict containing hiero.ui.FnUIProperty
+        Sets any custom properties described by get_transcode_exporter_ui_properties
+        on the custom widget returned by create_transcode_exporter_widget. This method
+        will only be called if the create method is implemented to return a custom
+        widget. The order of the properties within the dictionary passed in is the
+        same as the order they're returned in the get properties hook method.
+
+        .. note:: See the :meth:`set_shot_processor_ui_properties` method for
+            for an example implementation.
+
+        :param widget: The Qt widget that was created by the associated create
+            widget hook method.
+        :param OrderedDict properties: A dict containing property widget
             objects, keyed by label, that were constructed from the data
-            built by the get_transcode_exporter_ui_properties hook method.
+            built by the associated get properties hook method.
         """
         return
 
     def create_audio_exporter_widget(self, parent):
         """
+        Builds and returns a custom widget to be embedded in the parent exporter.
+        If a custom widget is returned by this method, it will be added to the
+        parent exporter's layout.
 
+        .. note:: See the :meth:`create_shot_processor_widget` method for
+            more detailed documentation.
+
+        :param parent_widget: The parent widget.
+
+        :returns: A custom widget.
         """
         return None
 
     def get_audio_exporter_ui_properties(self):
         """
-        [
-            dict(
-                label=str,
-                key=str,
-                value=property_value,
-                type=property_type # Usually == type(value)
-                tooltip=str,
-            ),
-            ...
-        ]
+        Gets a list of property dictionaries describing the custom properties
+        required by the custom widget. This method will only be run if the
+        associated create widget hook method returns a widget. The dictionaries
+        will be turned into property widgets by the app before being passed to
+        the associated set properties hook method. The order that the dictionaries
+        are returned by this method is maintained when they are passed to the
+        associated set hook method.
+
+        .. note:: See the :meth:`get_shot_processor_ui_properties` method for
+            more detailed documentation.
+
+        :returns: A list of dictionaries.
+        :rtype: list
         """
         return []
 
     def set_audio_exporter_ui_properties(self, widget, properties):
         """
-        :param widget: The Qt widget that was created by the
-            create_audio_exporter_widget hook method.
-        :param OrderedDict properties: A dict containing hiero.ui.FnUIProperty
+        Sets any custom properties described by get_audio_exporter_ui_properties
+        on the custom widget returned by create_audio_exporter_widget. This method
+        will only be called if the create method is implemented to return a custom
+        widget. The order of the properties within the dictionary passed in is the
+        same as the order they're returned in the get properties hook method.
+
+        .. note:: See the :meth:`set_shot_processor_ui_properties` method for
+            for an example implementation.
+
+        :param widget: The Qt widget that was created by the associated create
+            widget hook method.
+        :param OrderedDict properties: A dict containing property widget
             objects, keyed by label, that were constructed from the data
-            built by the get_audio_exporter_ui_properties hook method.
+            built by the associated get properties hook method.
         """
         return
 
     def create_nuke_shot_exporter_widget(self, parent):
         """
+        Builds and returns a custom widget to be embedded in the parent exporter.
+        If a custom widget is returned by this method, it will be added to the
+        parent exporter's layout.
 
+        .. note:: See the :meth:`create_shot_processor_widget` method for
+            more detailed documentation.
+
+        :param parent_widget: The parent widget.
+
+        :returns: A custom widget.
         """
         return None
 
     def get_nuke_shot_exporter_ui_properties(self):
         """
-        [
-            dict(
-                label=str,
-                key=str,
-                value=property_value,
-                type=property_type # Usually == type(value)
-                tooltip=str,
-            ),
-            ...
-        ]
+        Gets a list of property dictionaries describing the custom properties
+        required by the custom widget. This method will only be run if the
+        associated create widget hook method returns a widget. The dictionaries
+        will be turned into property widgets by the app before being passed to
+        the associated set properties hook method. The order that the dictionaries
+        are returned by this method is maintained when they are passed to the
+        associated set hook method.
+
+        .. note:: See the :meth:`get_shot_processor_ui_properties` method for
+            more detailed documentation.
+
+        :returns: A list of dictionaries.
+        :rtype: list
         """
         return []
 
     def set_nuke_shot_exporter_ui_properties(self, widget, properties):
         """
-        :param widget: The Qt widget that was created by the
-            create_audio_exporter_widget hook method.
-        :param OrderedDict properties: A dict containing hiero.ui.FnUIProperty
+        Sets any custom properties described by get_nuke_shot_exporter_ui_properties
+        on the custom widget returned by create_nuke_shot_exporter_widget. This method
+        will only be called if the create method is implemented to return a custom
+        widget. The order of the properties within the dictionary passed in is the
+        same as the order they're returned in the get properties hook method.
+
+        .. note:: See the :meth:`set_shot_processor_ui_properties` method for
+            for an example implementation.
+
+        :param widget: The Qt widget that was created by the associated create
+            widget hook method.
+        :param OrderedDict properties: A dict containing property widget
             objects, keyed by label, that were constructed from the data
-            built by the get_audio_exporter_ui_properties hook method.
+            built by the associated get properties hook method.
         """
         return
         

@@ -232,10 +232,9 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
         self._parentType = ShotgunAudioExporter
         CollatedShotPreset.__init__(self, self.properties())
 
-        # Handle custom properties from the preset_properties hook.
-        self.properties().update(
-            self.app.execute_hook_method(
-                "hook_preset_properties",
-                "get_audio_exporter_preset_properties",
-            )
-        )
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_audio_exporter_ui_properties"
+        ) or []
+
+        self.properties().update({d["key"]: d["value"] for d in custom_properties})

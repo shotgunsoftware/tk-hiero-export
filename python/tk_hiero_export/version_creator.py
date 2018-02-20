@@ -445,12 +445,9 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
         # set default values
         self._properties["create_version"] = True
 
-        # Handle custom properties from the preset_properties hook.
-        default_properties.update(
-            self.app.execute_hook_method(
-                "hook_preset_properties",
-                "get_transcode_exporter_preset_properties",
-            )
-        )
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_transcode_exporter_ui_properties"
+        ) or []
 
-        self.properties().update(properties)
+        self.properties().update({d["key"]: d["value"] for d in custom_properties})
