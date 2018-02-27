@@ -237,4 +237,4 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
             "get_audio_exporter_ui_properties"
         ) or []
 
-        self.properties().update({d["key"]: d["value"] for d in custom_properties})
+        self.properties().update({d["name"]: d["value"] for d in custom_properties})

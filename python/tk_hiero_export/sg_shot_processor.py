@@ -828,7 +828,7 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
             "get_shot_processor_ui_properties"
         ) or []
 
-        default_properties.update({d["key"]: d["value"] for d in custom_properties})
+        default_properties.update({d["name"]: d["value"] for d in custom_properties})
 
         # finally, update the properties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})

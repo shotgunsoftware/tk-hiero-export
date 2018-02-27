@@ -450,4 +450,4 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
             "get_transcode_exporter_ui_properties"
         ) or []
 
-        self.properties().update({d["key"]: d["value"] for d in custom_properties})
+        self.properties().update({d["name"]: d["value"] for d in custom_properties})
