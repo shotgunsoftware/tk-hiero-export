@@ -29,13 +29,21 @@ class HieroUpdateCuts(HookBaseClass):
         processor preset via other hooks, such as the
         customize_export_ui hook.
 
+        Example Implementation:
+
+        .. code-block:: python
+
+            # The my_custom_property is a bool property that controls
+            # whether we update cuts or not.
+            return preset_properties.get("my_custom_property", True)
+
         :param dict preset_properties: The properties dictionary of
             shot processor preset.
 
         :returns: True to allow Cut updates, False to disallow.
         :rtype: bool
         """
-        return True
+        raise NotImplementedError
 
     def create_cut_item(self, cut_item_data, preset_properties):
         """
@@ -55,9 +63,7 @@ class HieroUpdateCuts(HookBaseClass):
             no CutItem entity was created.
         :rtype: dict or None
         """
-        cut_item = self.parent.sgtk.shotgun.create("CutItem", cut_item_data)
-        self.parent.logger.info("Created CutItem in Shotgun: %s" % cut_item)
-        return cut_item
+        raise NotImplementedError
 
     def get_cut_thumbnail(self, cut, task_item, preset_properties):
         """
@@ -76,21 +82,4 @@ class HieroUpdateCuts(HookBaseClass):
             is to be uploaded to Shotgun.
         :rtype: str or None
         """
-        thumbnail = None
-
-        # Some additional documentation from The Foundry might help here:
-        #
-        # https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem.sequence
-        # https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.Sequence
-        hiero_sequence = task_item.sequence()
-
-        try:
-            # See if we can find a poster frame for the sequence and
-            # turn that into a usable thumbnail.
-            thumbnail = hiero_sequence.thumbnail(hiero_sequence.posterFrame())
-        except Exception:
-            self.parent.logger.debug(
-                "Unable to generate a thumbnail from the sequence's posterFrame."
-            )
-
-        return thumbnail
+        raise NotImplementedError

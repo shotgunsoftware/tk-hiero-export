@@ -30,6 +30,20 @@ class HieroUpdateShot(HookBaseClass):
         been defined in other hooks, like can be achieved when using
         the hiero_customize_export_ui hook.
 
+        Example Implementation:
+
+        .. code-block:: python
+
+            # Check our custom property to know whether we should create the filesystem
+            # structure or not.
+            if preset_properties.get("custom_create_filesystem_property", True):
+                self.parent.logger.debug(
+                    "Creating file system structure for %s %s..." % (entity_type, entity_id)
+                )
+                self.parent.sgtk.create_filesystem_structure(entity_type, [entity_id])
+            else:
+                self.parent.logger.debug("Not creating the filesystem structure!")
+
         :param str entity_type: The entity type that was created or
             updated as part of the export. Most likely this will be
             "Shot".
@@ -38,10 +52,7 @@ class HieroUpdateShot(HookBaseClass):
         :param dict preset_properties: The export preset's properties
             dictionary.
         """
-        self.parent.logger.debug(
-            "Creating file system structure for %s %s..." % (entity_type, entity_id)
-        )
-        self.parent.sgtk.create_filesystem_structure(entity_type, [entity_id])
+        raise NotImplementedError
 
     def update_shotgun_shot_entity(self, entity_type, entity_id, entity_data, preset_properties):
         """
@@ -51,13 +62,21 @@ class HieroUpdateShot(HookBaseClass):
         defined in other hooks, like can be achieved when using the
         hiero_customize_export_ui hook.
 
+        Example Implementation:
+
+        .. code-block:: python
+
+            # If the custom bool property is False, we don't update the
+            # sg_cut_in field on the Shot entity.
+            if not preset_properties.get("custom_update_cut_in_property", True):
+                del entity_data["sg_cut_in"]
+
+            self.parent.sgtk.shotgun.update(entity_type, entity_id, entity_data)
+
         :param str entity_type: The entity type to update.
         :param int entity_id: The id of the entity to update.
         :param dict entity_data: The new data to update the entity with.
         :param dict preset_properties: The export preset's properties
             dictionary.
         """
-        self.parent.logger.debug(
-            "Updating info for %s %s: %s" % (entity_type, entity_id, entity_data)
-        )
-        self.parent.sgtk.shotgun.update(entity_type, entity_id, entity_data)
+        raise NotImplementedError

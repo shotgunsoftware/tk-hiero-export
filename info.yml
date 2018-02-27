@@ -191,7 +191,8 @@ configuration:
 
     hook_update_cuts:
         type: hook
-        description: ""
+        description: "Called during SG shot processing. Provides methods for managing
+                     if and how Cuts and CutItems are created and updated."
         parameters: []
         default_value: hiero_update_cuts
 
