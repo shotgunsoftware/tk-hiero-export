@@ -30,6 +30,20 @@ class HieroUpdateShot(HookBaseClass):
         been defined in other hooks, like can be achieved when using
         the hiero_customize_export_ui hook.
 
+        Example Implementation:
+
+        .. code-block:: python
+
+            # Check our custom property to know whether we should create the filesystem
+            # structure or not.
+            if preset_properties.get("custom_create_filesystem_property", True):
+                self.parent.logger.debug(
+                    "Creating file system structure for %s %s..." % (entity_type, entity_id)
+                )
+                self.parent.sgtk.create_filesystem_structure(entity_type, [entity_id])
+            else:
+                self.parent.logger.debug("Not creating the filesystem structure!")
+
         :param str entity_type: The entity type that was created or
             updated as part of the export. Most likely this will be
             "Shot".

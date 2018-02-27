@@ -98,8 +98,8 @@ class ShotgunHieroObjectBase(object):
 
             for prop_data in hook_ui_properties:
                 cache[prop_data["label"]] = UIPropertyFactory.create(
-                    prop_data["type"],
-                    key=prop_data["key"],
+                    type(prop_data["value"]),
+                    key=prop_data["name"],
                     value=prop_data["value"],
                     dictionary=properties,
                     tooltip=prop_data["tooltip"],

@@ -54,20 +54,6 @@ class HieroCustomizeExportUI(HookBaseClass):
         are returned by this method is maintained when they are passed to the
         associated set hook method.
 
-        Example Return Data:
-
-        .. code-block:: python
-
-            [
-                dict(
-                    label=label_str,
-                    key=key_str,
-                    value=property_value,
-                    type=property_type # Usually == type(value)
-                    tooltip=tooltip_str,
-                ),
-            ]
-
         Example Implementation:
 
         .. code-block:: python
@@ -75,16 +61,14 @@ class HieroCustomizeExportUI(HookBaseClass):
             return [
                 dict(
                     label="Create Cut:",
-                    key="sgCreateCut",
+                    name="custom_create_cut_bool_property",
                     value=True,
-                    type=bool,
                     tooltip="Create a Cut and CutItems in Shotgun...",
                 ),
                 dict(
                     label="Head In:",
-                    key="updateSgHeadIn",
+                    name="custom_head_in_bool_property",
                     value=True,
-                    type=bool,
                     tooltip="Update 'sg_head_in' on the Shot entity.",
                 ),
             ]
@@ -273,14 +257,3 @@ class HieroCustomizeExportUI(HookBaseClass):
             built by the associated get properties hook method.
         """
         return
-        
-
-
-
-
-
-
-
-
-
-

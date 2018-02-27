@@ -85,6 +85,11 @@ class HieroUpdateCuts(HookBaseClass):
         :rtype: str or None
         """
         thumbnail = None
+
+        # Some additional documentation from The Foundry might help here:
+        #
+        # https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem.sequence
+        # https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.Sequence
         hiero_sequence = task_item.sequence()
 
         try:
