@@ -38,10 +38,19 @@ class ShotgunHieroObjectBase(object):
 
     def _get_custom_properties(self, get_method):
         """
+        Gets a list of custom property descriptions from the customize_export_ui
+        hook, calling the hook method provided. This method will cache the
+        list of property descriptions, and any subsequent calls here will
+        return cached data.
 
+        :param str get_method: The name of the getter hook method to call.
+
+        :returns: A list of property definition dictionaries, as returned by
+            the hook_customize_export_ui hook getter methods.
+        :rtype: list
         """
         # This base class isn't intended to be run through an __init__ since
-        # it's utility container used as part of a mixin. Little backwards
+        # it's a utility container used as part of a mixin. Little backwards
         # here, but if we don't have a cache location for these property
         # definitions we can just create it here before moving on.
         if not hasattr(self, "_custom_property_definitions"):
@@ -59,7 +68,21 @@ class ShotgunHieroObjectBase(object):
 
     def _get_custom_widget(self, parent, create_method, get_method, set_method, properties=None):
         """
+        Uses the customize_export_ui hook to get a custom widget, get custom
+        property definitions, and then set the widget's settings.
 
+        :param parent: The parent widget.
+        :param str create_method: The name of the create widget hook method to
+            call to get the custom widget.
+        :param str get_method: The name of the property getter hook method to
+            call to get the custom property definitions.
+        :param str set_method: The name of the widget property setter hook method
+            to call to setup the widget using the custom properties.
+        :param dict properties: The processor's properties dictionary to
+            associate with any custom UIProperty objects created.
+
+        :returns: A widget, or None if no custom widget was provided by the
+            hook.
         """
         properties = properties or self._preset.properties()
         hook_name = "hook_customize_export_ui"
