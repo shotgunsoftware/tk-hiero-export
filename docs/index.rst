@@ -56,42 +56,49 @@ Customizing PublishedFile data
 ------------------------------------
 
 .. autoclass:: HieroGetExtraPublishData
+    :members:
 
 
 Executing logic after Version entity creation
 ---------------------------------------------------
 
 .. autoclass:: HieroPostVersionCreation
+    :members:
 
 
 Executing logic prior to export
 -------------------------------------
 
 .. autoclass:: HieroPreExport
+    :members:
 
 
 Resolving strings into Shotgun-queried values
 ---------------------------------------------------
 
 .. autoclass:: HieroResolveCustomStrings
+    :members:
 
 
 Resolving Shotgun Toolkit templates into export string representations
 ----------------------------------------------------------------------------
 
 .. autoclass:: HieroTranslateTemplate
+    :members:
 
 
 Customizing Version entity data
 -------------------------------------
 
 .. autoclass:: HieroUpdateVersionData
+    :members:
 
 
 Uploading Thumbnails to Shotgun
 -------------------------------------
 
 .. autoclass:: HieroUploadThumbnail
+    :members:
 
 
 
