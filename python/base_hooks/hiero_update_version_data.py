@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Shotgun Software Inc.
+# Copyright (c) 2018 Shotgun Software Inc.
 #
 # CONFIDENTIAL AND PROPRIETARY
 #
@@ -14,10 +14,20 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 
 class HieroUpdateVersionData(HookBaseClass):
-    """ Update the data dictionary for a Version to be created in Shotgun. """
+    """
+    This class implements a hook that can be used to customize the data
+    dictionary for a Version entity that is going to be created by the
+    export process.
+    """
     def execute(self, version_data, task, **kwargs):
         """
-        Update the version_data dictionary to change the data for the Version
-        that will be created in Shotgun.
+        Updates the version_data dictionary to change the data for the Version
+        that will be created in Shotgun. Updating the given version_data
+        dictionary in place will ensure your customizations are used when
+        creating the new Version entity.
+
+        :param dict version_data: The data dictionary that will be used by
+            the export process to create a new Version entity in Shotgun.
+        :param task: The Hiero export task being processed.
         """
         pass

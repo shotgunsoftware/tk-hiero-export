@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Shotgun Software Inc.
+# Copyright (c) 2018 Shotgun Software Inc.
 #
 # CONFIDENTIAL AND PROPRIETARY
 #
@@ -15,13 +15,14 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class HieroPreExport(HookBaseClass):
     """
-    Allows clearing of caches prior to shot processing
+    This class implements a hook that can be used to run custom logic prior to
+    the start if the export process.
     """
     def execute(self, processor, **kwargs):
         """
-        Allows clearing of caches prior to shot processing. This is called just prior to export.
+        Called just prior to export. One use case for would be to clear
+        cached data here, just before the export begins.
 
-        :param processor: Processor The is being used, in case distinguishing between
-                          differnt exports is needed.
+        :param processor: The processor object that is about to be started.
         """
         pass

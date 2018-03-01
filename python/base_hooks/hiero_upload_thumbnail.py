@@ -15,7 +15,17 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class HieroUploadThumbnail(HookBaseClass):
     """
-    Upload a thumbnail to a given Shotgun entity for a given Hiero source item.
+    This class implements a hook that's responsible for uploading a thumbnail
+    to a given Shotgun entity for a given Hiero source item.
     """
     def execute(self, entity, source, item, **kwargs):
+        """
+        Uploads a thumbnail to the given entity in Shotgun.
+
+        :param dict entity: The entity dictionary that will receive the new
+            thumbnail image.
+        :param source: The Hiero source sequence object being exported.
+        :param item: The Hiero task item being processed.
+        :param task: The Hiero task being processed.
+        """
         pass

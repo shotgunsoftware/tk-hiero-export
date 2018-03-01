@@ -1,4 +1,4 @@
-# Copyright (c) 2015 Shotgun Software Inc.
+# Copyright (c) 2018 Shotgun Software Inc.
 #
 # CONFIDENTIAL AND PROPRIETARY
 #
@@ -14,11 +14,13 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 class HieroPostVersionCreation(HookBaseClass):
 	"""
-	Post processing of the Version entity that was created during export.
+	This class implements a hook that can be used to add custom logic to
+	be run after a Version entity is created in Shotgun as part of the
+	export process.
 	"""
 	def execute(self, version_data, **kwargs):
 		"""
-		Run following the creation of the Version entity in Shotgun. The
+		Runs following the creation of the Version entity in Shotgun. The
 		provided version data is the data structure containing information
 		about the Version entity, including its ID in Shotgun.
 
@@ -34,9 +36,11 @@ class HieroPostVersionCreation(HookBaseClass):
 			 'published_files': [{'id': 108,
 			                      'name': 'scene_v031_ABC.mov',
 			                      'type': 'PublishedFile'}],
-			 'sg_path_to_movie': 'd:\\shotgun\\projects\\devwindows\\sequences\\123\\ABC\\editorial\\2015_11_24\\plates\\scene_v031_ABC.mov',
+			 'sg_path_to_movie': '/shotgun/projects/devwindows/sequences/123/ABC/editorial/2015_11_24/plates/scene_v031_ABC.mov',
 			 'sg_task': {'id': 2113, 'name': 'Comp', 'type': 'Task'},
 			 'type': 'Version',
 			 'user': {'id': 39, 'name': 'Jeff Beeland', 'type': 'HumanUser'}}
+
+		:param dict version_data: The Version entity that was created in Shotgun.
 		"""
 		pass

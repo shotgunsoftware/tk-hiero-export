@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Shotgun Software Inc.
+# Copyright (c) 2018 Shotgun Software Inc.
 #
 # CONFIDENTIAL AND PROPRIETARY
 #
@@ -14,13 +14,22 @@ HookBaseClass = sgtk.get_hook_baseclass()
 
 
 class HieroResolveCustomStrings(HookBaseClass):
-    """Translates a keyword string into its resolved value for a given task."""
+    """
+    This class implements a hook that is used to resolve custom tokens into
+    their concrete value when paths are being processed during the export.
+    """
     def execute(self, task, keyword, **kwargs):
         """
         The default implementation of the custom resolver simply looks up
-        the keyword from the shotgun shot dictionary.
+        the keyword from the Shotgun Shot entity dictionary. For example,
+        to pull the shot code, you would simply specify 'code'. To pull
+        the sequence code you would use 'sg_sequence.Sequence.code'.
 
-        For example, to pull the shot code, you would simply specify 'code'.
-        To pull the sequence code you would use 'sg_sequence.Sequence.code'.
+        :param task: The export task being processed.
+        :param str keyword: The keyword token that needs to be resolved.
+
+        :returns: The resolved keyword value to be replaced into the
+            associated string.
+        :rtype: str
         """
         pass

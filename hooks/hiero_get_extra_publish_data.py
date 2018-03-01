@@ -12,14 +12,23 @@ from tank import Hook
 
 
 class HieroGetExtraPublishData(Hook):
-    """ Get a data dictionary for a PublishedFile to be updated in Shotgun. """
+    """
+    This class defines a hook that can be used to gather additional data
+    and add it to the data dictionary that's used to register any new
+    PublishedFile entities in Shotgun during the given Task's execution.
+    """
     def execute(self, task, **kwargs):
         """
-        :param task: The Hiero Task that is currently being processed
-        Return the dictionary to update the data for the PublishedFile in Shotgun
-        or None if there is no extra information to publish.
+        Get a data dictionary for a PublishedFile to be updated in Shotgun.
 
-        The track item associated with this task can be accessed via task._item.
+        .. note:: The track item associated with this task can be accessed via
+            task._item.
+
+        :param task: The Hiero Task that is currently being processed.
+
+        :returns: A dictionary to update the data for the PublishedFile in
+            Shotgun, or None if there is no extra information to publish.
+        :rtype: dict
         """
         # No extra data by default
         return None

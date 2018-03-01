@@ -13,15 +13,21 @@ from tank import Hook
 
 class HieroGetShot(Hook):
     """
-    Return a Shotgun Shot dictionary for the given Hiero items
+    This class implements a hook that can determines which Shotgun entity
+    should be associated with each task and track item being exported.
     """
-
     def execute(self, task, item, data, **kwargs):
         """
         Takes a hiero.core.TrackItem as input and returns a data dictionary for
         the shot to update the cut info for.
-        """
 
+        :param task: The Hiero task being processed.
+        :param item: The hiero.core.TrackItem being processed.
+        :param dict data: A dictionary with cached parent data.
+
+        :returns: A Shot entity.
+        :rtype: dict
+        """
         # get the parent entity for the Shot
         parent = self.get_shot_parent(item.parentSequence(), data)
 
@@ -72,13 +78,15 @@ class HieroGetShot(Hook):
         Given a Hiero sequence and data cache, return the corresponding entity
         in Shotgun to serve as the parent for contained Shots.
 
+        .. note:: The data dict is typically the app's `preprocess_data` which
+            maintains the cache across invocations of this hook.
+
         :param hiero_sequence: A Hiero sequence object
-        :param data: A dictionary with cached parent data.
+        :param dict data: A dictionary with cached parent data.
 
-        The data dict is typically the app's `preprocess_data` which maintains
-        the cache across invocations of this hook.
+        :returns: A Shotgun entity.
+        :rtype: dict
         """
-
         # stick a lookup cache on the data object.
         if "parent_cache" not in data:
             data["parent_cache"] = {}
