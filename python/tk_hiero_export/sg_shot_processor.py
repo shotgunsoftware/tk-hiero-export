@@ -315,7 +315,11 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # Call pre processor hook here to make sure it happens pior to any 'hook_resolve_custom_strings'.
         # The order if execution is basically [init processor, resolve user entries, startProcessing].
-        self.app.execute_hook("hook_pre_export", processor=self)
+        self.app.execute_hook(
+            "hook_pre_export",
+            processor=self,
+            base_class=self.app.base_hooks.HieroPreExport,
+        )
 
     def startProcessing(self, exportItems, preview=False):
         """
@@ -478,6 +482,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "shotgunShotCreateProperties",
                 dict(),
             ),
+            base_class=self.app.base_hooks.HieroUpdateCuts,
         )
 
         if not allow_cut_updates:
@@ -538,6 +543,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 hiero_sequence=hiero_sequence,
                 data=self.app.preprocess_data,
                 upload_thumbnail=False,
+                base_class=self.app.base_hooks.HieroGetShot,
             )
         except TankHookMethodDoesNotExistError, e:
             # the method doesen't exist in the hook. the hook may have been
@@ -718,6 +724,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 item=shot_updater_task._item,
                 data=self.app.preprocess_data,
                 upload_thumbnail=False,
+                base_class=self.app.base_hooks.HieroGetShot,
             )
 
             # update the cut item data with the shot, timecodes and other fields
@@ -852,7 +859,12 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
             resolver.addResolver(
                 "{%s}" % ctf['keyword'], ctf['description'],
                 lambda keyword, task:
-                    self.app.execute_hook("hook_resolve_custom_strings", keyword=keyword, task=task)
+                    self.app.execute_hook(
+                        "hook_resolve_custom_strings",
+                        keyword=keyword,
+                        task=task,
+                        base_class=self.app.base_hooks.HieroResolveCustomStrings,
+                    )
             )
 
     def isValid(self):

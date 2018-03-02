@@ -40,7 +40,7 @@ class HieroCustomizeExportUI(HookBaseClass):
 
         :returns: A custom widget.
         """
-        raise NotImplementedError
+        return None
 
     def get_shot_processor_ui_properties(self):
         """
@@ -74,7 +74,7 @@ class HieroCustomizeExportUI(HookBaseClass):
         :returns: A list of dictionaries.
         :rtype: list
         """
-        raise NotImplementedError
+        return []
 
     def set_shot_processor_ui_properties(self, widget, properties):
         """
@@ -98,7 +98,7 @@ class HieroCustomizeExportUI(HookBaseClass):
             objects, keyed by label, that were constructed from the data
             built by the associated get properties hook method.
         """
-        raise NotImplementedError
+        return
 
     def create_transcode_exporter_widget(self, parent):
         """
@@ -113,7 +113,7 @@ class HieroCustomizeExportUI(HookBaseClass):
 
         :returns: A custom widget.
         """
-        raise NotImplementedError
+        return None
 
     def get_transcode_exporter_ui_properties(self):
         """
@@ -131,7 +131,7 @@ class HieroCustomizeExportUI(HookBaseClass):
         :returns: A list of dictionaries.
         :rtype: list
         """
-        raise NotImplementedError
+        return []
 
     def set_transcode_exporter_ui_properties(self, widget, properties):
         """
@@ -150,7 +150,7 @@ class HieroCustomizeExportUI(HookBaseClass):
             objects, keyed by label, that were constructed from the data
             built by the associated get properties hook method.
         """
-        raise NotImplementedError
+        return
 
     def create_audio_exporter_widget(self, parent):
         """
@@ -165,7 +165,7 @@ class HieroCustomizeExportUI(HookBaseClass):
 
         :returns: A custom widget.
         """
-        raise NotImplementedError
+        return None
 
     def get_audio_exporter_ui_properties(self):
         """
@@ -183,7 +183,7 @@ class HieroCustomizeExportUI(HookBaseClass):
         :returns: A list of dictionaries.
         :rtype: list
         """
-        raise NotImplementedError
+        return []
 
     def set_audio_exporter_ui_properties(self, widget, properties):
         """
@@ -202,7 +202,7 @@ class HieroCustomizeExportUI(HookBaseClass):
             objects, keyed by label, that were constructed from the data
             built by the associated get properties hook method.
         """
-        raise NotImplementedError
+        return
 
     def create_nuke_shot_exporter_widget(self, parent):
         """
@@ -217,7 +217,7 @@ class HieroCustomizeExportUI(HookBaseClass):
 
         :returns: A custom widget.
         """
-        raise NotImplementedError
+        return None
 
     def get_nuke_shot_exporter_ui_properties(self):
         """
@@ -235,7 +235,7 @@ class HieroCustomizeExportUI(HookBaseClass):
         :returns: A list of dictionaries.
         :rtype: list
         """
-        raise NotImplementedError
+        return []
 
     def set_nuke_shot_exporter_ui_properties(self, widget, properties):
         """
@@ -254,4 +254,4 @@ class HieroCustomizeExportUI(HookBaseClass):
             objects, keyed by label, that were constructed from the data
             built by the associated get properties hook method.
         """
-        raise NotImplementedError
+        return

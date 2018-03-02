@@ -153,7 +153,10 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         """ Run Task """
         # call the publish data hook to allow for publish customization while _item is valid (unlike finishTask)
         self._extra_publish_data = self.app.execute_hook(
-            "hook_get_extra_publish_data", task=self)
+            "hook_get_extra_publish_data",
+            task=self,
+            base_class=self.app.base_hooks.HieroGetExtraPublishData,
+        )
 
         return FnNukeShotExporter.NukeShotExporter.startTask(self)
 
@@ -203,7 +206,11 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             self.app.shotgun.update(sg_publish["type"], sg_publish["id"], self._extra_publish_data)
 
         # call the publish data hook to allow for publish customization.
-        extra_publish_data = self.app.execute_hook("hook_get_extra_publish_data", task=self)
+        extra_publish_data = self.app.execute_hook(
+            "hook_get_extra_publish_data",
+            task=self,
+            base_class=self.app.base_hooks.HieroGetExtraPublishData,
+        )
         if extra_publish_data is not None:
             self.app.log_debug("Updating Shotgun %s %s" % (publish_entity_type, str(extra_publish_data)))
             self.app.shotgun.update(sg_publish["type"], sg_publish["id"], extra_publish_data)

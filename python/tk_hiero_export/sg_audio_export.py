@@ -105,7 +105,13 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
             item = self._item
 
         # store the shot for use in finishTask
-        self._sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=item, data=self.app.preprocess_data)
+        self._sg_shot = self.app.execute_hook(
+            "hook_get_shot",
+            task=self,
+            item=item,
+            data=self.app.preprocess_data,
+            base_class=self.app.base_hooks.HieroGetShot,
+        )
 
         ##############################
         # see if we get a task to use

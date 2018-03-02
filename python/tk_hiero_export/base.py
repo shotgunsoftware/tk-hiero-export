@@ -62,6 +62,7 @@ class ShotgunHieroObjectBase(object):
             self._custom_property_definitions[get_method] = self.app.execute_hook_method(
                 "hook_customize_export_ui",
                 get_method,
+                base_class=self.app.base_hooks.HieroCustomizeExportUI,
             )
 
         return self._custom_property_definitions[get_method]
@@ -90,6 +91,7 @@ class ShotgunHieroObjectBase(object):
             hook_name,
             create_method,
             parent_widget=parent,
+            base_class=self.app.base_hooks.HieroCustomizeExportUI,
         )
 
         if hook_widget is not None:
@@ -133,6 +135,7 @@ class ShotgunHieroObjectBase(object):
                 set_method,
                 widget=hook_widget,
                 properties=self._custom_properties[get_method],
+                base_class=self.app.base_hooks.HieroCustomizeExportUI,
             )
 
         return hook_widget
