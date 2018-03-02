@@ -38,7 +38,10 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
 
     def populateUI(self, widget, exportTemplate):
         """
+        Builds the user interfave for the audio exporter.
 
+        :param widget: The parent widget.
+        :param exportTemplate: The export template.
         """
         # Multiple inheritance means we can't rely on super() here.
         FnAudioExportUI.AudioExportUI.populateUI(self, widget, exportTemplate)
