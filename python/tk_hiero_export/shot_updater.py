@@ -14,6 +14,12 @@ from hiero.exporters import FnShotExporter
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter
 
+from .. import (
+    HieroGetShot,
+    HieroUpdateShot,
+    HieroUpdateCuts,
+)
+
 class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, CollatingExporter):
     """
     Ensures that Shots and Sequences exist in Shotgun
@@ -130,7 +136,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             task=self,
             item=self._item,
             data=self.app.preprocess_data,
-            base_class=self.app.base_hooks.HieroGetShot,
+            base_class=HieroGetShot,
         )
 
         # clean up the dict
@@ -268,7 +274,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             entity_id=shot_id,
             entity_data=sg_shot,
             preset_properties=self._preset.properties(),
-            base_class=self.app.base_hooks.HieroUpdateShot,
+            base_class=HieroUpdateShot,
         )
 
         # create the directory structure
@@ -278,7 +284,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             entity_type=shot_type,
             entity_id=shot_id,
             preset_properties=self._preset.properties(),
-            base_class=self.app.base_hooks.HieroUpdateShot,
+            base_class=HieroUpdateShot,
         )
 
         # return without error
@@ -297,7 +303,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 "create_cut_item",
                 cut_item_data=cut_item_data,
                 preset_properties=self._preset.properties(),
-                base_class=self.app.base_hooks.HieroUpdateCuts,
+                base_class=HieroUpdateCuts,
             )
 
             # If a CutItem entity wasn't created by the hook method, then it
@@ -316,7 +322,7 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 cut=cut,
                 task_item=self._item,
                 preset_properties=self._preset.properties(),
-                base_class=self.app.base_hooks.HieroUpdateCuts,
+                base_class=HieroUpdateCuts,
             )
 
             if thumbnail:

@@ -39,6 +39,13 @@ from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
+from .. import (
+    HieroPreExport,
+    HieroUpdateCuts,
+    HieroGetShot,
+    HieroResolveCustomStrings,
+)
+
 from tank.errors import TankHookMethodDoesNotExistError
 
 
@@ -318,7 +325,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         self.app.execute_hook(
             "hook_pre_export",
             processor=self,
-            base_class=self.app.base_hooks.HieroPreExport,
+            base_class=HieroPreExport,
         )
 
     def startProcessing(self, exportItems, preview=False):
@@ -482,7 +489,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "shotgunShotCreateProperties",
                 dict(),
             ),
-            base_class=self.app.base_hooks.HieroUpdateCuts,
+            base_class=HieroUpdateCuts,
         )
 
         if not allow_cut_updates:
@@ -543,7 +550,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 hiero_sequence=hiero_sequence,
                 data=self.app.preprocess_data,
                 upload_thumbnail=False,
-                base_class=self.app.base_hooks.HieroGetShot,
+                base_class=HieroGetShot,
             )
         except TankHookMethodDoesNotExistError, e:
             # the method doesen't exist in the hook. the hook may have been
@@ -724,7 +731,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 item=shot_updater_task._item,
                 data=self.app.preprocess_data,
                 upload_thumbnail=False,
-                base_class=self.app.base_hooks.HieroGetShot,
+                base_class=HieroGetShot,
             )
 
             # update the cut item data with the shot, timecodes and other fields
@@ -863,7 +870,7 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
                         "hook_resolve_custom_strings",
                         keyword=keyword,
                         task=task,
-                        base_class=self.app.base_hooks.HieroResolveCustomStrings,
+                        base_class=HieroResolveCustomStrings,
                     )
             )
 

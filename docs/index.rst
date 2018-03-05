@@ -1,6 +1,8 @@
 Shotgun Hiero Export API reference, |release|
-###################################################
+#############################################
 
+Overview
+********
 
 The ``tk-hiero-export`` app adds custom Shotgun export processors to the Hiero/Nuke Studio export framework.
 

@@ -8,9 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-#  UI Hook
-# ===========================
-
 import sgtk
 
 HookBaseClass = sgtk.get_hook_baseclass()
@@ -74,7 +71,7 @@ class HieroUpdateCuts(HookBaseClass):
         :param dict cut: The Cut entity dictionary associated with the
             export.
         :param task_item: The TrackItem object associated with the export
-            task.
+            task. Hiero API docs are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem>`_
         :param dict preset_properties: The export preset's properties
             dictionary.
 

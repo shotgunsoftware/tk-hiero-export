@@ -22,6 +22,7 @@ import sgtk
 from sgtk.platform.qt import QtGui, QtCore
 
 from .base import ShotgunHieroObjectBase
+from .. import HieroGetExtraPublishData
 
 class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
     """
@@ -155,7 +156,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         self._extra_publish_data = self.app.execute_hook(
             "hook_get_extra_publish_data",
             task=self,
-            base_class=self.app.base_hooks.HieroGetExtraPublishData,
+            base_class=HieroGetExtraPublishData,
         )
 
         return FnNukeShotExporter.NukeShotExporter.startTask(self)
@@ -209,7 +210,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         extra_publish_data = self.app.execute_hook(
             "hook_get_extra_publish_data",
             task=self,
-            base_class=self.app.base_hooks.HieroGetExtraPublishData,
+            base_class=HieroGetExtraPublishData,
         )
         if extra_publish_data is not None:
             self.app.log_debug("Updating Shotgun %s %s" % (publish_entity_type, str(extra_publish_data)))

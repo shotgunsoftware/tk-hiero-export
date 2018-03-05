@@ -25,6 +25,8 @@ from .collating_exporter import CollatingExporter, CollatedShotPreset
 from hiero import core
 from hiero.core import *
 
+from .. import HieroGetShot
+
 
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
     """
@@ -110,7 +112,7 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
             task=self,
             item=item,
             data=self.app.preprocess_data,
-            base_class=self.app.base_hooks.HieroGetShot,
+            base_class=HieroGetShot,
         )
 
         ##############################

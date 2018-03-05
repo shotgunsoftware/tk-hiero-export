@@ -30,6 +30,14 @@ from sgtk.platform.qt import QtGui, QtCore
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter, CollatedShotPreset
 
+from .. import (
+    HieroGetQuicktimeSettings,
+    HieroGetShot,
+    HieroUpdateVersionData,
+    HieroGetExtraPublishData,
+    HieroPostVersionCreation,
+)
+
 
 class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.TranscodeExporterUI):
     """
@@ -164,7 +172,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         file_type, properties = self.app.execute_hook(
             "hook_get_quicktime_settings",
             for_shotgun=True,
-            base_class=self.app.base_hooks.HieroGetQuicktimeSettings,
+            base_class=HieroGetQuicktimeSettings,
         )
         self.app.log_info("Transcode quicktime settings: %s" % (properties,))
         preset.properties().update({
@@ -267,7 +275,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 "sg_head_in",
                 "sg_tail_out"
             ],
-            base_class=self.app.base_hooks.HieroGetShot,
+            base_class=HieroGetShot,
         )
 
         # populate the data dictionary for our Version while the item is still valid
@@ -319,14 +327,14 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 "hook_update_version_data",
                 version_data=self._version_data,
                 task=self,
-                base_class=self.app.base_hooks.HieroUpdateVersionData,
+                base_class=HieroUpdateVersionData,
             )
 
         # call the publish data hook to allow for publish customization
         self._extra_publish_data = self.app.execute_hook(
             "hook_get_extra_publish_data",
             task=self,
-            base_class=self.app.base_hooks.HieroGetExtraPublishData,
+            base_class=HieroGetExtraPublishData,
         )
 
         # figure out the thumbnail frame
@@ -412,7 +420,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self.app.execute_hook(
                 "hook_post_version_creation",
                 version_data=vers,
-                base_class=self.app.base_hooks.HieroPostVersionCreation,
+                base_class=HieroPostVersionCreation,
             )
 
         # Update the cut item if possible

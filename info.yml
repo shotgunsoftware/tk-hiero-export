@@ -242,4 +242,4 @@ description: "App that adds Shotgun awareness to Nuke Studio's sequence export. 
              determine Shotgun Shot status and task templates to create/update
              the Shots in Shotgun."
 
-requires_core_version: "v0.17.21"
+requires_core_version: "v0.18.124"

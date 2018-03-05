@@ -25,7 +25,8 @@ class HieroResolveCustomStrings(HookBaseClass):
         to pull the shot code, you would simply specify 'code'. To pull
         the sequence code you would use 'sg_sequence.Sequence.code'.
 
-        :param task: The export task being processed.
+        :param task: The export task being processed. Hiero API docs are
+            available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase>`_
         :param str keyword: The keyword token that needs to be resolved.
 
         :returns: The resolved keyword value to be replaced into the

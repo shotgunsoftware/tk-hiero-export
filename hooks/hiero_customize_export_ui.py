@@ -8,9 +8,6 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-#  UI Hook
-# ===========================
-
 import sgtk
 
 HookBaseClass = sgtk.get_hook_baseclass()
