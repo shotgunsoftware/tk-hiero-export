@@ -30,7 +30,7 @@ from sgtk.platform.qt import QtGui, QtCore
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter, CollatedShotPreset
 
-from .. import (
+from . import (
     HieroGetQuicktimeSettings,
     HieroGetShot,
     HieroUpdateVersionData,

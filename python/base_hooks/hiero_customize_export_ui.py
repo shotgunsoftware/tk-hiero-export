@@ -109,7 +109,7 @@ class HieroCustomizeExportUI(HookBaseClass):
         """
         return
 
-    def create_transcode_exporter_widget(self, parent):
+    def create_transcode_exporter_widget(self, parent_widget):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
         If a custom widget is returned by this method, it will be added to the
@@ -161,7 +161,7 @@ class HieroCustomizeExportUI(HookBaseClass):
         """
         return
 
-    def create_audio_exporter_widget(self, parent):
+    def create_audio_exporter_widget(self, parent_widget):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
         If a custom widget is returned by this method, it will be added to the
@@ -213,7 +213,7 @@ class HieroCustomizeExportUI(HookBaseClass):
         """
         return
 
-    def create_nuke_shot_exporter_widget(self, parent):
+    def create_nuke_shot_exporter_widget(self, parent_widget):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
         If a custom widget is returned by this method, it will be added to the

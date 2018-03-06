@@ -39,7 +39,7 @@ from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
-from .. import (
+from . import (
     HieroPreExport,
     HieroUpdateCuts,
     HieroGetShot,

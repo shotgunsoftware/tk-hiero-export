@@ -22,7 +22,7 @@ import sgtk
 from sgtk.platform.qt import QtGui, QtCore
 
 from .base import ShotgunHieroObjectBase
-from .. import HieroGetExtraPublishData
+from . import HieroGetExtraPublishData
 
 class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
     """
@@ -291,4 +291,4 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
             "get_nuke_shot_exporter_ui_properties"
         ) or []
 
-        self.properties().update({d["key"]: d["value"] for d in custom_properties})
+        self.properties().update({d["name"]: d["value"] for d in custom_properties})

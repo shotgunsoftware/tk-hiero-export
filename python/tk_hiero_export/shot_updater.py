@@ -14,7 +14,7 @@ from hiero.exporters import FnShotExporter
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter
 
-from .. import (
+from . import (
     HieroGetShot,
     HieroUpdateShot,
     HieroUpdateCuts,

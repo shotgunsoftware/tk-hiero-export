@@ -23,7 +23,7 @@ from hiero.ui.FnUIProperty import UIPropertyFactory
 import tank
 from tank.platform.qt import QtGui, QtCore
 
-from .. import HieroCustomizeExportUI
+from . import HieroCustomizeExportUI
 
 
 class ShotgunHieroObjectBase(object):
