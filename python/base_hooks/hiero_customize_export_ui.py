@@ -18,6 +18,18 @@ class HieroCustomizeExportUI(HookBaseClass):
     This class defines methods that can be used to customize the UI of the various
     Shotgun-related exporters. Each processor has its own set of create/get/set
     methods, allowing for customizable UI elements for each type of export.
+
+    Example properties embedded into a custom QGroupBox:
+
+    .. figure:: ./resources/hiero_export_custom_ui.png
+
+    ..
+
+    Creating custom UI elements for the Hiero export app involves three steps:
+
+    - Creating a widget
+    - Defining custom properties to add to the associated preset
+    - Setting the widget up to display controls for the custom properties
     """
     def create_shot_processor_widget(self, parent_widget):
         """

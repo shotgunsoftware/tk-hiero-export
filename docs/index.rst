@@ -105,24 +105,6 @@ Uploading Thumbnails to Shotgun
 Creating custom UI elements and properties
 ------------------------------------------
 
-Each processor/exporter utilized by the Hiero export app can have its properties and UI customized.
-
-Creating custom UI elements for the Hiero export app involves three steps:
-
-- Creating a widget
-- Defining custom properties to add to the associated preset
-- Setting the widget up to display controls for the custom properties
-
-These steps are implemented for processors/exporters in each of their associated hook methods:
-
-- create_*_widget()
-- get_*_ui_properties()
-- set_*_ui_properties()
-
-Example Custom UI:
-
-.. image:: ./resources/hiero_export_custom_ui.png
-
 .. autoclass:: HieroCustomizeExportUI
     :members:
 
