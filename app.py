@@ -50,6 +50,7 @@ from tk_hiero_export import (
     ShotgunAudioExporterUI,
     ShotgunHieroObjectBase,
 )
+
 sys.path.pop()
 
 # list keywords Hiero is using in its export substitution
@@ -61,6 +62,7 @@ HIERO_SUBSTITUTION_KEYWORDS = ["clip", "day", "DD", "event",
 
 
 class HieroExport(Application):
+
     def init_app(self):
         # let the shot exporter know when the first shot is being run
         self.first_shot = False

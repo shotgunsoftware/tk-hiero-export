@@ -22,6 +22,7 @@ import sgtk
 from sgtk.platform.qt import QtGui, QtCore
 
 from .base import ShotgunHieroObjectBase
+from . import HieroGetExtraPublishData
 
 class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
     """
@@ -80,6 +81,18 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
                 "Unable to find the expected UI layout to display the list of "
                 "Shotgun Write Nodes in the export dialog."
             )
+
+        # Handle any custom widget work the user did via the custom_export_ui
+        # hook.
+        custom_widget = self._get_custom_widget(
+            parent=widget,
+            create_method="create_nuke_shot_exporter_widget",
+            get_method="get_nuke_shot_exporter_ui_properties",
+            set_method="set_nuke_shot_exporter_ui_properties",
+        )
+
+        if custom_widget is not None:
+            layout.addWidget(custom_widget)
 
     def toolkitPresetChanged(self, topLeft, bottomRight):
         self._preset.properties()["toolkitWriteNodes"] = []
@@ -141,7 +154,10 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         """ Run Task """
         # call the publish data hook to allow for publish customization while _item is valid (unlike finishTask)
         self._extra_publish_data = self.app.execute_hook(
-            "hook_get_extra_publish_data", task=self)
+            "hook_get_extra_publish_data",
+            task=self,
+            base_class=HieroGetExtraPublishData,
+        )
 
         return FnNukeShotExporter.NukeShotExporter.startTask(self)
 
@@ -191,7 +207,11 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             self.app.shotgun.update(sg_publish["type"], sg_publish["id"], self._extra_publish_data)
 
         # call the publish data hook to allow for publish customization.
-        extra_publish_data = self.app.execute_hook("hook_get_extra_publish_data", task=self)
+        extra_publish_data = self.app.execute_hook(
+            "hook_get_extra_publish_data",
+            task=self,
+            base_class=HieroGetExtraPublishData,
+        )
         if extra_publish_data is not None:
             self.app.log_debug("Updating Shotgun %s %s" % (publish_entity_type, str(extra_publish_data)))
             self.app.shotgun.update(sg_publish["type"], sg_publish["id"], extra_publish_data)
@@ -265,3 +285,10 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
             name = "Toolkit Node: %s (\"%s\")" % (node['name'], node['channel'])
             toolkit_write_nodes.append(name)
         self.properties()["toolkitWriteNodes"] = toolkit_write_nodes
+
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_nuke_shot_exporter_ui_properties"
+        ) or []
+
+        self.properties().update({d["name"]: d["value"] for d in custom_properties})

@@ -30,6 +30,14 @@ from sgtk.platform.qt import QtGui, QtCore
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter, CollatedShotPreset
 
+from . import (
+    HieroGetQuicktimeSettings,
+    HieroGetShot,
+    HieroUpdateVersionData,
+    HieroGetExtraPublishData,
+    HieroPostVersionCreation,
+)
+
 
 class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.TranscodeExporterUI):
     """
@@ -91,6 +99,17 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
         layout.addWidget(top)
         layout.addWidget(middle)
 
+        # Handle any custom widget work the user did via the custom_export_ui
+        # hook.
+        custom_widget = self._get_custom_widget(
+            parent=widget,
+            create_method="create_transcode_exporter_widget",
+            get_method="get_transcode_exporter_ui_properties",
+            set_method="set_transcode_exporter_ui_properties",
+        )
+
+        if custom_widget is not None:
+            layout.addWidget(custom_widget)
 
 
 
@@ -150,7 +169,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         preset = FnTranscodeExporter.TranscodePreset("Qt Write", self._preset.properties())
 
         # insert the write node to generate the quicktime
-        file_type, properties = self.app.execute_hook("hook_get_quicktime_settings", for_shotgun=True)
+        file_type, properties = self.app.execute_hook(
+            "hook_get_quicktime_settings",
+            for_shotgun=True,
+            base_class=HieroGetQuicktimeSettings,
+        )
         self.app.log_info("Transcode quicktime settings: %s" % (properties,))
         preset.properties().update({
             "file_type": file_type,
@@ -251,7 +274,8 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             fields=[
                 "sg_head_in",
                 "sg_tail_out"
-            ]
+            ],
+            base_class=HieroGetShot,
         )
 
         # populate the data dictionary for our Version while the item is still valid
@@ -302,11 +326,16 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self.app.execute_hook(
                 "hook_update_version_data",
                 version_data=self._version_data,
-                task=self)
+                task=self,
+                base_class=HieroUpdateVersionData,
+            )
 
         # call the publish data hook to allow for publish customization
         self._extra_publish_data = self.app.execute_hook(
-            "hook_get_extra_publish_data", task=self)
+            "hook_get_extra_publish_data",
+            task=self,
+            base_class=HieroGetExtraPublishData,
+        )
 
         # figure out the thumbnail frame
         ##########################
@@ -391,6 +420,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self.app.execute_hook(
                 "hook_post_version_creation",
                 version_data=vers,
+                base_class=HieroPostVersionCreation,
             )
 
         # Update the cut item if possible
@@ -434,4 +464,9 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
         # set default values
         self._properties["create_version"] = True
 
-        self.properties().update(properties)
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_transcode_exporter_ui_properties"
+        ) or []
+
+        self.properties().update({d["name"]: d["value"] for d in custom_properties})

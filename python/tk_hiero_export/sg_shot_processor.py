@@ -39,6 +39,13 @@ from .shot_updater import ShotgunShotUpdater
 from .collating_exporter import CollatedShotPreset
 from .collating_exporter_ui import CollatingExporterUI
 
+from . import (
+    HieroPreExport,
+    HieroUpdateCuts,
+    HieroGetShot,
+    HieroResolveCustomStrings,
+)
+
 from tank.errors import TankHookMethodDoesNotExistError
 
 
@@ -132,6 +139,19 @@ class ShotgunShotProcessorUI(ShotgunHieroObjectBase, ShotProcessorUI, CollatingE
             ShotProcessorUI.populateUI(self, default, taskUIWidget, exportItems)
         else:
             ShotProcessorUI.populateUI(self, default, exportItems, editMode)
+
+        # Handle any custom widget work the user did via the custom_export_ui
+        # hook.
+        custom_widget = self._get_custom_widget(
+            parent=widget,
+            create_method="create_shot_processor_widget",
+            get_method="get_shot_processor_ui_properties",
+            set_method="set_shot_processor_ui_properties",
+            properties=self._preset.properties()["shotgunShotCreateProperties"],
+        )
+
+        if custom_widget is not None:
+            layout.addWidget(custom_widget)
 
     def _build_cut_type_layout(self, properties):
         """
@@ -302,7 +322,11 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # Call pre processor hook here to make sure it happens pior to any 'hook_resolve_custom_strings'.
         # The order if execution is basically [init processor, resolve user entries, startProcessing].
-        self.app.execute_hook("hook_pre_export", processor=self)
+        self.app.execute_hook(
+            "hook_pre_export",
+            processor=self,
+            base_class=HieroPreExport,
+        )
 
     def startProcessing(self, exportItems, preview=False):
         """
@@ -326,6 +350,31 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 itemPreset.properties()['collateTracks'] = collateTracks
             if 'collateShotNames' in itemPreset.properties():
                 itemPreset.properties()['collateShotNames'] = collateShotNames
+
+            # We need to pull any custom properties that were added to the
+            # preset and get their current value, adding them to the item's
+            # properties.
+            custom_properties = self._get_custom_properties(
+                get_method="get_shot_processor_ui_properties",
+            )
+            sg_shot_properties = self._preset.properties().get(
+                "shotgunShotCreateProperties",
+                dict(),
+            )
+            self.app.logger.warning("PROPS TO BE INJECTED: %s" % sg_shot_properties)
+            for property_data in custom_properties:
+                key = property_data["key"]
+
+                # If we don't have the current value for the property in the
+                # shot processor preset, or the item's preset doesn't contain
+                # the property, we move on without altering the item's properties.
+                if key not in sg_shot_properties or key not in itemPreset.properties():
+                    continue
+
+                # Replace the default value that's in the item preset properties
+                # right now with the current value from the shot processor preset,
+                # which will reflect what the user set in the UI prior to exporting.
+                itemPreset.properties()[key] = sg_shot_properties[key]
 
         exportTemplate.insert(0, (".shotgun", ShotgunShotUpdaterPreset(".shotgun", properties)))
         self._exportTemplate.restore(exportTemplate)
@@ -428,6 +477,24 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             )
             return
 
+        # We give the hook method the opportunity to determine whether we'll
+        # continue with updating the Cut entity. Passing in the shot creation
+        # properties from the preset will allow programmers to customize this
+        # behavior based on any custom properties they've added to the preset
+        # through the customize_export_ui hook methods.
+        allow_cut_updates = self.app.execute_hook_method(
+            "hook_update_cuts",
+            "allow_cut_updates",
+            preset_properties=self._preset.properties().get(
+                "shotgunShotCreateProperties",
+                dict(),
+            ),
+            base_class=HieroUpdateCuts,
+        )
+
+        if not allow_cut_updates:
+            return
+
         # collate complicates cut support for hiero. For now duck out at this
         # point with a log msg. The user should be aware of this from the
         # message in the collating preset UI.
@@ -483,6 +550,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 hiero_sequence=hiero_sequence,
                 data=self.app.preprocess_data,
                 upload_thumbnail=False,
+                base_class=HieroGetShot,
             )
         except TankHookMethodDoesNotExistError, e:
             # the method doesen't exist in the hook. the hook may have been
@@ -663,6 +731,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 item=shot_updater_task._item,
                 data=self.app.preprocess_data,
                 upload_thumbnail=False,
+                base_class=HieroGetShot,
             )
 
             # update the cut item data with the shot, timecodes and other fields
@@ -768,6 +837,13 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
         # holds the cut type to use when creating Cut entires in SG
         default_properties["sg_cut_type"] = ""
 
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_shot_processor_ui_properties"
+        ) or []
+
+        default_properties.update({d["name"]: d["value"] for d in custom_properties})
+
         # finally, update the properties based on the properties passed to the constructor
         explicit_constructor_properties = properties.get('shotgunShotCreateProperties', {})
         default_properties.update(explicit_constructor_properties)
@@ -790,7 +866,12 @@ class ShotgunShotProcessorPreset(ShotgunHieroObjectBase, FnShotProcessor.ShotPro
             resolver.addResolver(
                 "{%s}" % ctf['keyword'], ctf['description'],
                 lambda keyword, task:
-                    self.app.execute_hook("hook_resolve_custom_strings", keyword=keyword, task=task)
+                    self.app.execute_hook(
+                        "hook_resolve_custom_strings",
+                        keyword=keyword,
+                        task=task,
+                        base_class=HieroResolveCustomStrings,
+                    )
             )
 
     def isValid(self):

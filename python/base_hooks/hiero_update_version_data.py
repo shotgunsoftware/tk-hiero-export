@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Shotgun Software Inc.
+# Copyright (c) 2018 Shotgun Software Inc.
 #
 # CONFIDENTIAL AND PROPRIETARY
 #
@@ -8,10 +8,12 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-from tank import Hook
+import sgtk
+
+HookBaseClass = sgtk.get_hook_baseclass()
 
 
-class HieroUpdateVersionData(Hook):
+class HieroUpdateVersionData(HookBaseClass):
     """
     This class implements a hook that can be used to customize the data
     dictionary for a Version entity that is going to be created by the
@@ -26,6 +28,7 @@ class HieroUpdateVersionData(Hook):
 
         :param dict version_data: The data dictionary that will be used by
             the export process to create a new Version entity in Shotgun.
-        :param task: The Hiero export task being processed.
+        :param task: The Hiero export task being processed. Hiero API docs
+            can be found `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_ui.html#hiero.ui.TaskUIBase>`_
         """
         pass

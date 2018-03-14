@@ -12,17 +12,26 @@ from tank import Hook
 
 
 class HieroResolveCustomStrings(Hook):
-    """Translates a keyword string into its resolved value for a given task."""
-    # cache of shots that have already been pulled from shotgun
+    """
+    This class implements a hook that is used to resolve custom tokens into
+    their concrete value when paths are being processed during the export.
+    """
+    # Cache of shots that have already been pulled from shotgun
     _sg_lookup_cache = {}
 
     def execute(self, task, keyword, **kwargs):
         """
         The default implementation of the custom resolver simply looks up
-        the keyword from the shotgun shot dictionary.
+        the keyword from the Shotgun Shot entity dictionary. For example,
+        to pull the shot code, you would simply specify 'code'. To pull
+        the sequence code you would use 'sg_sequence.Sequence.code'.
 
-        For example, to pull the shot code, you would simply specify 'code'.
-        To pull the sequence code you would use 'sg_sequence.Sequence.code'.
+        :param task: The export task being processed.
+        :param str keyword: The keyword token that needs to be resolved.
+
+        :returns: The resolved keyword value to be replaced into the
+            associated string.
+        :rtype: str
         """
         shot_code = task._item.name()
 

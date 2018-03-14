@@ -172,6 +172,30 @@ configuration:
         parameters: [task]
         default_value: hiero_get_extra_publish_data
 
+    hook_customize_export_ui:
+        type: hook
+        description: "Called during initialization of the export UI. Provides methods
+                     for defining custom UI properties on presets, initializing and
+                     injecting custom widgets into the exporter, and setting up custom
+                     widgets to make use of property UI widgets."
+        parameters: []
+        default_value: hiero_customize_export_ui
+
+    hook_update_shot:
+        type: hook
+        description: "Called during SG shot processing. Provides methods for managing
+                     if and how the Shot's entity in updated, and if and how creation
+                     of the Shots filesystem structure happens during export."
+        parameters: []
+        default_value: hiero_update_shot
+
+    hook_update_cuts:
+        type: hook
+        description: "Called during SG shot processing. Provides methods for managing
+                     if and how Cuts and CutItems are created and updated."
+        parameters: []
+        default_value: hiero_update_cuts
+
     # paths
     template_plate_path:
         type: template
@@ -218,4 +242,4 @@ description: "App that adds Shotgun awareness to Nuke Studio's sequence export. 
              determine Shotgun Shot status and task templates to create/update
              the Shots in Shotgun."
 
-requires_core_version: "v0.17.21"
+requires_core_version: "v0.18.124"

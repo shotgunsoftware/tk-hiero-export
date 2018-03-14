@@ -25,14 +25,39 @@ from .collating_exporter import CollatingExporter, CollatedShotPreset
 from hiero import core
 from hiero.core import *
 
+from . import HieroGetShot
+
+
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
     """
     Custom Preferences UI for the shotgun audio exporter
     """
     def __init__(self, preset):
         FnAudioExportUI.AudioExportUI.__init__(self, preset)
+
         self._displayName = "Shotgun Audio Export"
         self._taskType = ShotgunAudioExporter
+
+    def populateUI(self, widget, exportTemplate):
+        """
+        Builds the user interfave for the audio exporter.
+
+        :param widget: The parent widget.
+        :param exportTemplate: The export template.
+        """
+        # Multiple inheritance means we can't rely on super() here.
+        FnAudioExportUI.AudioExportUI.populateUI(self, widget, exportTemplate)
+
+        custom_widget = self._get_custom_widget(
+            parent=widget,
+            create_method="create_audio_exporter_widget",
+            get_method="get_audio_exporter_ui_properties",
+            set_method="set_audio_exporter_ui_properties",
+        )
+
+        if custom_widget is not None:
+            widget.layout().addWidget(custom_widget)
+
 
 class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask, CollatingExporter):
     """
@@ -85,7 +110,13 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
             item = self._item
 
         # store the shot for use in finishTask
-        self._sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=item, data=self.app.preprocess_data)
+        self._sg_shot = self.app.execute_hook(
+            "hook_get_shot",
+            task=self,
+            item=item,
+            data=self.app.preprocess_data,
+            base_class=HieroGetShot,
+        )
 
         ##############################
         # see if we get a task to use
@@ -211,3 +242,10 @@ class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPr
         FnAudioExportTask.AudioExportPreset.__init__(self, name, properties)
         self._parentType = ShotgunAudioExporter
         CollatedShotPreset.__init__(self, self.properties())
+
+        # Handle custom properties from the customize_export_ui hook.
+        custom_properties = self._get_custom_properties(
+            "get_audio_exporter_ui_properties"
+        ) or []
+
+        self.properties().update({d["name"]: d["value"] for d in custom_properties})

@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Shotgun Software Inc.
+# Copyright (c) 2018 Shotgun Software Inc.
 #
 # CONFIDENTIAL AND PROPRIETARY
 #
@@ -8,12 +8,12 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import sys
+import sgtk
 
-from tank import Hook
+HookBaseClass = sgtk.get_hook_baseclass()
 
 
-class HieroGetQuicktimeSettings(Hook):
+class HieroGetQuicktimeSettings(HookBaseClass):
     """
     This class defines a hook that allows for customization of encoding
     settings for any Quicktimes written by the export process.
@@ -30,23 +30,4 @@ class HieroGetQuicktimeSettings(Hook):
             values.
         :rtype: tuple
         """
-        import nuke
-
-        if sys.platform.startswith("linux") and nuke.NUKE_VERSION_MAJOR < 11:
-            file_type = "mov"
-            properties = {
-                "encoder": "mov64",
-                "format": "MOV format (mov)",
-                "bitrate": 2000000,
-            }
-        else:
-            file_type = "mov"
-            properties = {
-                "encoder": self.parent.get_default_encoder_name(),
-                "codec": "avc1\tH.264",
-                "quality": 3,
-                "settingsString": "H.264, High Quality",
-                "keyframerate": 1,
-                }
-
-        return (file_type, properties)
+        pass

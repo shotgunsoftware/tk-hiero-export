@@ -14,6 +14,12 @@ from hiero.exporters import FnShotExporter
 from .base import ShotgunHieroObjectBase
 from .collating_exporter import CollatingExporter
 
+from . import (
+    HieroGetShot,
+    HieroUpdateShot,
+    HieroUpdateCuts,
+)
+
 class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, CollatingExporter):
     """
     Ensures that Shots and Sequences exist in Shotgun
@@ -124,7 +130,14 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # call the preprocess hook to get extra values
         if self.app.shot_count == 0:
             self.app.preprocess_data = {}
-        sg_shot = self.app.execute_hook("hook_get_shot", task=self, item=self._item, data=self.app.preprocess_data)
+
+        sg_shot = self.app.execute_hook(
+            "hook_get_shot",
+            task=self,
+            item=self._item,
+            data=self.app.preprocess_data,
+            base_class=HieroGetShot,
+        )
 
         # clean up the dict
         shot_id = sg_shot['id']
@@ -254,12 +267,25 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
             sg_shot['task_template'] = template
 
         # commit the changes and update the thumbnail
-        self.app.log_debug("Updating info for %s %s: %s" % (shot_type, shot_id, str(sg_shot)))
-        self.app.tank.shotgun.update(shot_type, shot_id, sg_shot)
+        self.app.execute_hook_method(
+            "hook_update_shot",
+            "update_shotgun_shot_entity",
+            entity_type=shot_type,
+            entity_id=shot_id,
+            entity_data=sg_shot,
+            preset_properties=self._preset.properties(),
+            base_class=HieroUpdateShot,
+        )
 
         # create the directory structure
-        self.app.log_debug("Creating file system structure for %s %s..." % (shot_type, shot_id))
-        self.app.tank.create_filesystem_structure(shot_type, [shot_id])
+        self.app.execute_hook_method(
+            "hook_update_shot",
+            "create_filesystem_structure",
+            entity_type=shot_type,
+            entity_id=shot_id,
+            preset_properties=self._preset.properties(),
+            base_class=HieroUpdateShot,
+        )
 
         # return without error
         self.app.log_info("Updated %s %s" % (shot_type, self.shotName()))
@@ -267,28 +293,39 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         # keep shot count
         self.app.shot_count += 1
 
-        cut = None
         # create the CutItem with the data populated by the shot processor
+        cut = None
+
         if hasattr(self, "_cut_item_data"):
             cut_item_data = self._cut_item_data
-            cut_item = self.app.tank.shotgun.create("CutItem", cut_item_data)
-            self.app.log_info("Created CutItem in Shotgun: %s" % (cut_item,))
+            cut_item = self.app.execute_hook_method(
+                "hook_update_cuts",
+                "create_cut_item",
+                cut_item_data=cut_item_data,
+                preset_properties=self._preset.properties(),
+                base_class=HieroUpdateCuts,
+            )
 
-            # update the object's cut item data to include the new info
-            self._cut_item_data.update(cut_item)
+            # If a CutItem entity wasn't created by the hook method, then it
+            # will have returned a None.
+            if cut_item is not None:
+                # update the object's cut item data to include the new info
+                self._cut_item_data.update(cut_item)
 
-            cut = cut_item["cut"]
+                cut = cut_item["cut"]
 
         # see if this task has been designated to update the Cut thumbnail
         if cut and hasattr(self, "_create_cut_thumbnail"):
-            hiero_sequence = self._item.sequence()
-            try:
-                # see if we can find a poster frame for the sequence
-                thumbnail = hiero_sequence.thumbnail(hiero_sequence.posterFrame())
-            except Exception:
-                self.app.log_debug("No thumbnail found for the 'Cut'.")
-                pass
-            else:
+            thumbnail = self.app.execute_hook_method(
+                "hook_update_cuts",
+                "get_cut_thumbnail",
+                cut=cut,
+                task_item=self._item,
+                preset_properties=self._preset.properties(),
+                base_class=HieroUpdateCuts,
+            )
+
+            if thumbnail:
                 # found one, uplaod to sg for the cut
                 self._upload_thumbnail_to_sg(cut, thumbnail)
 
