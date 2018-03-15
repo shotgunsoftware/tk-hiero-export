@@ -1,0 +1,505 @@
+
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>base_hooks.hiero_customize_export_ui &mdash; tk-hiero-export v0.5.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="tk-hiero-export v0.5.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+    <a href='http://developer.shotgunsoftware.com'>
+    
+        <img style='width: 191px;
+                height: 60px; 
+                margin: 2px;
+                border-radius: 0px; 
+                padding: 0px;' 
+            src='../../_static/logo@2x.png'/>
+    
+    </a>
+    
+
+          
+            <a href="../../index.html" class="icon icon-home"> tk-hiero-export
+          
+
+          
+          </a>
+
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+    
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"></div>
+            
+          
+
+    <a href='genindex.html'>Alphabetic Index</a>
+
+    <div style='margin-top: 50px;
+                margin-left: 10px;
+                margin-right: 10px;
+                padding: 10px; 
+                color: #b3b3b3; 
+                font-size: 70%;
+                border-radius: 3px;
+                background-color: #444;
+                line-height: 18px;
+                '>    
+    <style>
+        a.custom_post_menu { display: inline; 
+                             padding: 0px; 
+                             text-decoration: underline; }
+    </style>
+
+    <b>tk-hiero-export</b> v0.5.1.<br>
+    
+        This documentation is part of the Shotgun Pipeline Toolkit.
+    
+    For more information, please visit
+    <a class=custom_post_menu href='https://support.shotgunsoftware.com/home'>Shotgun Support</a>.
+    The code associated with this documentation can be found 
+    <a class=custom_post_menu href='https://github.com/shotgunsoftware/tk-hiero-export'>here</a>.
+
+    </div>
+
+
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">tk-hiero-export</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>base_hooks.hiero_customize_export_ui</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for base_hooks.hiero_customize_export_ui</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2018 Shotgun Software Inc.</span>
+<span class="c1">#</span>
+<span class="c1"># CONFIDENTIAL AND PROPRIETARY</span>
+<span class="c1">#</span>
+<span class="c1"># This work is provided &quot;AS IS&quot; and subject to the Shotgun Pipeline Toolkit</span>
+<span class="c1"># Source Code License included in this distribution package. See LICENSE.</span>
+<span class="c1"># By accessing, using, copying or modifying this work you indicate your</span>
+<span class="c1"># agreement to the Shotgun Pipeline Toolkit Source Code License. All rights</span>
+<span class="c1"># not expressly granted therein are reserved by Shotgun Software Inc.</span>
+
+<span class="kn">import</span> <span class="nn">sgtk</span>
+
+<span class="n">HookBaseClass</span> <span class="o">=</span> <span class="n">sgtk</span><span class="o">.</span><span class="n">get_hook_baseclass</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="HieroCustomizeExportUI"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI">[docs]</a><span class="k">class</span> <span class="nc">HieroCustomizeExportUI</span><span class="p">(</span><span class="n">HookBaseClass</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class defines methods that can be used to customize the UI of the various</span>
+<span class="sd">    Shotgun-related exporters. Each processor has its own set of create/get/set</span>
+<span class="sd">    methods, allowing for customizable UI elements for each type of export.</span>
+
+<span class="sd">    Example properties embedded into a custom QGroupBox:</span>
+
+<span class="sd">    .. figure:: ./resources/hiero_export_custom_ui.png</span>
+
+<span class="sd">    ..</span>
+
+<span class="sd">    Creating custom UI elements for the Hiero export app involves three steps:</span>
+
+<span class="sd">    - Creating a widget</span>
+<span class="sd">    - Defining custom properties to add to the associated preset</span>
+<span class="sd">    - Setting the widget up to display controls for the custom properties</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="HieroCustomizeExportUI.create_shot_processor_widget"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget">[docs]</a>    <span class="k">def</span> <span class="nf">create_shot_processor_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds and returns a custom widget to be embedded in the parent exporter.</span>
+<span class="sd">        If a custom widget is returned by this method, it will be added to the</span>
+<span class="sd">        parent exporter&#39;s layout.</span>
+
+<span class="sd">        Example Implementation:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            widget = QtGui.QGroupBox(&quot;My Custom Properties&quot;, parent_widget)</span>
+<span class="sd">            widget.setLayout(QtGui.QFormLayout())</span>
+<span class="sd">            return widget</span>
+
+<span class="sd">        :param parent_widget: The parent widget.</span>
+
+<span class="sd">        :returns: A custom widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.get_shot_processor_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_shot_processor_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a list of property dictionaries describing the custom properties</span>
+<span class="sd">        required by the custom widget. This method will only be run if the</span>
+<span class="sd">        associated create widget hook method returns a widget. The dictionaries</span>
+<span class="sd">        will be turned into property widgets by the app before being passed to</span>
+<span class="sd">        the associated set properties hook method. The order that the dictionaries</span>
+<span class="sd">        are returned by this method is maintained when they are passed to the</span>
+<span class="sd">        associated set hook method.</span>
+
+<span class="sd">        Example Implementation:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            return [</span>
+<span class="sd">                dict(</span>
+<span class="sd">                    label=&quot;Create Cut:&quot;,</span>
+<span class="sd">                    name=&quot;custom_create_cut_bool_property&quot;,</span>
+<span class="sd">                    value=True,</span>
+<span class="sd">                    tooltip=&quot;Create a Cut and CutItems in Shotgun...&quot;,</span>
+<span class="sd">                ),</span>
+<span class="sd">                dict(</span>
+<span class="sd">                    label=&quot;Head In:&quot;,</span>
+<span class="sd">                    name=&quot;custom_head_in_bool_property&quot;,</span>
+<span class="sd">                    value=True,</span>
+<span class="sd">                    tooltip=&quot;Update &#39;sg_head_in&#39; on the Shot entity.&quot;,</span>
+<span class="sd">                ),</span>
+<span class="sd">            ]</span>
+
+<span class="sd">        :returns: A list of dictionaries.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.set_shot_processor_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">set_shot_processor_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets any custom properties described by get_shot_processor_ui_properties</span>
+<span class="sd">        on the custom widget returned by create_shot_processor_widget. This method</span>
+<span class="sd">        will only be called if the create method is implemented to return a custom</span>
+<span class="sd">        widget. The order of the properties within the dictionary passed in is the</span>
+<span class="sd">        same as the order they&#39;re returned in the get properties hook method.</span>
+
+<span class="sd">        Example Implementation:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            layout = widget.layout()</span>
+<span class="sd">            for label, prop in properties.iteritems():</span>
+<span class="sd">                layout.addRow(label, prop)</span>
+
+<span class="sd">        :param widget: The Qt widget that was created by the associated create</span>
+<span class="sd">            widget hook method.</span>
+<span class="sd">        :param OrderedDict properties: A dict containing property widget</span>
+<span class="sd">            objects, keyed by label, that were constructed from the data</span>
+<span class="sd">            built by the associated get properties hook method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.create_transcode_exporter_widget"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.create_transcode_exporter_widget">[docs]</a>    <span class="k">def</span> <span class="nf">create_transcode_exporter_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds and returns a custom widget to be embedded in the parent exporter.</span>
+<span class="sd">        If a custom widget is returned by this method, it will be added to the</span>
+<span class="sd">        parent exporter&#39;s layout.</span>
+
+<span class="sd">        .. note:: See the :meth:`create_shot_processor_widget` method for</span>
+<span class="sd">            more detailed documentation.</span>
+
+<span class="sd">        :param parent_widget: The parent widget.</span>
+
+<span class="sd">        :returns: A custom widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.get_transcode_exporter_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.get_transcode_exporter_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_transcode_exporter_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a list of property dictionaries describing the custom properties</span>
+<span class="sd">        required by the custom widget. This method will only be run if the</span>
+<span class="sd">        associated create widget hook method returns a widget. The dictionaries</span>
+<span class="sd">        will be turned into property widgets by the app before being passed to</span>
+<span class="sd">        the associated set properties hook method. The order that the dictionaries</span>
+<span class="sd">        are returned by this method is maintained when they are passed to the</span>
+<span class="sd">        associated set hook method.</span>
+
+<span class="sd">        .. note:: See the :meth:`get_shot_processor_ui_properties` method for</span>
+<span class="sd">            more detailed documentation.</span>
+
+<span class="sd">        :returns: A list of dictionaries.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.set_transcode_exporter_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.set_transcode_exporter_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">set_transcode_exporter_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets any custom properties described by get_transcode_exporter_ui_properties</span>
+<span class="sd">        on the custom widget returned by create_transcode_exporter_widget. This method</span>
+<span class="sd">        will only be called if the create method is implemented to return a custom</span>
+<span class="sd">        widget. The order of the properties within the dictionary passed in is the</span>
+<span class="sd">        same as the order they&#39;re returned in the get properties hook method.</span>
+
+<span class="sd">        .. note:: See the :meth:`set_shot_processor_ui_properties` method for</span>
+<span class="sd">            for an example implementation.</span>
+
+<span class="sd">        :param widget: The Qt widget that was created by the associated create</span>
+<span class="sd">            widget hook method.</span>
+<span class="sd">        :param OrderedDict properties: A dict containing property widget</span>
+<span class="sd">            objects, keyed by label, that were constructed from the data</span>
+<span class="sd">            built by the associated get properties hook method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.create_audio_exporter_widget"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.create_audio_exporter_widget">[docs]</a>    <span class="k">def</span> <span class="nf">create_audio_exporter_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds and returns a custom widget to be embedded in the parent exporter.</span>
+<span class="sd">        If a custom widget is returned by this method, it will be added to the</span>
+<span class="sd">        parent exporter&#39;s layout.</span>
+
+<span class="sd">        .. note:: See the :meth:`create_shot_processor_widget` method for</span>
+<span class="sd">            more detailed documentation.</span>
+
+<span class="sd">        :param parent_widget: The parent widget.</span>
+
+<span class="sd">        :returns: A custom widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.get_audio_exporter_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.get_audio_exporter_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_audio_exporter_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a list of property dictionaries describing the custom properties</span>
+<span class="sd">        required by the custom widget. This method will only be run if the</span>
+<span class="sd">        associated create widget hook method returns a widget. The dictionaries</span>
+<span class="sd">        will be turned into property widgets by the app before being passed to</span>
+<span class="sd">        the associated set properties hook method. The order that the dictionaries</span>
+<span class="sd">        are returned by this method is maintained when they are passed to the</span>
+<span class="sd">        associated set hook method.</span>
+
+<span class="sd">        .. note:: See the :meth:`get_shot_processor_ui_properties` method for</span>
+<span class="sd">            more detailed documentation.</span>
+
+<span class="sd">        :returns: A list of dictionaries.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.set_audio_exporter_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.set_audio_exporter_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">set_audio_exporter_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets any custom properties described by get_audio_exporter_ui_properties</span>
+<span class="sd">        on the custom widget returned by create_audio_exporter_widget. This method</span>
+<span class="sd">        will only be called if the create method is implemented to return a custom</span>
+<span class="sd">        widget. The order of the properties within the dictionary passed in is the</span>
+<span class="sd">        same as the order they&#39;re returned in the get properties hook method.</span>
+
+<span class="sd">        .. note:: See the :meth:`set_shot_processor_ui_properties` method for</span>
+<span class="sd">            for an example implementation.</span>
+
+<span class="sd">        :param widget: The Qt widget that was created by the associated create</span>
+<span class="sd">            widget hook method.</span>
+<span class="sd">        :param OrderedDict properties: A dict containing property widget</span>
+<span class="sd">            objects, keyed by label, that were constructed from the data</span>
+<span class="sd">            built by the associated get properties hook method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.create_nuke_shot_exporter_widget"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.create_nuke_shot_exporter_widget">[docs]</a>    <span class="k">def</span> <span class="nf">create_nuke_shot_exporter_widget</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds and returns a custom widget to be embedded in the parent exporter.</span>
+<span class="sd">        If a custom widget is returned by this method, it will be added to the</span>
+<span class="sd">        parent exporter&#39;s layout.</span>
+
+<span class="sd">        .. note:: See the :meth:`create_shot_processor_widget` method for</span>
+<span class="sd">            more detailed documentation.</span>
+
+<span class="sd">        :param parent_widget: The parent widget.</span>
+
+<span class="sd">        :returns: A custom widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">None</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.get_nuke_shot_exporter_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.get_nuke_shot_exporter_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">get_nuke_shot_exporter_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets a list of property dictionaries describing the custom properties</span>
+<span class="sd">        required by the custom widget. This method will only be run if the</span>
+<span class="sd">        associated create widget hook method returns a widget. The dictionaries</span>
+<span class="sd">        will be turned into property widgets by the app before being passed to</span>
+<span class="sd">        the associated set properties hook method. The order that the dictionaries</span>
+<span class="sd">        are returned by this method is maintained when they are passed to the</span>
+<span class="sd">        associated set hook method.</span>
+
+<span class="sd">        .. note:: See the :meth:`get_shot_processor_ui_properties` method for</span>
+<span class="sd">            more detailed documentation.</span>
+
+<span class="sd">        :returns: A list of dictionaries.</span>
+<span class="sd">        :rtype: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="HieroCustomizeExportUI.set_nuke_shot_exporter_ui_properties"><a class="viewcode-back" href="../../index.html#base_hooks.HieroCustomizeExportUI.set_nuke_shot_exporter_ui_properties">[docs]</a>    <span class="k">def</span> <span class="nf">set_nuke_shot_exporter_ui_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">widget</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets any custom properties described by get_nuke_shot_exporter_ui_properties</span>
+<span class="sd">        on the custom widget returned by create_nuke_shot_exporter_widget. This method</span>
+<span class="sd">        will only be called if the create method is implemented to return a custom</span>
+<span class="sd">        widget. The order of the properties within the dictionary passed in is the</span>
+<span class="sd">        same as the order they&#39;re returned in the get properties hook method.</span>
+
+<span class="sd">        .. note:: See the :meth:`set_shot_processor_ui_properties` method for</span>
+<span class="sd">            for an example implementation.</span>
+
+<span class="sd">        :param widget: The Qt widget that was created by the associated create</span>
+<span class="sd">            widget hook method.</span>
+<span class="sd">        :param OrderedDict properties: A dict containing property widget</span>
+<span class="sd">            objects, keyed by label, that were constructed from the data</span>
+<span class="sd">            built by the associated get properties hook method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Autodesk.
+
+    </p>
+  </div> 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'v0.5.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+  
+ 
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-2114792-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+</body>
+</html>
