@@ -361,9 +361,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 "shotgunShotCreateProperties",
                 dict(),
             )
-            self.app.logger.warning("PROPS TO BE INJECTED: %s" % sg_shot_properties)
+
             for property_data in custom_properties:
-                key = property_data["key"]
+                key = property_data["name"]
 
                 # If we don't have the current value for the property in the
                 # shot processor preset, or the item's preset doesn't contain
