@@ -8,12 +8,10 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import sgtk
-
-HookBaseClass = sgtk.get_hook_baseclass()
+from tank import Hook
 
 
-class HieroUpdateCuts(HookBaseClass):
+class HieroUpdateCuts(Hook):
     """
     This class defines methods that control if and how Cuts and CutItems
     are created or updated during the export process.

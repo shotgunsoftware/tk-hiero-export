@@ -8,12 +8,9 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import sgtk
+from tank import Hook
 
-HookBaseClass = sgtk.get_hook_baseclass()
-
-
-class HieroCustomizeExportUI(HookBaseClass):
+class HieroCustomizeExportUI(Hook):
     """
     This class defines methods that can be used to customize the UI of the various
     Shotgun-related exporters. Each processor has its own set of create/get/set

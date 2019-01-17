@@ -8,11 +8,9 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import sgtk
+from tank import Hook
 
-HookBaseClass = sgtk.get_hook_baseclass()
-
-class HieroPostVersionCreation(HookBaseClass):
+class HieroPostVersionCreation(Hook):
 	"""
 	This class implements a hook that can be used to add custom logic to
 	be run after a Version entity is created in Shotgun as part of the

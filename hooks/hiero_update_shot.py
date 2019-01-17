@@ -8,12 +8,10 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import sgtk
-
-HookBaseClass = sgtk.get_hook_baseclass()
+from tank import Hook
 
 
-class HieroUpdateShot(HookBaseClass):
+class HieroUpdateShot(Hook):
     """
     This class defines methods that handle updating the Shot entity
     in Shotgun, as well as whether and how the filesystem structure

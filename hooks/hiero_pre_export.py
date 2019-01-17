@@ -8,8 +8,7 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-from sgtk import Hook
-
+from tank import Hook
 
 class HieroPreExport(Hook):
     """
