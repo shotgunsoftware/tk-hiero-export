@@ -28,7 +28,7 @@ class HieroCustomizeExportUI(Hook):
     - Defining custom properties to add to the associated preset
     - Setting the widget up to display controls for the custom properties
     """
-    def create_shot_processor_widget(self, parent_widget):
+    def create_shot_processor_widget(self, parent_widget, **kwargs):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
         If a custom widget is returned by this method, it will be added to the
@@ -48,7 +48,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return None
 
-    def get_shot_processor_ui_properties(self):
+    def get_shot_processor_ui_properties(self, **kwargs):
         """
         Gets a list of property dictionaries describing the custom properties
         required by the custom widget. This method will only be run if the
@@ -82,7 +82,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return []
 
-    def set_shot_processor_ui_properties(self, widget, properties):
+    def set_shot_processor_ui_properties(self, widget, properties, **kwargs):
         """
         Sets any custom properties described by get_shot_processor_ui_properties
         on the custom widget returned by create_shot_processor_widget. This method
@@ -106,7 +106,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return
 
-    def create_transcode_exporter_widget(self, parent_widget):
+    def create_transcode_exporter_widget(self, parent_widget, **kwargs):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
         If a custom widget is returned by this method, it will be added to the
@@ -121,7 +121,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return None
 
-    def get_transcode_exporter_ui_properties(self):
+    def get_transcode_exporter_ui_properties(self, **kwargs):
         """
         Gets a list of property dictionaries describing the custom properties
         required by the custom widget. This method will only be run if the
@@ -139,7 +139,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return []
 
-    def set_transcode_exporter_ui_properties(self, widget, properties):
+    def set_transcode_exporter_ui_properties(self, widget, properties, **kwargs):
         """
         Sets any custom properties described by get_transcode_exporter_ui_properties
         on the custom widget returned by create_transcode_exporter_widget. This method
@@ -158,7 +158,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return
 
-    def create_audio_exporter_widget(self, parent_widget):
+    def create_audio_exporter_widget(self, parent_widget, **kwargs):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
         If a custom widget is returned by this method, it will be added to the
@@ -173,7 +173,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return None
 
-    def get_audio_exporter_ui_properties(self):
+    def get_audio_exporter_ui_properties(self, **kwargs):
         """
         Gets a list of property dictionaries describing the custom properties
         required by the custom widget. This method will only be run if the
@@ -191,7 +191,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return []
 
-    def set_audio_exporter_ui_properties(self, widget, properties):
+    def set_audio_exporter_ui_properties(self, widget, properties, **kwargs):
         """
         Sets any custom properties described by get_audio_exporter_ui_properties
         on the custom widget returned by create_audio_exporter_widget. This method
@@ -210,7 +210,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return
 
-    def create_nuke_shot_exporter_widget(self, parent_widget):
+    def create_nuke_shot_exporter_widget(self, parent_widget, **kwargs):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
         If a custom widget is returned by this method, it will be added to the
@@ -225,7 +225,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return None
 
-    def get_nuke_shot_exporter_ui_properties(self):
+    def get_nuke_shot_exporter_ui_properties(self, **kwargs):
         """
         Gets a list of property dictionaries describing the custom properties
         required by the custom widget. This method will only be run if the
@@ -243,7 +243,7 @@ class HieroCustomizeExportUI(Hook):
         """
         return []
 
-    def set_nuke_shot_exporter_ui_properties(self, widget, properties):
+    def set_nuke_shot_exporter_ui_properties(self, widget, properties, **kwargs):
         """
         Sets any custom properties described by get_nuke_shot_exporter_ui_properties
         on the custom widget returned by create_nuke_shot_exporter_widget. This method
