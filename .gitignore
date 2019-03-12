@@ -1,4 +1,5 @@
 *.py[cod]
+tk-metadata
 
 *.py.swp
 
