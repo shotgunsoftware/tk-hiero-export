@@ -12,11 +12,11 @@ import re
 import os
 import sys
 import ast
+from traceback import format_exc
 
 from hiero.core import nuke, util
-from hiero.exporters import FnNukeShotExporter
-from hiero.exporters import FnNukeShotExporterUI
 from .collating_exporter import CollatedShotPreset
+from hiero.exporters.FnNukeShotExporter import NukeShotPreset
 
 import sgtk
 from sgtk.platform.qt import QtGui, QtCore
@@ -24,45 +24,19 @@ from sgtk.platform.qt import QtGui, QtCore
 from .base import ShotgunHieroObjectBase
 from . import HieroGetExtraPublishData
 
-class PhospheneWriteNode(nuke.Node):
-	'''
-	an extension of the hiero node creation class, specifically for the phosphene write node
-	basically allows the creation of a node by inputting the raw script value of that node
-	'''
-	
-	def __init__(self, inputNode0=None, inputNodes=None, **keywords):
-		nuke.Node.__init__(self, "Group", inputNode0, inputNodes, **keywords)
-		
-		#if we hard code the string here, it'll lose a lot of the formating it needs
-		#better to keep it as-is in the python internal buffer by reading it directly from disk
-		self.phospheneWriteFile='X:\\ShotgunRepository\\sandboxes\\2018_FALL_FEAT_PIPELINE_clone\\config\\phosphene\\nuke\\phospheneWriteNode\\writeNode.nk'
-		with open(self.phospheneWriteFile, 'r') as myFile:
-			self.phospheneWriteNode=myFile.read()
-			
-		#trim off the header
-		self.phospheneWriteNode="Group {"+self.phospheneWriteNode.split("Group {")[1]
-		
-		#remove the inputs 0 line (seems to indicate node is not connected to anything
-		if " inputs 0\n" in self.phospheneWriteNode:
-			self.phospheneWriteNode=self.phospheneWriteNode.replace(" inputs 0\n", "")
+from CustomFnNukeShotExporter import PhospheneNukeShotExporter, PhospheneNukeShotExporterUI
 
-	def serialize(self, ScriptWriter):
-		'''crazy stuff happening here, but we're going to need to affect ScriptWriter's _nodeOutput property for this to work'''
-		
-		ScriptWriter._nodeOutput=self.phospheneWriteNode
-
-
-class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
+class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, PhospheneNukeShotExporterUI):
 	"""
 	Custom Preferences UI for the shotgun nuke shot exporter
 	"""
 	def __init__(self, preset):
-		FnNukeShotExporterUI.NukeShotExporterUI.__init__(self, preset)
+		PhospheneNukeShotExporterUI.__init__(self, preset)
 		self._displayName = "Shotgun Nuke Project File"
 		self._taskType = ShotgunNukeShotExporter
 
 	def populateUI(self, widget, exportTemplate):
-		FnNukeShotExporterUI.NukeShotExporterUI.populateUI(self, widget, exportTemplate)
+		PhospheneNukeShotExporterUI.populateUI(self, widget, exportTemplate)
 
 		layout = widget.layout()
 		self._toolkit_list = QtGui.QListView()
@@ -133,7 +107,7 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
 		self.app.log_debug("toolkitPresetChanged: %s" % preset)
 
 
-class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotExporter):
+class ShotgunNukeShotExporter(PhospheneNukeShotExporter):
 	"""
 	Create Transcode object and send to Shotgun
 	"""
@@ -141,7 +115,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 		"""
 		Constructor
 		"""
-		FnNukeShotExporter.NukeShotExporter.__init__(self, initDict)
+		PhospheneNukeShotExporter.__init__(self, initDict)
 		self._resolved_export_path = None
 		self._tk_version_number = None
 		self._thumbnail = None
@@ -159,7 +133,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 		# override getSequence from the resolver to be collate friendly
 		if getattr(self, '_collate', False):
 			return self._item.parentSequence().name()
-		return FnNukeShotExporter.NukeShotExporter.sequenceName(self)
+		return PhospheneNukeShotExporter.sequenceName(self)
 
 	def taskStep(self):
 		"""
@@ -176,7 +150,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 		source = self._item.source()
 		self._thumbnail = source.thumbnail(source.posterFrame())
 		
-		return FnNukeShotExporter.NukeShotExporter.taskStep(self)
+		return PhospheneNukeShotExporter.taskStep(self)
 
 	def startTask(self):
 		""" Run Task """
@@ -187,14 +161,14 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 			base_class=HieroGetExtraPublishData,
 		)
 
-		return FnNukeShotExporter.NukeShotExporter.startTask(self)
+		return PhospheneNukeShotExporter.startTask(self)
 
 	def finishTask(self):
 		"""
 		Finish Task
 		"""
 		# run base class implementation
-		FnNukeShotExporter.NukeShotExporter.finishTask(self)
+		PhospheneNukeShotExporter.finishTask(self)
 		# Don't create PublishedFiles for non-hero collated items
 		if self._collate and not self._hero:
 			return
@@ -280,35 +254,16 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 		Add ShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to 
 		create full Tk WriteNodes in the Nuke environment
 		"""
-		FnNukeShotExporter.NukeShotExporter._beforeNukeScriptWrite(self, script)
+		PhospheneNukeShotExporter._beforeNukeScriptWrite(self, script)
 		
-		testNode=nuke.Node("NoOp", inputNode0=None, inputNodes=None)
-		testNode.addCheckboxKnob("testing", text="Test", tooltip="This is an unchecked box.", value=False, visible=True)
-		script.addNode(testNode)
-		
-		phospheneWrite=PhospheneWriteNode()
-		script.addNode(phospheneWrite)
 
-		for toolkit_specifier in self._preset.properties()["toolkitWriteNodes"]:
-			# break down a string like 'Toolkit Node: Mono Dpx ("editorial")' into name and output
-			match = re.match("^Toolkit Node: (?P<name>.+) \(\"(?P<output>.+)\"\)",
-				toolkit_specifier)
-
-			metadata = match.groupdict()
-			node = nuke.MetadataNode(metadatavalues=metadata.items())
-			node.setName('ShotgunWriteNodePlaceholder')
-
-			self.app.log_debug("Created ShotgunWriteNodePlaceholder Node: %s" % node._knobValues)
-			script.addNode(node)
-
-
-class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset, CollatedShotPreset):
+class ShotgunNukeShotPreset(ShotgunHieroObjectBase, NukeShotPreset, CollatedShotPreset):
 	"""
 	Settings for the shotgun transcode step
 	"""
 
 	def __init__(self, name, properties):
-		FnNukeShotExporter.NukeShotPreset.__init__(self, name, properties)
+		NukeShotPreset.__init__(self, name, properties)
 		self._parentType = ShotgunNukeShotExporter
 		CollatedShotPreset.__init__(self, self.properties())
 		
