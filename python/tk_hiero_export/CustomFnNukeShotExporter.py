@@ -7,7 +7,7 @@ monkey-patched nuke script exporter for hiero
 
 
 from os.path import dirname, realpath, exists, join, exists
-import os
+import os, math
 from pprint import pprint
 import re, copy, itertools
 
