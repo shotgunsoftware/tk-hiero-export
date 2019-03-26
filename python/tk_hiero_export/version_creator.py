@@ -22,6 +22,7 @@ from hiero.exporters import FnTranscodeExporterUI
 import hiero
 from hiero import core
 from hiero.core import *
+import hiero.core.nuke as nuke
 
 import tank
 import sgtk.util
@@ -128,6 +129,27 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         self._quicktime_path = None
         self._temp_quicktime = None
 
+    def addWriteNodeToScript(self, script, rootNode, framerate):
+        """
+        Override the default addWriteNodeToScript functionality so that we can add a SetNode before
+        the default writenodes get added to the script. The SetNode will allow us to later push our mov writenode
+        to this point so that it get parented correctly.
+        :param script:
+        :param rootNode:
+        :param framerate:
+        :return:
+        """
+        self.app.log_debug("Adding SetNode before base write node gets added")
+        # We create and store an arbitrary name for our SetNode, this is used as an id, so that when we create
+        # the PushNode later we can connect it to this SetNode.
+        self.write_set_node_label = "SG_Write_Attachment"
+
+        # Add the SetNode before the write nodes are added.
+        setCommand = nuke.SetNode(self.write_set_node_label, 0)
+        script.addNode(setCommand)
+
+        super(ShotgunTranscodeExporter, self).addWriteNodeToScript(script, rootNode, framerate)
+
     def buildScript(self):
         """
         Override the default buildScript functionality to also output a temp movie
@@ -137,14 +159,18 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # This is a bit of a hack to account for some changes to the
         # transcode exporter that ships with Nuke/Hiero 9.0 compared
         # to earlier versions of Hiero.
+
         file_type = self._preset.properties()['file_type']
+        self.app.log_debug("Transcode export file_type: %s" % file_type)
+
         if file_type in ["mov", "ffmpeg"]:
             if not self._preset.properties()[file_type].get("encoder"):
                 encoder_name = self.app.get_default_encoder_name()
                 self._preset.properties()[file_type]["encoder"] = encoder_name
 
-        # Build the usual script
+        # Build the usual script using the base code
         FnTranscodeExporter.TranscodeExporter.buildScript(self)
+        self.app.log_debug("Transcode base script built")
 
         # If we are not creating a version then we do not need the extra node
         if not self._preset.properties()['create_version']:
@@ -211,6 +237,12 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 project=self._project,
             )
         mov_write_node = FnExternalRender.createWriteNode(**kwargs)
+
+        # We create a push node and connect it to the set node we created just before the base write node was created
+        # This means that our write node will parent to the same node the base write node gets parented to.
+        pushCommand = nuke.PushNode(self.write_set_node_label)
+        self._script.addNode(pushCommand)
+
         self._script.addNode(mov_write_node)
 
     def sequenceName(self):
