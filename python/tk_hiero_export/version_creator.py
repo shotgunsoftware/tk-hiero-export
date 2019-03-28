@@ -118,6 +118,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
     """
     Create Transcode object and send to Shotgun
     """
+
+    # This is an arbitrarily named label we will use as a SetNode id,
+    # which can then be later used to connect a PushNode to
+    _write_set_node_label = "SG_Write_Attachment"
+
     def __init__(self, initDict):
         """ Constructor """
         FnTranscodeExporter.TranscodeExporter.__init__(self, initDict)
@@ -134,19 +139,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         Override the default addWriteNodeToScript functionality so that we can add a SetNode before
         the default writenodes get added to the script. The SetNode will allow us to later push our mov writenode
         to this point so that it get parented correctly.
-        :param script:
-        :param rootNode:
-        :param framerate:
-        :return:
         """
         self.app.log_debug("Adding SetNode before base write node gets added")
-        # We create and store an arbitrary name for our SetNode, this is used as an id, so that when we create
-        # the PushNode later we can connect it to this SetNode.
-        self.write_set_node_label = "SG_Write_Attachment"
-
         # Add the SetNode before the write nodes are added.
-        setCommand = nuke.SetNode(self.write_set_node_label, 0)
-        script.addNode(setCommand)
+        set_command = nuke.SetNode(self._write_set_node_label, 0)
+        script.addNode(set_command)
 
         super(ShotgunTranscodeExporter, self).addWriteNodeToScript(script, rootNode, framerate)
 
@@ -240,8 +237,8 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
 
         # We create a push node and connect it to the set node we created just before the base write node was created
         # This means that our write node will parent to the same node the base write node gets parented to.
-        pushCommand = nuke.PushNode(self.write_set_node_label)
-        self._script.addNode(pushCommand)
+        push_command = nuke.PushNode(self._write_set_node_label)
+        self._script.addNode(push_command)
 
         self._script.addNode(mov_write_node)
 
