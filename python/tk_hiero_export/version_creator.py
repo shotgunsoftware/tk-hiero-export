@@ -430,7 +430,10 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         vers = None
         if self._preset.properties()['create_version']:
             if published_file_entity_type == "PublishedFile":
-                self._version_data["published_files"] = [pub_data]
+                if hasattr(self._version_data, "published_files") and isinstance(self._version_data, list):
+                    self._version_data["published_files"] += [pub_data]    
+                else:
+                    self._version_data["published_files"] = [pub_data]
             else:  # == "TankPublishedFile
                 self._version_data["tank_published_file"] = pub_data
 
@@ -449,6 +452,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self.app.execute_hook(
                 "hook_post_version_creation",
                 version_data=vers,
+                task=self,
                 base_class=HieroPostVersionCreation,
             )
 
