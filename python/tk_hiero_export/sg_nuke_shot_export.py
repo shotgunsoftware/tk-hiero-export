@@ -246,7 +246,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 
     def _beforeNukeScriptWrite(self, script):
         """
-        Add ShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to 
+        AddShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to
         create full Tk WriteNodes in the Nuke environment
         """
         FnNukeShotExporter.NukeShotExporter._beforeNukeScriptWrite(self, script)
@@ -264,27 +264,30 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         # now extract the last node's layout and keep hold of it so we can add it back on.
         oldLayoutEnd = currentLayoutContext.getNodes().pop()
 
-        for toolkit_specifier in self._preset.properties()["toolkitWriteNodes"]:
-            # break down a string like 'Toolkit Node: Mono Dpx ("editorial")' into name and output
-            match = re.match("^Toolkit Node: (?P<name>.+) \(\"(?P<output>.+)\"\)",
-                toolkit_specifier)
+        try:
+            for toolkit_specifier in self._preset.properties()["toolkitWriteNodes"]:
+                # break down a string like 'Toolkit Node: Mono Dpx ("editorial")' into name and output
+                match = re.match("^Toolkit Node: (?P<name>.+) \(\"(?P<output>.+)\"\)",
+                    toolkit_specifier)
 
-            metadata = match.groupdict()
-            node = nuke.MetadataNode(metadatavalues=metadata.items())
-            node.setName('ShotgunWriteNodePlaceholder')
+                metadata = match.groupdict()
+                node = nuke.MetadataNode(metadatavalues=metadata.items())
+                node.setName('ShotgunWriteNodePlaceholder')
 
-            self.app.log_debug("Created ShotgunWriteNodePlaceholder Node: %s" % node._knobValues)
-            # rather than using the script.addNode, we append our node directly to the nodeList
-            nodeList.append(node)
+                self.app.log_debug("Created ShotgunWriteNodePlaceholder Node: %s" % node._knobValues)
+                # rather than using the script.addNode, we append our node directly to the nodeList
+                nodeList.append(node)
 
-            # now add our new node to the layout
-            currentLayoutContext.getNodes().append(node)
-
-        # now put back the viewer nodes layout
-        currentLayoutContext.getNodes().append(oldLayoutEnd)
-
-        # put the old end Node back
-        nodeList.append(oldScriptEnd)
+                # now add our new node to the layout
+                currentLayoutContext.getNodes().append(node)
+        except Exception:
+            self.app.logger.exception("Failed to add SG writenodes")
+        finally:
+            # now put back the viewer nodes layout
+            currentLayoutContext.getNodes().append(oldLayoutEnd)
+    
+            # put the old end Node back
+            nodeList.append(oldScriptEnd)
 
 
 class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset, CollatedShotPreset):
