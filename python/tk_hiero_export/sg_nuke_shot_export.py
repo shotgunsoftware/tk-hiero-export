@@ -246,7 +246,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
 
     def _beforeNukeScriptWrite(self, script):
         """
-        AddShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to
+        Add ShotgunWriteNodePlaceholder Metadata nodes for tk-nuke-writenode to
         create full Tk WriteNodes in the Nuke environment
         """
         FnNukeShotExporter.NukeShotExporter._beforeNukeScriptWrite(self, script)
