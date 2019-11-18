@@ -24,6 +24,6 @@ class HieroPreExport(HookBaseClass):
         cached data here, just before the export begins.
 
         :param processor: The processor object that is about to be started.
-            Hiero API docs are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.ProcessorBase>`_
+            Hiero API docs are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.ProcessorBase>`__
         """
         pass

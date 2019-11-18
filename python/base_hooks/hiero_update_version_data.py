@@ -29,6 +29,6 @@ class HieroUpdateVersionData(HookBaseClass):
         :param dict version_data: The data dictionary that will be used by
             the export process to create a new Version entity in Shotgun.
         :param task: The Hiero export task being processed. Hiero API docs
-            can be found `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_ui.html#hiero.ui.TaskUIBase>`_
+            can be found `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_ui.html#hiero.ui.TaskUIBase>`__
         """
         pass

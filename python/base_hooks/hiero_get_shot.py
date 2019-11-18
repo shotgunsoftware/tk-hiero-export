@@ -24,9 +24,9 @@ class HieroGetShot(HookBaseClass):
         the shot to update the cut info for.
 
         :param task: The Hiero task being processed. Hiero API docs are
-            available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase>`_
+            available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase>`__
         :param item: The Hiero track item being processed. Hiero API docs
-            are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem>`_
+            are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem>`__
         :param dict data: A dictionary with cached parent data.
 
         :returns: A Shot entity.
@@ -43,7 +43,7 @@ class HieroGetShot(HookBaseClass):
             maintains the cache across invocations of this hook.
 
         :param hiero_sequence: A Hiero sequence object. Hiero API docs are
-            available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.Sequence>`_
+            available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.Sequence>`__
         :param dict data: A dictionary with cached parent data.
 
         :returns: A Shotgun entity.

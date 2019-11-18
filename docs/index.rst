@@ -15,7 +15,7 @@ During the export process a number things can happen:
 - Sequence and Shot entity data can be updated in Shotgun
 - Cuts can be update to include new CutItems built from the exported sequences
 
-Documentation from The Foundry concerning the Hiero Python API can be found `here. <https://learn.foundry.com/hiero/developers/11.0/HieroPythonDevGuide/api/index.html>`_
+Documentation from The Foundry concerning the Hiero Python API can be found `here. <https://learn.foundry.com/hiero/developers/11.0/HieroPythonDevGuide/api/index.html>`__
 
 Hooks
 *****

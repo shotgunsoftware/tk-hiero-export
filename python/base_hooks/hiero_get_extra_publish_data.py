@@ -27,7 +27,7 @@ class HieroGetExtraPublishData(HookBaseClass):
             task._item.
 
         :param task: The Hiero task that is currently being processed. Hiero
-            docs are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase>`_
+            docs are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase>`__
 
         :returns: A dictionary to update the data for the PublishedFile in
             Shotgun, or None if there is no extra information to publish.

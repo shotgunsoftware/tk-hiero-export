@@ -71,7 +71,7 @@ class HieroUpdateCuts(HookBaseClass):
         :param dict cut: The Cut entity dictionary associated with the
             export.
         :param task_item: The TrackItem object associated with the export
-            task. Hiero API docs are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem>`_
+            task. Hiero API docs are available `here. <https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem>`__
         :param dict preset_properties: The export preset's properties
             dictionary.
 
