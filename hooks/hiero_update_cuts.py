@@ -8,17 +8,15 @@
 # agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
-import sgtk
-
-HookBaseClass = sgtk.get_hook_baseclass()
+from tank import Hook
 
 
-class HieroUpdateCuts(HookBaseClass):
+class HieroUpdateCuts(Hook):
     """
     This class defines methods that control if and how Cuts and CutItems
     are created or updated during the export process.
     """
-    def allow_cut_updates(self, preset_properties):
+    def allow_cut_updates(self, preset_properties, **kwargs):
         """
         Determines whether to process the associated Cut entity during
         export. The preset properties provided allow for customization
@@ -34,7 +32,7 @@ class HieroUpdateCuts(HookBaseClass):
         """
         return True
 
-    def create_cut_item(self, cut_item_data, preset_properties):
+    def create_cut_item(self, cut_item_data, preset_properties, **kwargs):
         """
         Handles the creation of the CutItem entity in Shotgun. This
         hook method can be overridden in order to put conditions on
@@ -56,7 +54,7 @@ class HieroUpdateCuts(HookBaseClass):
         self.parent.logger.info("Created CutItem in Shotgun: %s" % cut_item)
         return cut_item
 
-    def get_cut_thumbnail(self, cut, task_item, preset_properties):
+    def get_cut_thumbnail(self, cut, task_item, preset_properties, **kwargs):
         """
         Gets the path to a thumbnail image to use when updating the
         export's associated Cut's thumbnail image. If None is returned
