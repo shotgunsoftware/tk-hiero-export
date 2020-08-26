@@ -97,9 +97,9 @@ configuration:
     hook_get_shot:
         type: hook
         description: "Called to return the shot to update cut information for.
-                     The first argument is the Hiero export Task object. The second 
+                     The first argument is the Hiero export Task object. The second
                      argument is the hiero.core.TrackItem that is driving shot creation.
-                     The third argument is a data dictionary that can be used to pass 
+                     The third argument is a data dictionary that can be used to pass
                      data between different calls to shot create.
 
                      The return value is a data dictionary for the shot, whose

@@ -19,6 +19,7 @@ class HieroUpdateShot(HookBaseClass):
     in Shotgun, as well as whether and how the filesystem structure
     is created for a Shot during export.
     """
+
     def create_filesystem_structure(self, entity_type, entity_id, preset_properties):
         """
         Handles creating the filesystem structure for the shot that
@@ -40,7 +41,9 @@ class HieroUpdateShot(HookBaseClass):
         )
         self.parent.sgtk.create_filesystem_structure(entity_type, [entity_id])
 
-    def update_shotgun_shot_entity(self, entity_type, entity_id, entity_data, preset_properties):
+    def update_shotgun_shot_entity(
+        self, entity_type, entity_id, entity_data, preset_properties
+    ):
         """
         Handles updating the Shot entity in Shotgun with the new data produced
         during the export. The preset properties dictionary is provided to

@@ -32,6 +32,7 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
     """
     Custom Preferences UI for the shotgun audio exporter
     """
+
     def __init__(self, preset):
         FnAudioExportUI.AudioExportUI.__init__(self, preset)
 
@@ -59,10 +60,13 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
             widget.layout().addWidget(custom_widget)
 
 
-class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask, CollatingExporter):
+class ShotgunAudioExporter(
+    ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask, CollatingExporter
+):
     """
     Create Audio object and send to Shotgun
     """
+
     def __init__(self, initDict):
         """
         Constructor
@@ -95,7 +99,9 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
             self._sequence_name = self.sequenceName()
 
             # convert slashes to native os style..
-            self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
+            self._resolved_export_path = self._resolved_export_path.replace(
+                "/", os.path.sep
+            )
 
         # call the get_shot hook
         ########################
@@ -155,7 +161,7 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         Copied from Base class. Cannot simply swap _item with item, because resolvedExportPath()
         will crash Hiero with wrong item.
         """
-        
+
         # Write out the audio bounce down
         if isinstance(item, (Sequence, TrackItem)):
             if self._sequenceHasAudio(self._sequence):
@@ -173,8 +179,11 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
 
                 elif isinstance(item, TrackItem):
                     handles = self._cutHandles if self._cutHandles is not None else 0
-                    start, end = (item.timelineIn() - handles), (item.timelineOut() + handles) + 1
-                    
+                    start, end = (
+                        (item.timelineIn() - handles),
+                        (item.timelineOut() + handles) + 1,
+                    )
+
                     # If trackitem write out just the audio within the cut
                     self._sequence.writeAudioToFile(self._audioFile, start, end)
 
@@ -212,8 +221,10 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         """
         Publish task output.
         """
-        ctx = self.app.tank.context_from_entity('Shot', self._sg_shot['id'])
-        published_file_type = self.app.get_setting('audio_published_file_type', "Hiero Audio")
+        ctx = self.app.tank.context_from_entity("Shot", self._sg_shot["id"])
+        published_file_type = self.app.get_setting(
+            "audio_published_file_type", "Hiero Audio"
+        )
 
         args = {
             "tk": self.app.tank,
@@ -234,18 +245,22 @@ class ShotgunAudioExporter(ShotgunHieroObjectBase, FnAudioExportTask.AudioExport
         # upload thumbnail for publish
         self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
 
-class ShotgunAudioPreset(ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset, CollatedShotPreset):
+
+class ShotgunAudioPreset(
+    ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset, CollatedShotPreset
+):
     """
     Settings for the shotgun audio export step
     """
+
     def __init__(self, name, properties):
         FnAudioExportTask.AudioExportPreset.__init__(self, name, properties)
         self._parentType = ShotgunAudioExporter
         CollatedShotPreset.__init__(self, self.properties())
 
         # Handle custom properties from the customize_export_ui hook.
-        custom_properties = self._get_custom_properties(
-            "get_audio_exporter_ui_properties"
-        ) or []
+        custom_properties = (
+            self._get_custom_properties("get_audio_exporter_ui_properties") or []
+        )
 
         self.properties().update({d["name"]: d["value"] for d in custom_properties})

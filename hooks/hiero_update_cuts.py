@@ -18,6 +18,7 @@ class HieroUpdateCuts(HookBaseClass):
     This class defines methods that control if and how Cuts and CutItems
     are created or updated during the export process.
     """
+
     def allow_cut_updates(self, preset_properties):
         """
         Determines whether to process the associated Cut entity during

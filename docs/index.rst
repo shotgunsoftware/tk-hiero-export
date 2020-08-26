@@ -107,5 +107,3 @@ Creating custom UI elements and properties
 
 .. autoclass:: HieroCustomizeExportUI
     :members:
-
-

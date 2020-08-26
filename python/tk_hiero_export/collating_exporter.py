@@ -13,6 +13,7 @@ import math
 
 import hiero
 
+
 class CollatingExporter(object):
     def __init__(self, properties=None):
         super(CollatingExporter, self).__init__()
@@ -49,7 +50,7 @@ class CollatingExporter(object):
 
         # Check if this task is enabled.  Some tasks in a preset might be selectively disabled
         # when re-exporting
-        #if not self._preset.properties()["enable"]:
+        # if not self._preset.properties()["enable"]:
         #    return
 
         # All clear.
@@ -69,7 +70,13 @@ class CollatingExporter(object):
                 if self._has_nuke_backend():
                     # Find all the effects which apply to collated items
                     from hiero.exporters import FnEffectHelpers
-                    self._effects, self._annotations = FnEffectHelpers.findEffectsAnnotationsForTrackItems(self._collatedItems)
+
+                    (
+                        self._effects,
+                        self._annotations,
+                    ) = FnEffectHelpers.findEffectsAnnotationsForTrackItems(
+                        self._collatedItems
+                    )
 
                 # Build the sequence of collated shots
                 self._buildCollatedSequence(properties)
@@ -77,7 +84,13 @@ class CollatingExporter(object):
                 if self._has_nuke_backend():
                     # Find the effects which apply to this item.  Note this function expects a list.
                     from hiero.exporters import FnEffectHelpers
-                    self._effects, self._annotations = FnEffectHelpers.findEffectsAnnotationsForTrackItems( [self._item] )
+
+                    (
+                        self._effects,
+                        self._annotations,
+                    ) = FnEffectHelpers.findEffectsAnnotationsForTrackItems(
+                        [self._item]
+                    )
 
     def _offsetTimelineLinked(self, trackItem, offset):
         """
@@ -96,7 +109,7 @@ class CollatingExporter(object):
         Trim In trackitem and it's linked audio items (since each video track is processed separately)
         """
         trackitem.trimIn(value)
-        for item in trackitem.linkedItems(): 
+        for item in trackitem.linkedItems():
             if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
                 item.trimIn(value)
 
@@ -105,7 +118,7 @@ class CollatingExporter(object):
         Trim Out trackitem and it's linked audio items (since each video track is processed separately)
         """
         trackitem.trimOut(value)
-        for item in trackitem.linkedItems(): 
+        for item in trackitem.linkedItems():
             if item.mediaType() is hiero.core.TrackItem.MediaType.kAudio:
                 item.trimOut(value)
 
@@ -144,14 +157,25 @@ class CollatingExporter(object):
                     for nameMatchTrackItem in nameMatches:
                         if collateTime:
                             # Starts before or at same time
-                            if trackitem.timelineIn() <= nameMatchTrackItem.timelineIn():
+                            if (
+                                trackitem.timelineIn()
+                                <= nameMatchTrackItem.timelineIn()
+                            ):
                                 # finishes after start
-                                if trackitem.timelineOut() >= nameMatchTrackItem.timelineIn():
+                                if (
+                                    trackitem.timelineOut()
+                                    >= nameMatchTrackItem.timelineIn()
+                                ):
                                     orderedMatches.append(trackitem)
                                     break
-                            elif trackitem.timelineIn() > nameMatchTrackItem.timelineIn():
+                            elif (
+                                trackitem.timelineIn() > nameMatchTrackItem.timelineIn()
+                            ):
                                 # Starts before end
-                                if trackitem.timelineIn() < nameMatchTrackItem.timelineOut():
+                                if (
+                                    trackitem.timelineIn()
+                                    < nameMatchTrackItem.timelineOut()
+                                ):
                                     orderedMatches.append(trackitem)
                                     break
                         elif trackitem == nameMatchTrackItem:
@@ -187,9 +211,12 @@ class CollatingExporter(object):
 
         # Hero item for a collated sequence is the first one on the highest track
         def keyFunc(item):
-            return ((sys.maxint - item.timelineIn()) * 1000) + item.parent().trackIndex()
+            return (
+                (sys.maxint - item.timelineIn()) * 1000
+            ) + item.parent().trackIndex()
+
         heroItem = max(self._collatedItems, key=keyFunc)
-        self._hero = (heroItem.guid() == self._item.guid())
+        self._hero = heroItem.guid() == self._item.guid()
         self._heroItem = heroItem
 
         # Build a new sequence from the collated items
@@ -202,7 +229,7 @@ class CollatingExporter(object):
         # Apply the format of the master shot to the whole sequence
         # NOTE: Shouldn't it be taken from self._sequence instead? Multiple clips can have different resolution/formats
         newSequence.setFormat(self._clip.format())
-        
+
         # Note: Without correct framerate, audio comes out silent when manually exporting the sequence.
         newSequence.setFramerate(self._clip.framerate())
 
@@ -241,7 +268,7 @@ class CollatingExporter(object):
 
             trackItemClone = _clone_item(trackitem)
             self._collatedItemsMap[trackitem.guid()] = trackItemClone
-            
+
             # Copy audio for track item
             linkedItems = trackitem.linkedItems()
             newAudio = {}
@@ -257,29 +284,41 @@ class CollatingExporter(object):
                         # Copy tags from track to clone
                         for tag in audioParentTrack.tags():
                             audioTrackClone.addTag(hiero.core.Tag(tag))
-                    
+
                     audioItemClone = _clone_item(item)
                     trackItemClone.link(audioItemClone)
 
                     self._collatedItemsMap[item.guid()] = audioItemClone
-                    
-                    if audioParentTrack.guid() not in newAudio: 
+
+                    if audioParentTrack.guid() not in newAudio:
                         newAudio[audioParentTrack.guid()] = []
                     newAudio[audioParentTrack.guid()].append(audioItemClone)
 
             # extend any shots
             if self._cutHandles is not None:
                 # Maximum available handle size
-                handleInLength, handleOutLength = trackitem.handleInLength(), trackitem.handleOutLength()
+                handleInLength, handleOutLength = (
+                    trackitem.handleInLength(),
+                    trackitem.handleOutLength(),
+                )
                 # Clamp to desired handle size
-                handleIn, handleOut = min(self._cutHandles, handleInLength), min(self._cutHandles, handleOutLength)
+                handleIn, handleOut = (
+                    min(self._cutHandles, handleInLength),
+                    min(self._cutHandles, handleOutLength),
+                )
 
                 if trackItemClone.timelineIn() <= sequenceIn and handleIn:
                     self._trimInLinked(trackItemClone, -handleIn)
-                    hiero.core.log.debug("Expanding %s in by %i frames" % (trackItemClone.name(), handleIn))
+                    hiero.core.log.debug(
+                        "Expanding %s in by %i frames"
+                        % (trackItemClone.name(), handleIn)
+                    )
                 if trackItemClone.timelineOut() >= sequenceOut and handleOut:
                     self._trimOutLinked(trackItemClone, -handleOut)
-                    hiero.core.log.debug("Expanding %s out by %i frames" % (trackItemClone.name(), handleOut))
+                    hiero.core.log.debug(
+                        "Expanding %s out by %i frames"
+                        % (trackItemClone.name(), handleOut)
+                    )
 
             self._offsetTimelineLinked(trackItemClone, self.HEAD_ROOM_OFFSET + offset)
 
@@ -291,7 +330,17 @@ class CollatingExporter(object):
                         audioTracks[trackGuid].addItem(item)
             except Exception as e:
                 clash = newTracks[parentTrack.guid()].items()[0]
-                error = "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n" % (trackItemClone.name(), trackItemClone.timelineIn(), trackItemClone.timelineOut(), clash.name(), clash.timelineIn(), clash.timelineOut())
+                error = (
+                    "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n"
+                    % (
+                        trackItemClone.name(),
+                        trackItemClone.timelineIn(),
+                        trackItemClone.timelineOut(),
+                        clash.name(),
+                        clash.timelineIn(),
+                        clash.timelineOut(),
+                    )
+                )
                 self.setError(error)
                 hiero.core.log.error(error)
                 hiero.core.log.error(str(e))
@@ -299,7 +348,9 @@ class CollatingExporter(object):
         handles = self._cutHandles if self._cutHandles is not None else 0
 
         # Use in/out point to constrain output framerange to track item range
-        newSequence.setInTime(max(0, (sequenceIn + offset + self.HEAD_ROOM_OFFSET) - handles))
+        newSequence.setInTime(
+            max(0, (sequenceIn + offset + self.HEAD_ROOM_OFFSET) - handles)
+        )
         newSequence.setOutTime((sequenceOut + offset + self.HEAD_ROOM_OFFSET) + handles)
 
         # Copy posterFrame from Hero item to sequence
@@ -307,10 +358,12 @@ class CollatingExporter(object):
         if isinstance(base, hiero.core.SequenceBase):
             posterFrame = base.posterFrame()
             if posterFrame:
-                newSequence.setPosterFrame(heroItem.timelineIn() + posterFrame + self.HEAD_ROOM_OFFSET + offset)
+                newSequence.setPosterFrame(
+                    heroItem.timelineIn() + posterFrame + self.HEAD_ROOM_OFFSET + offset
+                )
 
         # Useful for debugging, add cloned collated sequence to Project
-        #hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
+        # hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
 
         # Use this newly built sequence instead
         self._parentSequence = self._sequence
@@ -343,9 +396,12 @@ class CollatingExporter(object):
 
         # Hero item for a collated sequence is the first one on the highest track
         def keyFunc(item):
-            return ((sys.maxint - item.timelineIn()) * 1000) + item.parent().trackIndex()
+            return (
+                (sys.maxint - item.timelineIn()) * 1000
+            ) + item.parent().trackIndex()
+
         heroItem = max(self._collatedItems, key=keyFunc)
-        self._hero = (heroItem.guid() == self._item.guid())
+        self._hero = heroItem.guid() == self._item.guid()
         self._heroItem = heroItem
 
         # When building a collated sequence, everything is offset by 1000
@@ -370,7 +426,7 @@ class CollatingExporter(object):
                 # To make sure that when the shot is expanded to include handles this is still the first
                 # frame, here we offset the start frame by the in-handle size
                 if properties["collateCustomStart"] and self._cutHandles is not None:
-                #if  self._preset.properties()["collateCustomStart"]:
+                    # if  self._preset.properties()["collateCustomStart"]:
                     self._startFrame += self._cutHandles
 
                 # The offset required to shift the timeline position to the custom start frame.
@@ -381,7 +437,9 @@ class CollatingExporter(object):
         newSequence.setFormat(self._sequence.format())
         newSequence.setFramerate(self._sequence.framerate())
         newSequence.setDropFrame(self._sequence.dropFrame())
-        newSequence.setTimecodeStart(self._sequence.timecodeStart() - (headRoomOffset + offset))
+        newSequence.setTimecodeStart(
+            self._sequence.timecodeStart() - (headRoomOffset + offset)
+        )
 
         sequenceIn, sequenceOut = sys.maxint, 0
         for trackitem in self._collatedItems:
@@ -432,7 +490,13 @@ class CollatingExporter(object):
                 transitions.add(trackitem.outTransition())
 
             # Get the item's linked effects to be copied
-            linkedEffects.extend( [ item for item in trackitem.linkedItems() if isinstance(item, hiero.core.EffectTrackItem) ] )
+            linkedEffects.extend(
+                [
+                    item
+                    for item in trackitem.linkedItems()
+                    if isinstance(item, hiero.core.EffectTrackItem)
+                ]
+            )
 
             trackItemCopy = trackitem.copy()
 
@@ -444,15 +508,25 @@ class CollatingExporter(object):
             # use the largest source media format as the output format for the sequence.
             if trackitem.reformatState().type() == nuke.ReformatNode.kDisabled:
                 sourceFormat = trackitem.source().format()
-                if not self._collatedSequenceOutputFormat or (sourceFormat.width() > self._collatedSequenceOutputFormat.width() and sourceFormat.height() > self._collatedSequenceOutputFormat.height()):
+                if not self._collatedSequenceOutputFormat or (
+                    sourceFormat.width() > self._collatedSequenceOutputFormat.width()
+                    and sourceFormat.height()
+                    > self._collatedSequenceOutputFormat.height()
+                ):
                     self._collatedSequenceOutputFormat = sourceFormat
 
             # extend any shots
             if self._cutHandles is not None:
                 # Maximum available handle size
-                handleInLength, handleOutLength = trackitem.handleInLength(), trackitem.handleOutLength()
+                handleInLength, handleOutLength = (
+                    trackitem.handleInLength(),
+                    trackitem.handleOutLength(),
+                )
                 # Clamp to desired handle size
-                handleIn, handleOut = min(self._cutHandles, handleInLength), min(self._cutHandles, handleOutLength)
+                handleIn, handleOut = (
+                    min(self._cutHandles, handleInLength),
+                    min(self._cutHandles, handleOutLength),
+                )
 
                 # Prevent in handle going negative. Calculating timelineIn + offset tells us where the item will sit on the
                 # sequence, and thus how many frames of handles there are available before it would become negative (since
@@ -470,7 +544,10 @@ class CollatingExporter(object):
                     # the video track.
                     for linkedItem in trackitem.linkedItems():
                         handleInAdjustments[linkedItem] = -handleIn
-                    hiero.core.log.debug("Expanding %s in by %i frames" % (trackItemCopy.name(), handleIn))
+                    hiero.core.log.debug(
+                        "Expanding %s in by %i frames"
+                        % (trackItemCopy.name(), handleIn)
+                    )
                 if trackItemCopy.timelineOut() >= sequenceOut and handleOut:
                     sequenceOutHandle = max(sequenceOutHandle, handleOut)
                     trackItemCopy.trimOut(-handleOut)
@@ -480,17 +557,34 @@ class CollatingExporter(object):
                     # the video track.
                     for linkedItem in trackitem.linkedItems():
                         handleOutAdjustments[linkedItem] = handleOut
-                    hiero.core.log.debug("Expanding %s out by %i frames" % (trackItemCopy.name(), handleOut))
+                    hiero.core.log.debug(
+                        "Expanding %s out by %i frames"
+                        % (trackItemCopy.name(), handleOut)
+                    )
 
-            trackItemCopy.setTimes(trackItemCopy.timelineIn() + headRoomOffset + offset, trackItemCopy.timelineOut() + headRoomOffset + offset,
-                               trackItemCopy.sourceIn(), trackItemCopy.sourceOut())
+            trackItemCopy.setTimes(
+                trackItemCopy.timelineIn() + headRoomOffset + offset,
+                trackItemCopy.timelineOut() + headRoomOffset + offset,
+                trackItemCopy.sourceIn(),
+                trackItemCopy.sourceOut(),
+            )
 
             # Add copied track item to copied track
             try:
                 newTrack.addItem(trackItemCopy)
             except Exception as e:
                 clash = newTracks[parentTrack.guid()].items()[0]
-                error = "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n" % (trackItemCopy.name(), trackItemCopy.timelineIn(), trackItemCopy.timelineOut(), clash.name(), clash.timelineIn(), clash.timelineOut())
+                error = (
+                    "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n"
+                    % (
+                        trackItemCopy.name(),
+                        trackItemCopy.timelineIn(),
+                        trackItemCopy.timelineOut(),
+                        clash.name(),
+                        clash.timelineIn(),
+                        clash.timelineOut(),
+                    )
+                )
                 self.setError(error)
                 hiero.core.log.error(error)
                 hiero.core.log.error(str(e))
@@ -500,13 +594,19 @@ class CollatingExporter(object):
             parentTrack = transition.parentTrack()
             newTrack = newTracks[parentTrack.guid()]
             transitionCopy = transition.copy()
-            transitionCopy.setTimelineOut(transitionCopy.timelineOut() + headRoomOffset + offset)
-            transitionCopy.setTimelineIn(transitionCopy.timelineIn() + headRoomOffset + offset)
+            transitionCopy.setTimelineOut(
+                transitionCopy.timelineOut() + headRoomOffset + offset
+            )
+            transitionCopy.setTimelineIn(
+                transitionCopy.timelineIn() + headRoomOffset + offset
+            )
             newTrack.addTransition(transitionCopy)
 
         # Copy any effects and add them to the sequence.  We don't do anything with handles here,
         # the effects just have the same timeline duration as before.
-        for subTrackItem in itertools.chain(self._effects, linkedEffects, self._annotations):
+        for subTrackItem in itertools.chain(
+            self._effects, linkedEffects, self._annotations
+        ):
             parentTrack = subTrackItem.parentTrack()
             newTrack = newTracks[parentTrack.guid()]
             unusedNewTracks.discard(newTrack)
@@ -516,18 +616,24 @@ class CollatingExporter(object):
             subTrackItemCopy = subTrackItem.copy()
             inAdjustment = handleInAdjustments.get(subTrackItem, 0)
             outAdjustment = handleOutAdjustments.get(subTrackItem, 0)
-            subTrackItemCopy.setTimelineOut(subTrackItemCopy.timelineOut() + headRoomOffset + offset + outAdjustment)
-            subTrackItemCopy.setTimelineIn(subTrackItemCopy.timelineIn() + headRoomOffset + offset + inAdjustment)
+            subTrackItemCopy.setTimelineOut(
+                subTrackItemCopy.timelineOut() + headRoomOffset + offset + outAdjustment
+            )
+            subTrackItemCopy.setTimelineIn(
+                subTrackItemCopy.timelineIn() + headRoomOffset + offset + inAdjustment
+            )
 
             # Offset the soft effects key frames by 1000
-            if isinstance( subTrackItemCopy , EffectTrackItem ):
+            if isinstance(subTrackItemCopy, EffectTrackItem):
                 effectTrackNode = subTrackItemCopy.node()
-                offsetNodeAnimationFrames( effectTrackNode , headRoomOffset + offset);
+                offsetNodeAnimationFrames(effectTrackNode, headRoomOffset + offset)
 
             try:
                 newTrack.addSubTrackItem(subTrackItemCopy, subTrackIndex)
             except:
-                hiero.core.log.exception("NukeShotExporter._buildCollatedSequence failed to add effect")
+                hiero.core.log.exception(
+                    "NukeShotExporter._buildCollatedSequence failed to add effect"
+                )
 
         # Remove any empty tracks from the new sequence
         for track in unusedNewTracks:
@@ -543,13 +649,15 @@ class CollatingExporter(object):
         if isinstance(base, hiero.core.SequenceBase):
             posterFrame = base.posterFrame()
             if posterFrame:
-                newSequence.setPosterFrame(heroItem.timelineIn() + posterFrame + self.HEAD_ROOM_OFFSET + offset)
+                newSequence.setPosterFrame(
+                    heroItem.timelineIn() + posterFrame + self.HEAD_ROOM_OFFSET + offset
+                )
 
         self._collatedSequenceHandles = (sequenceInHandle, sequenceOutHandle)
 
         # Useful for debugging, add copied collated sequence to Project
-        #newSequence.setName("Collated Sequence")
-        #hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
+        # newSequence.setName("Collated Sequence")
+        # hiero.core.projects()[-1].clipsBin().addItem(hiero.core.BinItem(newSequence))
 
         # Use this newly built sequence instead
         self._parentSequence = self._sequence
@@ -570,10 +678,16 @@ class CollatingExporter(object):
     def finishTask(self):
         self._parentSequence = None
 
-    def collatedOutputRange(self, ignoreHandles=False, ignoreRetimes=True, clampToSource=True, adjustForCustomStart=True):
+    def collatedOutputRange(
+        self,
+        ignoreHandles=False,
+        ignoreRetimes=True,
+        clampToSource=True,
+        adjustForCustomStart=True,
+    ):
         """Returns the output file range (as tuple) for this task, if applicable"""
         start = 0
-        end  = 0
+        end = 0
 
         if isinstance(self._item, hiero.core.Sequence) or self._collate:
             start, end = 0, self._item.duration() - 1
@@ -595,12 +709,24 @@ class CollatingExporter(object):
                 pass
         elif isinstance(self._item, (hiero.core.TrackItem, hiero.core.Clip)):
             # Get input frame range
-            start, end = self.inputRange(ignoreHandles=ignoreHandles, ignoreRetimes=ignoreRetimes, clampToSource=clampToSource)
+            start, end = self.inputRange(
+                ignoreHandles=ignoreHandles,
+                ignoreRetimes=ignoreRetimes,
+                clampToSource=clampToSource,
+            )
 
-            if self._retime and isinstance(self._item, hiero.core.TrackItem) and ignoreRetimes:
+            if (
+                self._retime
+                and isinstance(self._item, hiero.core.TrackItem)
+                and ignoreRetimes
+            ):
                 srcDuration = abs(self._item.sourceDuration())
                 playbackSpeed = self._item.playbackSpeed()
-                end = (end - srcDuration) + (srcDuration / playbackSpeed) + (playbackSpeed - 1.0)
+                end = (
+                    (end - srcDuration)
+                    + (srcDuration / playbackSpeed)
+                    + (playbackSpeed - 1.0)
+                )
 
             start = int(math.floor(start))
             end = int(math.ceil(end))
@@ -665,11 +791,12 @@ def _subTrackIndex(subTrackItem):
         if subTrackItem in subTrackItems:
             return index
 
+
 class CollatedShotPreset(object):
     def __init__(self, properties):
         properties["collateTracks"] = False
         properties["collateShotNames"] = False
 
         # Not exposed in UI
-        properties["collateSequence"] = False    # Collate all trackitems within sequence
+        properties["collateSequence"] = False  # Collate all trackitems within sequence
         properties["collateCustomStart"] = True  # Start frame is inclusive of handles

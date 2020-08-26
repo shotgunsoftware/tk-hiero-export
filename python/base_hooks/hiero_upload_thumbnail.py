@@ -18,6 +18,7 @@ class HieroUploadThumbnail(HookBaseClass):
     This class implements a hook that's responsible for uploading a thumbnail
     to a given Shotgun entity for a given Hiero source item.
     """
+
     def execute(self, entity, source, item, **kwargs):
         """
         Uploads a thumbnail to the given entity in Shotgun.

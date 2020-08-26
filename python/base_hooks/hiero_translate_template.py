@@ -1,11 +1,11 @@
 # Copyright (c) 2018 Shotgun Software Inc.
-# 
+#
 # CONFIDENTIAL AND PROPRIETARY
-# 
-# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit 
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
 # Source Code License included in this distribution package. See LICENSE.
-# By accessing, using, copying or modifying this work you indicate your 
-# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights 
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
 # not expressly granted therein are reserved by Shotgun Software Inc.
 
 import sgtk
@@ -18,6 +18,7 @@ class HieroTranslateTemplate(HookBaseClass):
     This class implements a hook that's responsible for translating a Toolkit
     template object into a Hiero export string.
     """
+
     def execute(self, template, output_type, **kwargs):
         """
         Takes a Toolkit template object as input and returns a string

@@ -16,6 +16,7 @@ class HieroPreExport(Hook):
     This class implements a hook that can be used to run custom logic prior to
     the start if the export process.
     """
+
     def execute(self, processor, **kwargs):
         """
         Called just prior to export. One use case for would be to clear

@@ -19,6 +19,7 @@ class HieroCustomizeExportUI(HookBaseClass):
     Shotgun-related exporters. Each processor has its own set of create/get/set
     methods, allowing for customizable UI elements for each type of export.
     """
+
     # For detailed documentation of the methods available for this hook, see
     # the documentation at http://developer.shotgunsoftware.com/tk-hiero-export/
     pass

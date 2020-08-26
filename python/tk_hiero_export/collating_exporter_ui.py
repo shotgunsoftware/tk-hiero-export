@@ -30,14 +30,28 @@ class CollatingExporterUI(object):
         key = "collateTracks"
         value = False
         label = "Collate Shot Timings:"
-        self._collateTimeProperty = UIPropertyFactory.create(type(value), key=key, value=value, dictionary=properties, label=label, tooltip=collateTracksToolTip)
+        self._collateTimeProperty = UIPropertyFactory.create(
+            type(value),
+            key=key,
+            value=value,
+            dictionary=properties,
+            label=label,
+            tooltip=collateTracksToolTip,
+        )
         layout.addRow(label, self._collateTimeProperty)
 
         collateShotNameToolTip = """Enable this to include other shots which have the same name in the Nuke script. Cannot be enabled when Read Node overrides are set."""
         key = "collateShotNames"
         value = False
         label = "Collate Shot Name:"
-        self._collateNameProperty = UIPropertyFactory.create(type(value), key=key, value=value, dictionary=properties, label=label, tooltip=collateShotNameToolTip)
+        self._collateNameProperty = UIPropertyFactory.create(
+            type(value),
+            key=key,
+            value=value,
+            dictionary=properties,
+            label=label,
+            tooltip=collateShotNameToolTip,
+        )
         layout.addRow(label, self._collateNameProperty)
 
         if cut_support:
@@ -55,13 +69,17 @@ class CollatingExporterUI(object):
         return (self._collateTimeProperty, self._collateNameProperty)
 
     def getCollateTime(self):
-        return (self._collateTimeProperty._widget.checkState() == QtCore.Qt.Checked)
+        return self._collateTimeProperty._widget.checkState() == QtCore.Qt.Checked
+
     def setCollateTime(self, value):
         self._collateTimeProperty._widget.setChecked(value)
+
     collateTime = property(getCollateTime, setCollateTime)
 
     def getCollateName(self):
-        return (self._collateNameProperty._widget.checkState() == QtCore.Qt.Checked)
+        return self._collateNameProperty._widget.checkState() == QtCore.Qt.Checked
+
     def setCollateName(self, value):
         self._collateNameProperty._widget.setChecked(value)
+
     collateName = property(getCollateName, setCollateName)

@@ -31,6 +31,7 @@ class HieroCustomizeExportUI(HookBaseClass):
     - Defining custom properties to add to the associated preset
     - Setting the widget up to display controls for the custom properties
     """
+
     def create_shot_processor_widget(self, parent_widget):
         """
         Builds and returns a custom widget to be embedded in the parent exporter.
