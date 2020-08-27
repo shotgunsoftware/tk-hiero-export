@@ -12,14 +12,16 @@ import sgtk
 
 HookBaseClass = sgtk.get_hook_baseclass()
 
+
 class HieroPostVersionCreation(HookBaseClass):
-	"""
+    """
 	This class implements a hook that can be used to add custom logic to
 	be run after a Version entity is created in Shotgun as part of the
 	export process.
 	"""
-	def execute(self, version_data, **kwargs):
-		"""
+
+    def execute(self, version_data, **kwargs):
+        """
 		Runs following the creation of the Version entity in Shotgun. The
 		provided version data is the data structure containing information
 		about the Version entity, including its ID in Shotgun.
@@ -43,4 +45,4 @@ class HieroPostVersionCreation(HookBaseClass):
 
 		:param dict version_data: The Version entity that was created in Shotgun.
 		"""
-		pass
+        pass

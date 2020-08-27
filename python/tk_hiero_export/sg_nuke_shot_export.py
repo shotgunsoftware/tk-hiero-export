@@ -24,10 +24,14 @@ from sgtk.platform.qt import QtGui, QtCore
 from .base import ShotgunHieroObjectBase
 from . import HieroGetExtraPublishData
 
-class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI):
+
+class ShotgunNukeShotExporterUI(
+    ShotgunHieroObjectBase, FnNukeShotExporterUI.NukeShotExporterUI
+):
     """
     Custom Preferences UI for the shotgun nuke shot exporter
     """
+
     def __init__(self, preset):
         FnNukeShotExporterUI.NukeShotExporterUI.__init__(self, preset)
         self._displayName = "Shotgun Nuke Project File"
@@ -46,7 +50,7 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
         properties = self._preset.properties()
 
         for node in nodes:
-            name = "Toolkit Node: %s (\"%s\")" % (node['name'], node['channel'])
+            name = 'Toolkit Node: %s ("%s")' % (node["name"], node["channel"])
             item = QtGui.QStandardItem(name)
             item.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEnabled)
             if name in properties["toolkitWriteNodes"]:
@@ -105,10 +109,13 @@ class ShotgunNukeShotExporterUI(ShotgunHieroObjectBase, FnNukeShotExporterUI.Nuk
         self.app.log_debug("toolkitPresetChanged: %s" % preset)
 
 
-class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotExporter):
+class ShotgunNukeShotExporter(
+    ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotExporter
+):
     """
     Create Transcode object and send to Shotgun
     """
+
     def __init__(self, initDict):
         """
         Constructor
@@ -121,15 +128,19 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         self._heroItem = None
 
         if self._collate:
+
             def keyFunc(item):
-                return ((sys.maxint - item.timelineIn()) * 1000) + item.parent().trackIndex()
+                return (
+                    (sys.maxint - item.timelineIn()) * 1000
+                ) + item.parent().trackIndex()
+
             heroItem = max(self._collatedItems, key=keyFunc)
-            self._hero = (heroItem.guid() == self._item.guid())
+            self._hero = heroItem.guid() == self._item.guid()
             self._heroItem = heroItem
 
     def sequenceName(self):
         # override getSequence from the resolver to be collate friendly
-        if getattr(self, '_collate', False):
+        if getattr(self, "_collate", False):
             return self._item.parentSequence().name()
         return FnNukeShotExporter.NukeShotExporter.sequenceName(self)
 
@@ -142,12 +153,13 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             self._tk_version_number = self._formatTkVersionString(self.versionString())
 
             # convert slashes to native os style..
-            self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
-
+            self._resolved_export_path = self._resolved_export_path.replace(
+                "/", os.path.sep
+            )
 
         source = self._item.source()
         self._thumbnail = source.thumbnail(source.posterFrame())
-        
+
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
     def startTask(self):
@@ -174,7 +186,7 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         # register publish
         # get context we're publishing to
         ctx = self.app.tank.context_from_path(self._resolved_export_path)
-        published_file_type = self.app.get_setting('nuke_script_published_file_type')
+        published_file_type = self.app.get_setting("nuke_script_published_file_type")
 
         args = {
             "tk": self.app.tank,
@@ -203,8 +215,13 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         sg_publish = sgtk.util.register_publish(**args)
         if self._extra_publish_data is not None:
-            self.app.log_debug("Updating Shotgun %s %s" % (publish_entity_type, str(self._extra_publish_data)))
-            self.app.shotgun.update(sg_publish["type"], sg_publish["id"], self._extra_publish_data)
+            self.app.log_debug(
+                "Updating Shotgun %s %s"
+                % (publish_entity_type, str(self._extra_publish_data))
+            )
+            self.app.shotgun.update(
+                sg_publish["type"], sg_publish["id"], self._extra_publish_data
+            )
 
         # call the publish data hook to allow for publish customization.
         extra_publish_data = self.app.execute_hook(
@@ -213,8 +230,13 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
             base_class=HieroGetExtraPublishData,
         )
         if extra_publish_data is not None:
-            self.app.log_debug("Updating Shotgun %s %s" % (publish_entity_type, str(extra_publish_data)))
-            self.app.shotgun.update(sg_publish["type"], sg_publish["id"], extra_publish_data)
+            self.app.log_debug(
+                "Updating Shotgun %s %s"
+                % (publish_entity_type, str(extra_publish_data))
+            )
+            self.app.shotgun.update(
+                sg_publish["type"], sg_publish["id"], extra_publish_data
+            )
 
         # upload thumbnail for sequence
         self._upload_thumbnail_to_sg(sg_publish, self._thumbnail)
@@ -267,14 +289,18 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         try:
             for toolkit_specifier in self._preset.properties()["toolkitWriteNodes"]:
                 # break down a string like 'Toolkit Node: Mono Dpx ("editorial")' into name and output
-                match = re.match("^Toolkit Node: (?P<name>.+) \(\"(?P<output>.+)\"\)",
-                                 toolkit_specifier)
+                match = re.match(
+                    '^Toolkit Node: (?P<name>.+) \("(?P<output>.+)"\)',
+                    toolkit_specifier,
+                )
 
                 metadata = match.groupdict()
                 node = nuke.MetadataNode(metadatavalues=metadata.items())
-                node.setName('ShotgunWriteNodePlaceholder')
+                node.setName("ShotgunWriteNodePlaceholder")
 
-                self.app.log_debug("Created ShotgunWriteNodePlaceholder Node: %s" % node._knobValues)
+                self.app.log_debug(
+                    "Created ShotgunWriteNodePlaceholder Node: %s" % node._knobValues
+                )
                 # rather than using the script.addNode, we append our node directly to the nodeList
                 nodeList.append(node)
 
@@ -285,12 +311,14 @@ class ShotgunNukeShotExporter(ShotgunHieroObjectBase, FnNukeShotExporter.NukeSho
         finally:
             # now put back the viewer nodes layout
             currentLayoutContext.getNodes().append(oldLayoutEnd)
-    
+
             # put the old end Node back
             nodeList.append(oldScriptEnd)
 
 
-class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset, CollatedShotPreset):
+class ShotgunNukeShotPreset(
+    ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset, CollatedShotPreset
+):
     """
     Settings for the shotgun transcode step
     """
@@ -299,7 +327,7 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
         FnNukeShotExporter.NukeShotPreset.__init__(self, name, properties)
         self._parentType = ShotgunNukeShotExporter
         CollatedShotPreset.__init__(self, self.properties())
-        
+
         if "toolkitWriteNodes" in properties:
             # already taken care of by loading the preset
             return
@@ -308,13 +336,13 @@ class ShotgunNukeShotPreset(ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotP
         toolkit_write_nodes = []
         nodes = self.app.get_setting("nuke_script_toolkit_write_nodes")
         for node in nodes:
-            name = "Toolkit Node: %s (\"%s\")" % (node['name'], node['channel'])
+            name = 'Toolkit Node: %s ("%s")' % (node["name"], node["channel"])
             toolkit_write_nodes.append(name)
         self.properties()["toolkitWriteNodes"] = toolkit_write_nodes
 
         # Handle custom properties from the customize_export_ui hook.
-        custom_properties = self._get_custom_properties(
-            "get_nuke_shot_exporter_ui_properties"
-        ) or []
+        custom_properties = (
+            self._get_custom_properties("get_nuke_shot_exporter_ui_properties") or []
+        )
 
         self.properties().update({d["name"]: d["value"] for d in custom_properties})

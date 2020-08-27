@@ -17,6 +17,7 @@ class HieroGetExtraPublishData(Hook):
     and add it to the data dictionary that's used to register any new
     PublishedFile entities in Shotgun during the given Task's execution.
     """
+
     def execute(self, task, **kwargs):
         """
         Get a data dictionary for a PublishedFile to be updated in Shotgun.

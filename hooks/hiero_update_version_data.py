@@ -17,6 +17,7 @@ class HieroUpdateVersionData(Hook):
     dictionary for a Version entity that is going to be created by the
     export process.
     """
+
     def execute(self, version_data, task, **kwargs):
         """
         Updates the version_data dictionary to change the data for the Version

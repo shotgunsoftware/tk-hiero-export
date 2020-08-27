@@ -18,6 +18,7 @@ class HieroResolveCustomStrings(HookBaseClass):
     This class implements a hook that is used to resolve custom tokens into
     their concrete value when paths are being processed during the export.
     """
+
     def execute(self, task, keyword, **kwargs):
         """
         The default implementation of the custom resolver simply looks up

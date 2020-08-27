@@ -20,10 +20,14 @@ from . import (
     HieroUpdateCuts,
 )
 
-class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, CollatingExporter):
+
+class ShotgunShotUpdater(
+    ShotgunHieroObjectBase, FnShotExporter.ShotTask, CollatingExporter
+):
     """
     Ensures that Shots and Sequences exist in Shotgun
     """
+
     def __init__(self, initDict):
         FnShotExporter.ShotTask.__init__(self, initDict)
         CollatingExporter.__init__(self)
@@ -140,10 +144,10 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
         )
 
         # clean up the dict
-        shot_id = sg_shot['id']
-        del sg_shot['id']
-        shot_type = sg_shot['type']
-        del sg_shot['type']
+        shot_id = sg_shot["id"]
+        del sg_shot["id"]
+        shot_type = sg_shot["type"]
+        del sg_shot["type"]
 
         # The cut order may have been set by the processor. Otherwise keep old behavior.
         cut_order = self.app.shot_count + 1
@@ -244,27 +248,36 @@ class ShotgunShotUpdater(ShotgunHieroObjectBase, FnShotExporter.ShotTask, Collat
                 status = status_map[tag.name()]
                 break
         if status:
-            sg_shot['sg_status_list'] = status
+            sg_shot["sg_status_list"] = status
 
         # get task template from the tags
         template = None
         template_map = dict(self._preset.properties()["task_template_map"])
         for tag in self._item.tags():
             if tag.name() in template_map:
-                template = self.app.tank.shotgun.find_one('TaskTemplate',
-                                                          [['entity_type', 'is', shot_type],
-                                                           ['code', 'is', template_map[tag.name()]]])
+                template = self.app.tank.shotgun.find_one(
+                    "TaskTemplate",
+                    [
+                        ["entity_type", "is", shot_type],
+                        ["code", "is", template_map[tag.name()]],
+                    ],
+                )
                 break
 
         # if there are no associated, assign default template...
         if template is None:
-            default_template = self.app.get_setting('default_task_template')
+            default_template = self.app.get_setting("default_task_template")
             if default_template:
-                template = self.app.tank.shotgun.find_one('TaskTemplate',
-                    [['entity_type', 'is', shot_type], ['code', 'is', default_template]])
+                template = self.app.tank.shotgun.find_one(
+                    "TaskTemplate",
+                    [
+                        ["entity_type", "is", shot_type],
+                        ["code", "is", default_template],
+                    ],
+                )
 
         if template is not None:
-            sg_shot['task_template'] = template
+            sg_shot["task_template"] = template
 
         # commit the changes and update the thumbnail
         self.app.execute_hook_method(
@@ -345,6 +358,7 @@ class ShotgunShotUpdaterPreset(ShotgunHieroObjectBase, hiero.core.TaskPresetBase
     """
     Settings preset
     """
+
     def __init__(self, name, properties):
         hiero.core.TaskPresetBase.__init__(self, ShotgunShotUpdater, name)
         self.properties().update(properties)

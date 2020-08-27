@@ -18,6 +18,7 @@ class HieroGetShot(HookBaseClass):
     This class implements a hook that can determines which Shotgun entity
     should be associated with each task and track item being exported.
     """
+
     def execute(self, task, item, data, **kwargs):
         """
         Takes a hiero.core.TrackItem as input and returns a data dictionary for

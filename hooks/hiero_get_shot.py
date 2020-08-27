@@ -16,6 +16,7 @@ class HieroGetShot(Hook):
     This class implements a hook that can determines which Shotgun entity
     should be associated with each task and track item being exported.
     """
+
     def execute(self, task, item, data, **kwargs):
         """
         Takes a hiero.core.TrackItem as input and returns a data dictionary for
@@ -68,7 +69,7 @@ class HieroGetShot(Hook):
                 entity=shot,
                 source=item.source(),
                 item=item,
-                task=kwargs.get("task")
+                task=kwargs.get("task"),
             )
 
         return shot
@@ -108,8 +109,8 @@ class HieroGetShot(Hook):
         if len(parents) > 1:
             # can not handle multiple parents with the same name
             raise StandardError(
-                "Multiple %s entities named '%s' found" %
-                (par_entity_type, hiero_sequence.name())
+                "Multiple %s entities named '%s' found"
+                % (par_entity_type, hiero_sequence.name())
             )
 
         if len(parents) == 0:
@@ -120,7 +121,8 @@ class HieroGetShot(Hook):
             }
             parent = sg.create(par_entity_type, par_data)
             self.parent.log_info(
-                "Created %s in Shotgun: %s" % (par_entity_type, par_data))
+                "Created %s in Shotgun: %s" % (par_entity_type, par_data)
+            )
         else:
             parent = parents[0]
 
@@ -128,10 +130,7 @@ class HieroGetShot(Hook):
         upload_thumbnail = kwargs.get("upload_thumbnail", True)
         if upload_thumbnail:
             self.parent.execute_hook(
-                "hook_upload_thumbnail",
-                entity=parent,
-                source=hiero_sequence,
-                item=None
+                "hook_upload_thumbnail", entity=parent, source=hiero_sequence, item=None
             )
 
         # cache the results

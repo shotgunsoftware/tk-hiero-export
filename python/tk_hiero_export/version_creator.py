@@ -40,19 +40,22 @@ from . import (
 )
 
 
-class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.TranscodeExporterUI):
+class ShotgunTranscodeExporterUI(
+    ShotgunHieroObjectBase, FnTranscodeExporterUI.TranscodeExporterUI
+):
     """
     Custom Preferences UI for the shotgun transcoder
 
     Embeds the UI for the std transcoder UI.
     """
+
     def __init__(self, preset):
         FnTranscodeExporterUI.TranscodeExporterUI.__init__(self, preset)
         self._displayName = "Shotgun Transcode Images"
         self._taskType = ShotgunTranscodeExporter
 
     def create_version_changed(self, state):
-        create_version = (state == QtCore.Qt.Checked)
+        create_version = state == QtCore.Qt.Checked
         self._preset._properties["create_version"] = create_version
 
     def populateUI(self, widget, exportTemplate):
@@ -95,7 +98,9 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
             middle.setLayout(QtGui.QVBoxLayout())
 
         # populate the middle with the standard layout
-        FnTranscodeExporterUI.TranscodeExporterUI.populateUI(self, middle, exportTemplate)
+        FnTranscodeExporterUI.TranscodeExporterUI.populateUI(
+            self, middle, exportTemplate
+        )
 
         layout.addWidget(top)
         layout.addWidget(middle)
@@ -113,8 +118,9 @@ class ShotgunTranscodeExporterUI(ShotgunHieroObjectBase, FnTranscodeExporterUI.T
             layout.addWidget(custom_widget)
 
 
-
-class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodeExporter, CollatingExporter):
+class ShotgunTranscodeExporter(
+    ShotgunHieroObjectBase, FnTranscodeExporter.TranscodeExporter, CollatingExporter
+):
     """
     Create Transcode object and send to Shotgun
     """
@@ -145,7 +151,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         set_command = nuke.SetNode(self._write_set_node_label, 0)
         script.addNode(set_command)
 
-        super(ShotgunTranscodeExporter, self).addWriteNodeToScript(script, rootNode, framerate)
+        super(ShotgunTranscodeExporter, self).addWriteNodeToScript(
+            script, rootNode, framerate
+        )
 
     def buildScript(self):
         """
@@ -157,7 +165,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # transcode exporter that ships with Nuke/Hiero 9.0 compared
         # to earlier versions of Hiero.
 
-        file_type = self._preset.properties()['file_type']
+        file_type = self._preset.properties()["file_type"]
         self.app.log_debug("Transcode export file_type: %s" % file_type)
 
         if file_type in ["mov", "ffmpeg"]:
@@ -170,7 +178,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         self.app.log_debug("Transcode base script built")
 
         # If we are not creating a version then we do not need the extra node
-        if not self._preset.properties()['create_version']:
+        if not self._preset.properties()["create_version"]:
             return
 
         if file_type in ["mov", "ffmpeg"]:
@@ -179,7 +187,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self._temp_quicktime = False
             return
 
-        self._quicktime_path = os.path.join(tempfile.mkdtemp(), 'preview.mov')
+        self._quicktime_path = os.path.join(tempfile.mkdtemp(), "preview.mov")
         self._temp_quicktime = True
         nodeName = "Shotgun Screening Room Media"
 
@@ -189,7 +197,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         if self._clip.framerate().isValid():
             framerate = self._clip.framerate()
 
-        preset = FnTranscodeExporter.TranscodePreset("Qt Write", self._preset.properties())
+        preset = FnTranscodeExporter.TranscodePreset(
+            "Qt Write", self._preset.properties()
+        )
 
         # insert the write node to generate the quicktime
         file_type, properties = self.app.execute_hook(
@@ -198,10 +208,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             base_class=HieroGetQuicktimeSettings,
         )
         self.app.log_info("Transcode quicktime settings: %s" % (properties,))
-        preset.properties().update({
-            "file_type": file_type,
-            file_type: properties,
-        })
+        preset.properties().update(
+            {"file_type": file_type, file_type: properties,}
+        )
 
         # Sadly Foundry has a habit of changing the interfaces of
         # their Python classes out from under us, so now we're going
@@ -263,7 +272,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         # Call parent method with swapped items in order to get proper timings
         original = self._item
         self._item = item
-        
+
         result = FnTranscodeExporter.TranscodeExporter.writeAudio(self)
 
         self._item = original
@@ -278,7 +287,9 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             self._sequence_name = self.sequenceName()
 
             # convert slashes to native os style..
-            self._resolved_export_path = self._resolved_export_path.replace("/", os.path.sep)
+            self._resolved_export_path = self._resolved_export_path.replace(
+                "/", os.path.sep
+            )
 
         # call the get_shot hook
         ########################
@@ -300,10 +311,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             task=self,
             item=item,
             data=self.app.preprocess_data,
-            fields=[
-                "sg_head_in",
-                "sg_tail_out"
-            ],
+            fields=["sg_head_in", "sg_tail_out"],
             base_class=HieroGetShot,
         )
 
@@ -323,7 +331,7 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             setting = self.app.get_setting("default_task_filter", "[]")
             self.app.log_error("Invalid value for 'default_task_filter': %s" % setting)
 
-        if self._preset.properties()['create_version']:
+        if self._preset.properties()["create_version"]:
             # lookup current login
             sg_current_user = tank.util.get_current_user(self.app.tank)
 
@@ -390,8 +398,8 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         ################
         # by using entity instead of export path to get context, this ensures
         # collated plates get linked to the hero shot
-        ctx = self.app.tank.context_from_entity('Shot', self._sg_shot['id'])
-        published_file_type = self.app.get_setting('plate_published_file_type')
+        ctx = self.app.tank.context_from_entity("Shot", self._sg_shot["id"])
+        published_file_type = self.app.get_setting("plate_published_file_type")
 
         args = {
             "tk": self.app.tank,
@@ -405,30 +413,35 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
         if self._sg_task is not None:
             args["task"] = self._sg_task
 
-        published_file_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
+        published_file_entity_type = sgtk.util.get_published_file_entity_type(
+            self.app.sgtk
+        )
 
         # register publish
         self.app.log_debug("Register publish in shotgun: %s" % str(args))
         pub_data = tank.util.register_publish(**args)
         if self._extra_publish_data is not None:
-            self.app.log_debug("Updating Shotgun %s %s" % (published_file_entity_type, str(self._extra_publish_data)))
-            self.app.shotgun.update(pub_data["type"], pub_data["id"], self._extra_publish_data)
+            self.app.log_debug(
+                "Updating Shotgun %s %s"
+                % (published_file_entity_type, str(self._extra_publish_data))
+            )
+            self.app.shotgun.update(
+                pub_data["type"], pub_data["id"], self._extra_publish_data
+            )
 
         # upload thumbnail for publish
         if self._thumbnail:
             self._upload_thumbnail_to_sg(pub_data, self._thumbnail)
         else:
             self.app.log_debug(
-                "There was no thumbnail available for %s %s" % (
-                    published_file_entity_type,
-                    str(self._extra_publish_data)
-                )
+                "There was no thumbnail available for %s %s"
+                % (published_file_entity_type, str(self._extra_publish_data))
             )
 
         # create version
         ################
         vers = None
-        if self._preset.properties()['create_version']:
+        if self._preset.properties()["create_version"]:
             if published_file_entity_type == "PublishedFile":
                 self._version_data["published_files"] = [pub_data]
             else:  # == "TankPublishedFile
@@ -438,8 +451,12 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             vers = self.app.shotgun.create("Version", self._version_data)
 
             if os.path.exists(self._quicktime_path):
-                self.app.log_debug("Uploading quicktime to Shotgun... (%s)" % self._quicktime_path)
-                self.app.shotgun.upload("Version", vers["id"], self._quicktime_path, "sg_uploaded_movie")
+                self.app.log_debug(
+                    "Uploading quicktime to Shotgun... (%s)" % self._quicktime_path
+                )
+                self.app.shotgun.upload(
+                    "Version", vers["id"], self._quicktime_path, "sg_uploaded_movie"
+                )
                 if self._temp_quicktime:
                     shutil.rmtree(os.path.dirname(self._quicktime_path))
 
@@ -464,15 +481,13 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
                 cut_item_id = self._cut_item_data["id"]
 
                 # update the Cut item with the newly uploaded version
-                self.app.shotgun.update("CutItem", cut_item_id,
-                    {"version": vers})
+                self.app.shotgun.update("CutItem", cut_item_id, {"version": vers})
                 self.app.log_debug("Attached version to cut item.")
 
                 # upload a thumbnail for the cut item as well
                 if self._thumbnail:
                     self._upload_thumbnail_to_sg(
-                        {"type": "CutItem", "id": cut_item_id},
-                        self._thumbnail
+                        {"type": "CutItem", "id": cut_item_id}, self._thumbnail
                     )
 
         # Log usage metrics
@@ -483,8 +498,11 @@ class ShotgunTranscodeExporter(ShotgunHieroObjectBase, FnTranscodeExporter.Trans
             pass
 
 
-class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset):
+class ShotgunTranscodePreset(
+    ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset
+):
     """ Settings for the shotgun transcode step """
+
     def __init__(self, name, properties):
         FnTranscodeExporter.TranscodePreset.__init__(self, name, properties)
         self._parentType = ShotgunTranscodeExporter
@@ -494,8 +512,8 @@ class ShotgunTranscodePreset(ShotgunHieroObjectBase, FnTranscodeExporter.Transco
         self._properties["create_version"] = True
 
         # Handle custom properties from the customize_export_ui hook.
-        custom_properties = self._get_custom_properties(
-            "get_transcode_exporter_ui_properties"
-        ) or []
+        custom_properties = (
+            self._get_custom_properties("get_transcode_exporter_ui_properties") or []
+        )
 
         self.properties().update({d["name"]: d["value"] for d in custom_properties})
