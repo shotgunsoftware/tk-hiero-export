@@ -18,9 +18,10 @@ import shutil
 import tempfile
 import traceback
 
-from tank.platform.qt import QtCore
-from tank.platform import Application
-from tank import TankError
+import sgtk
+from sgtk.platform.qt import QtCore
+from sgtk.platform import Application
+from sgtk import TankError
 
 import hiero.ui
 import hiero.core
@@ -111,7 +112,7 @@ class HieroExport(Application):
         :rtype: str
         """
 
-        if sys.platform.startswith("linux"):
+        if sgtk.util.is_linux():
             encoder_name = "mov64"
         else:
             encoder_name = "mov32"

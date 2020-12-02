@@ -32,7 +32,7 @@ class HieroCustomizeExportUI(HookBaseClass):
 
     def set_shot_processor_ui_properties(self, widget, properties):
         layout = widget.layout()
-        for label, prop in properties.iteritems():
+        for label, prop in properties.items():
             layout.addRow(label, prop)
 
     def create_transcode_exporter_widget(self, parent_widget):
@@ -52,7 +52,7 @@ class HieroCustomizeExportUI(HookBaseClass):
 
     def set_transcode_exporter_ui_properties(self, widget, properties):
         layout = widget.layout()
-        for label, prop in properties.iteritems():
+        for label, prop in properties.items():
             layout.addRow(label, prop)
 
     def create_audio_exporter_widget(self, parent_widget):
@@ -72,7 +72,7 @@ class HieroCustomizeExportUI(HookBaseClass):
 
     def set_audio_exporter_ui_properties(self, widget, properties):
         layout = widget.layout()
-        for label, prop in properties.iteritems():
+        for label, prop in properties.items():
             layout.addRow(label, prop)
 
     def create_nuke_shot_exporter_widget(self, parent_widget):
@@ -92,5 +92,5 @@ class HieroCustomizeExportUI(HookBaseClass):
 
     def set_nuke_shot_exporter_ui_properties(self, widget, properties):
         layout = widget.layout()
-        for label, prop in properties.iteritems():
+        for label, prop in properties.items():
             layout.addRow(label, prop)

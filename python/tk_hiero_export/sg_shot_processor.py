@@ -306,7 +306,7 @@ class ShotgunShotProcessorUI(
         tagTable.resizeRowsToContents()
         tagTable.resizeColumnsToContents()
 
-        width = sum([tagTable.columnWidth(i) for i in xrange(len(keys) + 1)]) + 60
+        width = sum([tagTable.columnWidth(i) for i in range(len(keys) + 1)]) + 60
         tagTable.setMinimumWidth(width)
 
         return tagTable
