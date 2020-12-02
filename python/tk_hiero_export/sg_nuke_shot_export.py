@@ -131,7 +131,7 @@ class ShotgunNukeShotExporter(
 
             def keyFunc(item):
                 return (
-                    (sys.maxint - item.timelineIn()) * 1000
+                    (sys.maxsize - item.timelineIn()) * 1000
                 ) + item.parent().trackIndex()
 
             heroItem = max(self._collatedItems, key=keyFunc)
@@ -295,7 +295,7 @@ class ShotgunNukeShotExporter(
                 )
 
                 metadata = match.groupdict()
-                node = nuke.MetadataNode(metadatavalues=metadata.items())
+                node = nuke.MetadataNode(metadatavalues=list(metadata.items()))
                 node.setName("ShotgunWriteNodePlaceholder")
 
                 self.app.log_debug(

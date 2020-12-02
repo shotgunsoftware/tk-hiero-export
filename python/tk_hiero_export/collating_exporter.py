@@ -212,7 +212,7 @@ class CollatingExporter(object):
         # Hero item for a collated sequence is the first one on the highest track
         def keyFunc(item):
             return (
-                (sys.maxint - item.timelineIn()) * 1000
+                (sys.maxsize - item.timelineIn()) * 1000
             ) + item.parent().trackIndex()
 
         heroItem = max(self._collatedItems, key=keyFunc)
@@ -244,7 +244,7 @@ class CollatingExporter(object):
             # The offset required to shift the timeline position to the custom start frame.
             offset = self._startFrame - self._item.timelineIn()
 
-        sequenceIn, sequenceOut = sys.maxint, 0
+        sequenceIn, sequenceOut = sys.maxsize, 0
         for trackitem in self._collatedItems:
             if trackitem.timelineIn() <= sequenceIn:
                 sequenceIn = trackitem.timelineIn()
@@ -329,7 +329,7 @@ class CollatingExporter(object):
                     for item in newAudio[trackGuid]:
                         audioTracks[trackGuid].addItem(item)
             except Exception as e:
-                clash = newTracks[parentTrack.guid()].items()[0]
+                clash = list(newTracks[parentTrack.guid()].items())[0]
                 error = (
                     "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n"
                     % (
@@ -397,7 +397,7 @@ class CollatingExporter(object):
         # Hero item for a collated sequence is the first one on the highest track
         def keyFunc(item):
             return (
-                (sys.maxint - item.timelineIn()) * 1000
+                (sys.maxsize - item.timelineIn()) * 1000
             ) + item.parent().trackIndex()
 
         heroItem = max(self._collatedItems, key=keyFunc)
@@ -441,7 +441,7 @@ class CollatingExporter(object):
             self._sequence.timecodeStart() - (headRoomOffset + offset)
         )
 
-        sequenceIn, sequenceOut = sys.maxint, 0
+        sequenceIn, sequenceOut = sys.maxsize, 0
         for trackitem in self._collatedItems:
             if trackitem.timelineIn() <= sequenceIn:
                 sequenceIn = trackitem.timelineIn()
@@ -573,7 +573,7 @@ class CollatingExporter(object):
             try:
                 newTrack.addItem(trackItemCopy)
             except Exception as e:
-                clash = newTracks[parentTrack.guid()].items()[0]
+                clash = list(newTracks[parentTrack.guid()].items())[0]
                 error = (
                     "Failed to add shot %s (%i - %i) due to clash with collated shots, This is likely due to the expansion of the master shot to include handles. (%s %i - %i)\n"
                     % (

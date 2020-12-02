@@ -50,7 +50,7 @@ class HieroUploadThumbnail(Hook):
                 if (task is not None) and task.isCollated():
                     # collated shot, use middle frame from task sequence (all collated items)
                     max_frame = 0
-                    min_frame = sys.maxint
+                    min_frame = sys.maxsize
                     for track in task._sequence.videoTracks():
                         for i in track.items():
                             min_frame = min(i.timelineIn(), min_frame)
