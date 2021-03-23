@@ -10,7 +10,8 @@
 
 import sys
 
-from tank import Hook
+import sgtk
+from sgtk import Hook
 
 
 class HieroGetQuicktimeSettings(Hook):
@@ -33,7 +34,7 @@ class HieroGetQuicktimeSettings(Hook):
         """
         import nuke
 
-        if sys.platform.startswith("linux") and nuke.NUKE_VERSION_MAJOR < 11:
+        if sgtk.util.is_linux() and nuke.NUKE_VERSION_MAJOR < 11:
             file_type = "mov"
             properties = {
                 "encoder": "mov64",

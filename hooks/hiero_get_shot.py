@@ -48,7 +48,7 @@ class HieroGetShot(Hook):
         shots = sg.find("Shot", filter, fields=fields)
         if len(shots) > 1:
             # can not handle multiple shots with the same name
-            raise StandardError("Multiple shots named '%s' found", item.name())
+            raise Exception("Multiple shots named '%s' found", item.name())
         if len(shots) == 0:
             # create shot in shotgun
             shot_data = {
@@ -108,7 +108,7 @@ class HieroGetShot(Hook):
         parents = sg.find(par_entity_type, filter)
         if len(parents) > 1:
             # can not handle multiple parents with the same name
-            raise StandardError(
+            raise Exception(
                 "Multiple %s entities named '%s' found"
                 % (par_entity_type, hiero_sequence.name())
             )

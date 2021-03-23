@@ -65,11 +65,11 @@ class HieroTranslateTemplate(Hook):
         if output_type == "script":
             template_str = template_str.replace("{name}", "scene")
 
-        for (orig, repl) in mapping.iteritems():
+        for (orig, repl) in mapping.items():
             template_str = template_str.replace(orig, repl)
 
         # replace {SEQ} style keys with their translated string value
-        for (name, key) in template.keys.iteritems():
+        for (name, key) in template.keys.items():
             if isinstance(key, tank.templatekey.SequenceKey):
                 # this is a sequence template, for example {SEQ}
                 # replace it with ####
