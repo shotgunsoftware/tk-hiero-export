@@ -51,7 +51,7 @@ class ShotgunTranscodeExporterUI(
 
     def __init__(self, preset):
         FnTranscodeExporterUI.TranscodeExporterUI.__init__(self, preset)
-        self._displayName = "Shotgun Transcode Images"
+        self._displayName = "SG Transcode Images"
         self._taskType = ShotgunTranscodeExporter
 
     def create_version_changed(self, state):
@@ -74,12 +74,12 @@ class ShotgunTranscodeExporterUI(
 
         top_layout = QtGui.QVBoxLayout()
         top_layout.setContentsMargins(9, 0, 9, 0)
-        create_version_checkbox = QtGui.QCheckBox("Create Shotgun Version", widget)
+        create_version_checkbox = QtGui.QCheckBox("Create SG Version", widget)
         create_version_checkbox.setToolTip(
-            "Create a Version in Shotgun for this transcode.\n\n"
+            "Create a Version in SG for this transcode.\n\n"
             "If the output format is not a quicktime, then\n"
             "a quicktime will be created.  The quicktime will\n"
-            "be uploaded to Shotgun as Screening Room media."
+            "be uploaded to SG as Screening Room media."
         )
 
         create_version_checkbox.setCheckState(QtCore.Qt.Checked)
@@ -189,7 +189,7 @@ class ShotgunTranscodeExporter(
 
         self._quicktime_path = os.path.join(tempfile.mkdtemp(), "preview.mov")
         self._temp_quicktime = True
-        nodeName = "Shotgun Screening Room Media"
+        nodeName = "SG Screening Room Media"
 
         framerate = None
         if self._sequence:
@@ -422,7 +422,7 @@ class ShotgunTranscodeExporter(
         pub_data = tank.util.register_publish(**args)
         if self._extra_publish_data is not None:
             self.app.log_debug(
-                "Updating Shotgun %s %s"
+                "Updating SG %s %s"
                 % (published_file_entity_type, str(self._extra_publish_data))
             )
             self.app.shotgun.update(
@@ -447,7 +447,7 @@ class ShotgunTranscodeExporter(
             else:  # == "TankPublishedFile
                 self._version_data["tank_published_file"] = pub_data
 
-            self.app.log_debug("Creating Shotgun Version %s" % str(self._version_data))
+            self.app.log_debug("Creating SG Version %s" % str(self._version_data))
             vers = self.app.shotgun.create("Version", self._version_data)
 
             if os.path.exists(self._quicktime_path):
@@ -501,7 +501,7 @@ class ShotgunTranscodeExporter(
 class ShotgunTranscodePreset(
     ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset
 ):
-    """ Settings for the shotgun transcode step """
+    """ Settings for the SG transcode step """
 
     def __init__(self, name, properties):
         FnTranscodeExporter.TranscodePreset.__init__(self, name, properties)
