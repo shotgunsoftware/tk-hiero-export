@@ -61,10 +61,10 @@ class ShotgunShotProcessorUI(
         CollatingExporterUI.__init__(self)
 
     def displayName(self):
-        return "Process as Shotgun Shots"
+        return "Process as SG Shots"
 
     def toolTip(self):
-        return "Process as Shotgun Shots generates output on a per-shot basis and logs it in Shotgun."
+        return "Process as SG Shots generates output on a per-shot basis and logs it in SG."
 
     def populateUI(self, *args, **kwargs):
         """
@@ -84,9 +84,7 @@ class ShotgunShotProcessorUI(
         master_layout.setContentsMargins(0, 0, 0, 0)
 
         # add group box for shotgun stuff
-        shotgun_groupbox = QtGui.QGroupBox(
-            "Shotgun Shot and Sequence Creation Settings"
-        )
+        shotgun_groupbox = QtGui.QGroupBox("SG Shot and Sequence Creation Settings")
         master_layout.addWidget(shotgun_groupbox)
         shotgun_layout = QtGui.QVBoxLayout(shotgun_groupbox)
 
@@ -229,7 +227,7 @@ class ShotgunShotProcessorUI(
         statuses = schema["sg_status_list"]["properties"]["valid_values"]["value"]
 
         values = [statuses, templates]
-        labels = ["Shotgun Shot Status", "Shotgun Task Template for Shots"]
+        labels = ["SG Shot Status", "SG Task Template for Shots"]
         keys = ["sg_status_hiero_tags", "task_template_map"]
 
         # build a map of tag value pairs from the properties
@@ -530,9 +528,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # ---- at this point, we have the cut related tasks in order.
 
-        self.app.engine.show_busy(
-            "Preprocessing Sequence", "Creating Cut in Shotgun ..."
-        )
+        self.app.engine.show_busy("Preprocessing Sequence", "Creating Cut in SG ...")
 
         # wrap in a try/catch to make sure we can clear the popup at the end
         try:
@@ -897,7 +893,7 @@ class ShotgunShotProcessorPreset(
 
         resolver.addResolver(
             "{tk_version}",
-            "Version string formatted by Shotgun Toolkit.",
+            "Version string formatted by SG Toolkit.",
             lambda keyword, task: self._formatTkVersionString(task.versionString()),
         )
 

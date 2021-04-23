@@ -34,7 +34,7 @@ class ShotgunNukeShotExporterUI(
 
     def __init__(self, preset):
         FnNukeShotExporterUI.NukeShotExporterUI.__init__(self, preset)
-        self._displayName = "Shotgun Nuke Project File"
+        self._displayName = "SG Nuke Project File"
         self._taskType = ShotgunNukeShotExporter
 
     def populateUI(self, widget, exportTemplate):
@@ -79,11 +79,11 @@ class ShotgunNukeShotExporterUI(
             form_layout = layout
 
         if form_layout:
-            form_layout.insertRow(0, "Shotgun Write Nodes:", self._toolkit_list)
+            form_layout.insertRow(0, "SG Write Nodes:", self._toolkit_list)
         else:
             self.app.log_error(
                 "Unable to find the expected UI layout to display the list of "
-                "Shotgun Write Nodes in the export dialog."
+                "SG Write Nodes in the export dialog."
             )
 
         # Handle any custom widget work the user did via the custom_export_ui
@@ -216,7 +216,7 @@ class ShotgunNukeShotExporter(
         sg_publish = sgtk.util.register_publish(**args)
         if self._extra_publish_data is not None:
             self.app.log_debug(
-                "Updating Shotgun %s %s"
+                "Updating SG %s %s"
                 % (publish_entity_type, str(self._extra_publish_data))
             )
             self.app.shotgun.update(
@@ -231,8 +231,7 @@ class ShotgunNukeShotExporter(
         )
         if extra_publish_data is not None:
             self.app.log_debug(
-                "Updating Shotgun %s %s"
-                % (publish_entity_type, str(extra_publish_data))
+                "Updating SG %s %s" % (publish_entity_type, str(extra_publish_data))
             )
             self.app.shotgun.update(
                 sg_publish["type"], sg_publish["id"], extra_publish_data

@@ -56,7 +56,7 @@ class CollatingExporterUI(object):
 
         if cut_support:
             cut_lbl = QtGui.QLabel(
-                "NOTE: Cuts in Shotgun are only created when collate is off."
+                "NOTE: Cuts in SG are only created when collate is off."
             )
             color_role = QtGui.QPalette.WindowText
             palette = widget.palette()
