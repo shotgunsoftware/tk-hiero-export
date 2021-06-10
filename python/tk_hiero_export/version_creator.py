@@ -452,7 +452,7 @@ class ShotgunTranscodeExporter(
 
             if os.path.exists(self._quicktime_path):
                 self.app.log_debug(
-                    "Uploading quicktime to Shotgun... (%s)" % self._quicktime_path
+                    "Uploading quicktime to ShotGrid... (%s)" % self._quicktime_path
                 )
                 self.app.shotgun.upload(
                     "Version", vers["id"], self._quicktime_path, "sg_uploaded_movie"

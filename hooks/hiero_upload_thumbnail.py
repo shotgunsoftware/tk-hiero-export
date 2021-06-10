@@ -73,7 +73,7 @@ class HieroUploadThumbnail(Hook):
             self.parent.shotgun.upload_thumbnail(entity["type"], entity["id"], path)
         except:
             self.parent.log_info(
-                "Thumbnail for %s was not refreshed in Shotgun." % source
+                "Thumbnail for %s was not refreshed in ShotGrid." % source
             )
 
             tb = traceback.format_exc()
