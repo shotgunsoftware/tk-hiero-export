@@ -96,7 +96,7 @@ Customizing Version entity data
 
 
 Uploading Thumbnails to ShotGrid
--------------------------------
+--------------------------------
 
 .. autoclass:: HieroUploadThumbnail
     :members:
