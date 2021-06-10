@@ -182,7 +182,7 @@ class ShotgunHieroObjectBase(object):
             self.app.shotgun.upload_thumbnail(sg_entity["type"], sg_entity["id"], path)
         except Exception as e:
             self.app.log_info(
-                "Thumbnail for %s %s (#%s) was not refreshed in Shotgun: %s"
+                "Thumbnail for %s %s (#%s) was not refreshed in ShotGrid: %s"
                 % (sg_entity["type"], sg_entity.get("name"), sg_entity["id"], e)
             )
         finally:

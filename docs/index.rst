@@ -1,18 +1,18 @@
-Shotgun Hiero Export API reference, |release|
-#############################################
+ShotGrid Hiero Export API reference, |release|
+##############################################
 
 Overview
 ********
 
-The ``tk-hiero-export`` app adds custom Shotgun export processors to the Hiero/Nuke Studio export framework.
+The ``tk-hiero-export`` app adds custom ShotGrid export processors to the Hiero/Nuke Studio export framework.
 
-By way of custom export processors, the user can create and update entities in the current Project in Shotgun.
+By way of custom export processors, the user can create and update entities in the current Project in ShotGrid.
 
 During the export process a number things can happen:
 
 - Status of associated Shot entities can be updated
 - Nuke scripts can be written into the project's filesystem structure for each Shot that's processed
-- Sequence and Shot entity data can be updated in Shotgun
+- Sequence and Shot entity data can be updated in ShotGrid
 - Cuts can be update to include new CutItems built from the exported sequences
 
 Documentation from The Foundry concerning the Hiero Python API can be found `here. <https://learn.foundry.com/hiero/developers/11.0/HieroPythonDevGuide/api/index.html>`__
@@ -81,8 +81,8 @@ Resolving strings into Shotgun-queried values
     :members:
 
 
-Resolving Shotgun Toolkit templates into export string representations
-----------------------------------------------------------------------
+Resolving ShotGrid Toolkit templates into export string representations
+-----------------------------------------------------------------------
 
 .. autoclass:: HieroTranslateTemplate
     :members:
@@ -95,8 +95,8 @@ Customizing Version entity data
     :members:
 
 
-Uploading Thumbnails to Shotgun
--------------------------------
+Uploading Thumbnails to ShotGrid
+--------------------------------
 
 .. autoclass:: HieroUploadThumbnail
     :members:

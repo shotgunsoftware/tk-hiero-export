@@ -212,7 +212,7 @@ class ShotgunNukeShotExporter(
 
         publish_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
 
-        self.app.log_debug("Register publish in shotgun: %s" % str(args))
+        self.app.log_debug("Register publish in ShotGrid: %s" % str(args))
         sg_publish = sgtk.util.register_publish(**args)
         if self._extra_publish_data is not None:
             self.app.log_debug(
