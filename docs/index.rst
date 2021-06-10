@@ -82,7 +82,7 @@ Resolving strings into Shotgun-queried values
 
 
 Resolving ShotGrid Toolkit templates into export string representations
-----------------------------------------------------------------------
+-----------------------------------------------------------------------
 
 .. autoclass:: HieroTranslateTemplate
     :members:
