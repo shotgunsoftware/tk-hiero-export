@@ -93,12 +93,12 @@ class ShotgunShotProcessorUI(
         header_text.setWordWrap(True)
         header_text.setText(
             """
-            <big>Welcome to the Shotgun Shot Exporter!</big>
-            <p>When you are using the Shotgun Shot Processor, Shots and
-            Sequences in Shotgun will be created based on the curent timeline.
+            <big>Welcome to the ShotGrid Shot Exporter!</big>
+            <p>When you are using the ShotGrid Shot Processor, Shots and
+            Sequences in ShotGrid will be created based on the curent timeline.
             Existing Shots will be updated with the latest cut lengths.
             Quicktimes for each shot will be reviewable in the Media app when
-            you use the special Shotgun Transcode plugin - all included and
+            you use the special ShotGrid Transcode plugin - all included and
             ready to go in the default preset.
             </p>
             """
