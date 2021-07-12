@@ -7,10 +7,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Shotgun Hiero Export API reference, v0.6.0 &mdash; tk-hiero-export v0.6.0 documentation</title>
+  <title>ShotGrid Hiero Export API reference, v0.7.0 &mdash; tk-hiero-export v0.7.0 documentation</title>
   
 
   
@@ -49,7 +50,7 @@
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
           
-    <a href='http://developer.shotgunsoftware.com'>
+    <a href='http://developer.shotgridsoftware.com'>
     
         <img style='width: 191px;
                 height: 60px;
@@ -93,7 +94,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Shotgun Hiero Export API reference, v0.6.0</a><ul>
+<li><a class="reference internal" href="#">ShotGrid Hiero Export API reference, v0.7.0</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#hooks">Hooks</a><ul>
 <li><a class="reference internal" href="#updating-shot-entities">Updating Shot entities</a></li>
@@ -104,9 +105,9 @@
 <li><a class="reference internal" href="#executing-logic-after-version-entity-creation">Executing logic after Version entity creation</a></li>
 <li><a class="reference internal" href="#executing-logic-prior-to-export">Executing logic prior to export</a></li>
 <li><a class="reference internal" href="#resolving-strings-into-shotgun-queried-values">Resolving strings into Shotgun-queried values</a></li>
-<li><a class="reference internal" href="#resolving-shotgun-toolkit-templates-into-export-string-representations">Resolving Shotgun Toolkit templates into export string representations</a></li>
+<li><a class="reference internal" href="#resolving-shotgrid-toolkit-templates-into-export-string-representations">Resolving ShotGrid Toolkit templates into export string representations</a></li>
 <li><a class="reference internal" href="#customizing-version-entity-data">Customizing Version entity data</a></li>
-<li><a class="reference internal" href="#uploading-thumbnails-to-shotgun">Uploading Thumbnails to Shotgun</a></li>
+<li><a class="reference internal" href="#uploading-thumbnails-to-shotgrid">Uploading Thumbnails to ShotGrid</a></li>
 <li><a class="reference internal" href="#creating-custom-ui-elements-and-properties">Creating custom UI elements and properties</a></li>
 </ul>
 </li>
@@ -135,12 +136,12 @@
                              text-decoration: underline; }
     </style>
 
-    <b>tk-hiero-export</b> v0.6.0.<br>
+    <b>tk-hiero-export</b> v0.7.0.<br>
     
         This documentation is part of the Shotgun Pipeline Toolkit.
     
     For more information, please visit
-    <a class=custom_post_menu href='https://support.shotgunsoftware.com/home'>Shotgun Support</a>.
+    <a class=custom_post_menu href='https://support.shotgridsoftware.com/home'>Shotgun Support</a>.
     The code associated with this documentation can be found
     <a class=custom_post_menu href='https://github.com/shotgunsoftware/tk-hiero-export'>here</a>.
 
@@ -189,7 +190,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Shotgun Hiero Export API reference, v0.6.0</li>
+      <li>ShotGrid Hiero Export API reference, v0.7.0</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -206,25 +207,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="shotgun-hiero-export-api-reference-release">
-<h1>Shotgun Hiero Export API reference, v0.6.0<a class="headerlink" href="#shotgun-hiero-export-api-reference-release" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="overview">
+  <section id="shotgrid-hiero-export-api-reference-release">
+<h1>ShotGrid Hiero Export API reference, v0.7.0<a class="headerlink" href="#shotgrid-hiero-export-api-reference-release" title="Permalink to this headline">¶</a></h1>
+<section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">tk-hiero-export</span></code> app adds custom Shotgun export processors to the Hiero/Nuke Studio export framework.</p>
-<p>By way of custom export processors, the user can create and update entities in the current Project in Shotgun.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">tk-hiero-export</span></code> app adds custom ShotGrid export processors to the Hiero/Nuke Studio export framework.</p>
+<p>By way of custom export processors, the user can create and update entities in the current Project in ShotGrid.</p>
 <p>During the export process a number things can happen:</p>
 <ul class="simple">
 <li><p>Status of associated Shot entities can be updated</p></li>
 <li><p>Nuke scripts can be written into the project’s filesystem structure for each Shot that’s processed</p></li>
-<li><p>Sequence and Shot entity data can be updated in Shotgun</p></li>
+<li><p>Sequence and Shot entity data can be updated in ShotGrid</p></li>
 <li><p>Cuts can be update to include new CutItems built from the exported sequences</p></li>
 </ul>
 <p>Documentation from The Foundry concerning the Hiero Python API can be found <a class="reference external" href="https://learn.foundry.com/hiero/developers/11.0/HieroPythonDevGuide/api/index.html">here.</a></p>
-</div>
-<div class="section" id="hooks">
+</section>
+<section id="hooks">
 <h2>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h2>
 <p>Hooks provided by the Hiero Export app allow for customization of various aspects of the export process and its UI.</p>
-<div class="section" id="updating-shot-entities">
+<section id="updating-shot-entities">
 <h3>Updating Shot entities<a class="headerlink" href="#updating-shot-entities" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUpdateShot">
@@ -299,8 +300,8 @@ dictionary.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="updating-and-creating-cut-and-cutitem-entities">
+</section>
+<section id="updating-and-creating-cut-and-cutitem-entities">
 <h3>Updating and Creating Cut and CutItem entities<a class="headerlink" href="#updating-and-creating-cut-and-cutitem-entities" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUpdateCuts">
@@ -392,8 +393,8 @@ is to be uploaded to Shotgun.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="getting-shot-entities-for-hiero-trackitems">
+</section>
+<section id="getting-shot-entities-for-hiero-trackitems">
 <h3>Getting Shot entities for Hiero TrackItems<a class="headerlink" href="#getting-shot-entities-for-hiero-trackitems" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroGetShot">
@@ -453,8 +454,8 @@ available <a class="reference external" href="https://learn.foundry.com/hiero/de
 
 </dd></dl>
 
-</div>
-<div class="section" id="customizing-quicktime-export-settings">
+</section>
+<section id="customizing-quicktime-export-settings">
 <h3>Customizing Quicktime export settings<a class="headerlink" href="#customizing-quicktime-export-settings" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroGetQuicktimeSettings">
@@ -483,8 +484,8 @@ values.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="customizing-publishedfile-data">
+</section>
+<section id="customizing-publishedfile-data">
 <h3>Customizing PublishedFile data<a class="headerlink" href="#customizing-publishedfile-data" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroGetExtraPublishData">
@@ -518,8 +519,8 @@ Shotgun, or None if there is no extra information to publish.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="executing-logic-after-version-entity-creation">
+</section>
+<section id="executing-logic-after-version-entity-creation">
 <h3>Executing logic after Version entity creation<a class="headerlink" href="#executing-logic-after-version-entity-creation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroPostVersionCreation">
@@ -557,8 +558,8 @@ about the Version entity, including its ID in Shotgun.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="executing-logic-prior-to-export">
+</section>
+<section id="executing-logic-prior-to-export">
 <h3>Executing logic prior to export<a class="headerlink" href="#executing-logic-prior-to-export" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroPreExport">
@@ -580,8 +581,8 @@ Hiero API docs are available <a class="reference external" href="https://learn.f
 
 </dd></dl>
 
-</div>
-<div class="section" id="resolving-strings-into-shotgun-queried-values">
+</section>
+<section id="resolving-strings-into-shotgun-queried-values">
 <h3>Resolving strings into Shotgun-queried values<a class="headerlink" href="#resolving-strings-into-shotgun-queried-values" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroResolveCustomStrings">
@@ -615,9 +616,9 @@ associated string.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="resolving-shotgun-toolkit-templates-into-export-string-representations">
-<h3>Resolving Shotgun Toolkit templates into export string representations<a class="headerlink" href="#resolving-shotgun-toolkit-templates-into-export-string-representations" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="resolving-shotgrid-toolkit-templates-into-export-string-representations">
+<h3>Resolving ShotGrid Toolkit templates into export string representations<a class="headerlink" href="#resolving-shotgrid-toolkit-templates-into-export-string-representations" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroTranslateTemplate">
 <em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroTranslateTemplate</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_translate_template.html#HieroTranslateTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroTranslateTemplate" title="Permalink to this definition">¶</a></dt>
@@ -653,8 +654,8 @@ path is fully understood by Hiero.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="customizing-version-entity-data">
+</section>
+<section id="customizing-version-entity-data">
 <h3>Customizing Version entity data<a class="headerlink" href="#customizing-version-entity-data" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUpdateVersionData">
@@ -683,9 +684,9 @@ can be found <a class="reference external" href="https://learn.foundry.com/hiero
 
 </dd></dl>
 
-</div>
-<div class="section" id="uploading-thumbnails-to-shotgun">
-<h3>Uploading Thumbnails to Shotgun<a class="headerlink" href="#uploading-thumbnails-to-shotgun" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="uploading-thumbnails-to-shotgrid">
+<h3>Uploading Thumbnails to ShotGrid<a class="headerlink" href="#uploading-thumbnails-to-shotgrid" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUploadThumbnail">
 <em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroUploadThumbnail</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_upload_thumbnail.html#HieroUploadThumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUploadThumbnail" title="Permalink to this definition">¶</a></dt>
@@ -710,8 +711,8 @@ thumbnail image.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="creating-custom-ui-elements-and-properties">
+</section>
+<section id="creating-custom-ui-elements-and-properties">
 <h3>Creating custom UI elements and properties<a class="headerlink" href="#creating-custom-ui-elements-and-properties" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroCustomizeExportUI">
@@ -720,9 +721,9 @@ thumbnail image.</p></li>
 Shotgun-related exporters. Each processor has its own set of create/get/set
 methods, allowing for customizable UI elements for each type of export.</p>
 <p>Example properties embedded into a custom QGroupBox:</p>
-<div class="figure align-default">
+<figure class="align-default">
 <img alt="_images/hiero_export_custom_ui.png" src="_images/hiero_export_custom_ui.png" />
-</div>
+</figure>
 <p>Creating custom UI elements for the Hiero export app involves three steps:</p>
 <ul class="simple">
 <li><p>Creating a widget</p></li>
@@ -767,7 +768,7 @@ associated set hook method.</p>
         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Create Cut:&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;custom_create_cut_bool_property&quot;</span><span class="p">,</span>
         <span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Create a Cut and CutItems in Shotgun...&quot;</span><span class="p">,</span>
+        <span class="n">tooltip</span><span class="o">=</span><span class="s2">&quot;Create a Cut and CutItems in ShotGrid...&quot;</span><span class="p">,</span>
     <span class="p">),</span>
     <span class="nb">dict</span><span class="p">(</span>
         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Head In:&quot;</span><span class="p">,</span>
@@ -1033,9 +1034,9 @@ built by the associated get properties hook method.</p></li>
 
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
            </div>
