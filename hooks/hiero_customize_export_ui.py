@@ -21,5 +21,5 @@ class HieroCustomizeExportUI(HookBaseClass):
     """
 
     # For detailed documentation of the methods available for this hook, see
-    # the documentation at http://developer.shotgunsoftware.com/tk-hiero-export/
+    # the documentation at http://developer.shotgridsoftware.com/tk-hiero-export/
     pass
