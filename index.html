@@ -7,11 +7,10 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>ShotGrid Hiero Export API reference, v0.7.0 &mdash; tk-hiero-export v0.7.0 documentation</title>
+  <title>ShotGrid Hiero Export API reference, v0.7.1 &mdash; tk-hiero-export v0.7.1 documentation</title>
   
 
   
@@ -24,10 +23,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -94,7 +93,7 @@
             
               <!-- Local TOC -->
               <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">ShotGrid Hiero Export API reference, v0.7.0</a><ul>
+<li><a class="reference internal" href="#">ShotGrid Hiero Export API reference, v0.7.1</a><ul>
 <li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#hooks">Hooks</a><ul>
 <li><a class="reference internal" href="#updating-shot-entities">Updating Shot entities</a></li>
@@ -136,12 +135,12 @@
                              text-decoration: underline; }
     </style>
 
-    <b>tk-hiero-export</b> v0.7.0.<br>
+    <b>tk-hiero-export</b> v0.7.1.<br>
     
         This documentation is part of the Shotgun Pipeline Toolkit.
     
     For more information, please visit
-    <a class=custom_post_menu href='https://support.shotgridsoftware.com/home'>Shotgun Support</a>.
+    <a class=custom_post_menu href='https://developer.shotgridsoftware.com'>Shotgun Support</a>.
     The code associated with this documentation can be found
     <a class=custom_post_menu href='https://github.com/shotgunsoftware/tk-hiero-export'>here</a>.
 
@@ -190,7 +189,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>ShotGrid Hiero Export API reference, v0.7.0</li>
+      <li>ShotGrid Hiero Export API reference, v0.7.1</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -207,35 +206,35 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="shotgrid-hiero-export-api-reference-release">
-<h1>ShotGrid Hiero Export API reference, v0.7.0<a class="headerlink" href="#shotgrid-hiero-export-api-reference-release" title="Permalink to this headline">¶</a></h1>
-<section id="overview">
+  <div class="section" id="shotgrid-hiero-export-api-reference-release">
+<h1>ShotGrid Hiero Export API reference, v0.7.1<a class="headerlink" href="#shotgrid-hiero-export-api-reference-release" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">tk-hiero-export</span></code> app adds custom ShotGrid export processors to the Hiero/Nuke Studio export framework.</p>
 <p>By way of custom export processors, the user can create and update entities in the current Project in ShotGrid.</p>
 <p>During the export process a number things can happen:</p>
 <ul class="simple">
-<li><p>Status of associated Shot entities can be updated</p></li>
-<li><p>Nuke scripts can be written into the project’s filesystem structure for each Shot that’s processed</p></li>
-<li><p>Sequence and Shot entity data can be updated in ShotGrid</p></li>
-<li><p>Cuts can be update to include new CutItems built from the exported sequences</p></li>
+<li>Status of associated Shot entities can be updated</li>
+<li>Nuke scripts can be written into the project’s filesystem structure for each Shot that’s processed</li>
+<li>Sequence and Shot entity data can be updated in ShotGrid</li>
+<li>Cuts can be update to include new CutItems built from the exported sequences</li>
 </ul>
 <p>Documentation from The Foundry concerning the Hiero Python API can be found <a class="reference external" href="https://learn.foundry.com/hiero/developers/11.0/HieroPythonDevGuide/api/index.html">here.</a></p>
-</section>
-<section id="hooks">
+</div>
+<div class="section" id="hooks">
 <h2>Hooks<a class="headerlink" href="#hooks" title="Permalink to this headline">¶</a></h2>
 <p>Hooks provided by the Hiero Export app allow for customization of various aspects of the export process and its UI.</p>
-<section id="updating-shot-entities">
+<div class="section" id="updating-shot-entities">
 <h3>Updating Shot entities<a class="headerlink" href="#updating-shot-entities" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUpdateShot">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroUpdateShot</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_shot.html#HieroUpdateShot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateShot" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroUpdateShot</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_shot.html#HieroUpdateShot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateShot" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class defines methods that handle updating the Shot entity
 in Shotgun, as well as whether and how the filesystem structure
 is created for a Shot during export.</p>
 <dl class="method">
 <dt id="base_hooks.HieroUpdateShot.create_filesystem_structure">
-<code class="sig-name descname">create_filesystem_structure</code><span class="sig-paren">(</span><em class="sig-param">entity_type</em>, <em class="sig-param">entity_id</em>, <em class="sig-param">preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_shot.html#HieroUpdateShot.create_filesystem_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateShot.create_filesystem_structure" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_filesystem_structure</code><span class="sig-paren">(</span><em>entity_type</em>, <em>entity_id</em>, <em>preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_shot.html#HieroUpdateShot.create_filesystem_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateShot.create_filesystem_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handles creating the filesystem structure for the shot that
 was exported. The preset properties dictionary is provided to
 allow for the lookup of any custom properties that might have
@@ -253,24 +252,28 @@ the hiero_customize_export_ui hook.</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Not creating the filesystem structure!&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>entity_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The entity type that was created or
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>entity_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The entity type that was created or
 updated as part of the export. Most likely this will be
-“Shot”.</p></li>
-<li><p><strong>entity_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – The id of the entity that was created
-or updated as part of the export.</p></li>
-<li><p><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
-dictionary.</p></li>
+“Shot”.</li>
+<li><strong>entity_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – The id of the entity that was created
+or updated as part of the export.</li>
+<li><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
+dictionary.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroUpdateShot.update_shotgun_shot_entity">
-<code class="sig-name descname">update_shotgun_shot_entity</code><span class="sig-paren">(</span><em class="sig-param">entity_type</em>, <em class="sig-param">entity_id</em>, <em class="sig-param">entity_data</em>, <em class="sig-param">preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_shot.html#HieroUpdateShot.update_shotgun_shot_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateShot.update_shotgun_shot_entity" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update_shotgun_shot_entity</code><span class="sig-paren">(</span><em>entity_type</em>, <em>entity_id</em>, <em>entity_data</em>, <em>preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_shot.html#HieroUpdateShot.update_shotgun_shot_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateShot.update_shotgun_shot_entity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handles updating the Shot entity in Shotgun with the new data produced
 during the export. The preset properties dictionary is provided to
 allow for the lookup of any custom properties that might have been
@@ -285,32 +288,36 @@ hiero_customize_export_ui hook.</p>
 <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">sgtk</span><span class="o">.</span><span class="n">shotgun</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">entity_type</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">entity_data</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>entity_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The entity type to update.</p></li>
-<li><p><strong>entity_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – The id of the entity to update.</p></li>
-<li><p><strong>entity_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The new data to update the entity with.</p></li>
-<li><p><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
-dictionary.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>entity_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The entity type to update.</li>
+<li><strong>entity_id</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) – The id of the entity to update.</li>
+<li><strong>entity_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The new data to update the entity with.</li>
+<li><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
+dictionary.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="updating-and-creating-cut-and-cutitem-entities">
+</div>
+<div class="section" id="updating-and-creating-cut-and-cutitem-entities">
 <h3>Updating and Creating Cut and CutItem entities<a class="headerlink" href="#updating-and-creating-cut-and-cutitem-entities" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUpdateCuts">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroUpdateCuts</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroUpdateCuts</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class defines methods that control if and how Cuts and CutItems
 are created or updated during the export process.</p>
 <dl class="method">
 <dt id="base_hooks.HieroUpdateCuts.allow_cut_updates">
-<code class="sig-name descname">allow_cut_updates</code><span class="sig-paren">(</span><em class="sig-param">preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts.allow_cut_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts.allow_cut_updates" title="Permalink to this definition">¶</a></dt>
+<code class="descname">allow_cut_updates</code><span class="sig-paren">(</span><em>preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts.allow_cut_updates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts.allow_cut_updates" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determines whether to process the associated Cut entity during
 export. The preset properties provided allow for customization
 of this behavior based on custom properties added to the shot
@@ -322,215 +329,234 @@ customize_export_ui hook.</p>
 <span class="k">return</span> <span class="n">preset_properties</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;my_custom_property&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The properties dictionary of
-shot processor preset.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>True to allow Cut updates, False to disallow.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The properties dictionary of
+shot processor preset.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True to allow Cut updates, False to disallow.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroUpdateCuts.create_cut_item">
-<code class="sig-name descname">create_cut_item</code><span class="sig-paren">(</span><em class="sig-param">cut_item_data</em>, <em class="sig-param">preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts.create_cut_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts.create_cut_item" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_cut_item</code><span class="sig-paren">(</span><em>cut_item_data</em>, <em>preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts.create_cut_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts.create_cut_item" title="Permalink to this definition">¶</a></dt>
 <dd><p>Handles the creation of the CutItem entity in Shotgun. This
 hook method can be overridden in order to put conditions on
 whether or how this creation occurs. The preset’s properties
 are provided to allow for looking up custom properties that
 might have been added to the preset in other hooks, like can
 be achieved when using the hiero_customize_export_ui hook.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cut_item_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The dictionary of field/value
-pairs to use when creating the CutItem entity in Shotgun.</p></li>
-<li><p><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
-dictionary.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cut_item_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The dictionary of field/value
+pairs to use when creating the CutItem entity in Shotgun.</li>
+<li><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
+dictionary.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The created CutItem entity dictionary, or None if
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The created CutItem entity dictionary, or None if
 no CutItem entity was created.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a> or <a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a> or <a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroUpdateCuts.get_cut_thumbnail">
-<code class="sig-name descname">get_cut_thumbnail</code><span class="sig-paren">(</span><em class="sig-param">cut</em>, <em class="sig-param">task_item</em>, <em class="sig-param">preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts.get_cut_thumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts.get_cut_thumbnail" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_cut_thumbnail</code><span class="sig-paren">(</span><em>cut</em>, <em>task_item</em>, <em>preset_properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_cuts.html#HieroUpdateCuts.get_cut_thumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateCuts.get_cut_thumbnail" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the path to a thumbnail image to use when updating the
 export’s associated Cut’s thumbnail image. If None is returned
 by this method, the Cut’s thumbnail will not be updated.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cut</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The Cut entity dictionary associated with the
-export.</p></li>
-<li><p><strong>task_item</strong> – The TrackItem object associated with the export
-task. Hiero API docs are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem">here.</a></p></li>
-<li><p><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
-dictionary.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cut</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The Cut entity dictionary associated with the
+export.</li>
+<li><strong>task_item</strong> – The TrackItem object associated with the export
+task. Hiero API docs are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem">here.</a></li>
+<li><strong>preset_properties</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The export preset’s properties
+dictionary.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The path to the thumbnail image, or None if no thumbnail
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The path to the thumbnail image, or None if no thumbnail
 is to be uploaded to Shotgun.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a> or <a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)">None</a></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a> or <a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)">None</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="getting-shot-entities-for-hiero-trackitems">
+</div>
+<div class="section" id="getting-shot-entities-for-hiero-trackitems">
 <h3>Getting Shot entities for Hiero TrackItems<a class="headerlink" href="#getting-shot-entities-for-hiero-trackitems" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroGetShot">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroGetShot</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_shot.html#HieroGetShot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetShot" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroGetShot</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_shot.html#HieroGetShot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetShot" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a hook that can determines which Shotgun entity
 should be associated with each task and track item being exported.</p>
 <dl class="method">
 <dt id="base_hooks.HieroGetShot.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">task</em>, <em class="sig-param">item</em>, <em class="sig-param">data</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_shot.html#HieroGetShot.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetShot.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>task</em>, <em>item</em>, <em>data</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_shot.html#HieroGetShot.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetShot.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes a hiero.core.TrackItem as input and returns a data dictionary for
 the shot to update the cut info for.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>task</strong> – The Hiero task being processed. Hiero API docs are
-available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase">here.</a></p></li>
-<li><p><strong>item</strong> – The Hiero track item being processed. Hiero API docs
-are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem">here.</a></p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – A dictionary with cached parent data.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>task</strong> – The Hiero task being processed. Hiero API docs are
+available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase">here.</a></li>
+<li><strong>item</strong> – The Hiero track item being processed. Hiero API docs
+are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TrackItem">here.</a></li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – A dictionary with cached parent data.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A Shot entity.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A Shot entity.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroGetShot.get_shot_parent">
-<code class="sig-name descname">get_shot_parent</code><span class="sig-paren">(</span><em class="sig-param">hiero_sequence</em>, <em class="sig-param">data</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_shot.html#HieroGetShot.get_shot_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetShot.get_shot_parent" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_shot_parent</code><span class="sig-paren">(</span><em>hiero_sequence</em>, <em>data</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_shot.html#HieroGetShot.get_shot_parent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetShot.get_shot_parent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a Hiero sequence and data cache, return the corresponding entity
 in Shotgun to serve as the parent for contained Shots.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The data dict is typically the app’s <cite>preprocess_data</cite> which
+<p class="first admonition-title">Note</p>
+<p class="last">The data dict is typically the app’s <cite>preprocess_data</cite> which
 maintains the cache across invocations of this hook.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>hiero_sequence</strong> – A Hiero sequence object. Hiero API docs are
-available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.Sequence">here.</a></p></li>
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – A dictionary with cached parent data.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hiero_sequence</strong> – A Hiero sequence object. Hiero API docs are
+available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.Sequence">here.</a></li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – A dictionary with cached parent data.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A Shotgun entity.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A Shotgun entity.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="customizing-quicktime-export-settings">
+</div>
+<div class="section" id="customizing-quicktime-export-settings">
 <h3>Customizing Quicktime export settings<a class="headerlink" href="#customizing-quicktime-export-settings" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroGetQuicktimeSettings">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroGetQuicktimeSettings</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_quicktime_settings.html#HieroGetQuicktimeSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetQuicktimeSettings" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroGetQuicktimeSettings</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_quicktime_settings.html#HieroGetQuicktimeSettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetQuicktimeSettings" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class defines a hook that allows for customization of encoding
 settings for any Quicktimes written by the export process.</p>
 <dl class="method">
 <dt id="base_hooks.HieroGetQuicktimeSettings.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">for_shotgun</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_quicktime_settings.html#HieroGetQuicktimeSettings.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetQuicktimeSettings.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>for_shotgun</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_quicktime_settings.html#HieroGetQuicktimeSettings.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetQuicktimeSettings.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets encoding settings for Quicktimes generated by the export process.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>for_shotgun</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – Whether the settings are being gathered for
-Quicktime output intended for use within the Shotgun web app.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A tuple, where the first item is the file_type of a Nuke
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>for_shotgun</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) – Whether the settings are being gathered for
+Quicktime output intended for use within the Shotgun web app.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A tuple, where the first item is the file_type of a Nuke
 write node, and the second item is a dictionary of knob names and
-values.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>tuple</p>
-</dd>
-</dl>
+values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">tuple</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="customizing-publishedfile-data">
+</div>
+<div class="section" id="customizing-publishedfile-data">
 <h3>Customizing PublishedFile data<a class="headerlink" href="#customizing-publishedfile-data" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroGetExtraPublishData">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroGetExtraPublishData</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_extra_publish_data.html#HieroGetExtraPublishData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetExtraPublishData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroGetExtraPublishData</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_extra_publish_data.html#HieroGetExtraPublishData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetExtraPublishData" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class defines a hook that can be used to gather additional data
 and add it to the data dictionary that’s used to register any new
 PublishedFile entities in Shotgun during the given Task’s execution.</p>
 <dl class="method">
 <dt id="base_hooks.HieroGetExtraPublishData.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">task</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_extra_publish_data.html#HieroGetExtraPublishData.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetExtraPublishData.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>task</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_get_extra_publish_data.html#HieroGetExtraPublishData.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroGetExtraPublishData.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a data dictionary for a PublishedFile to be updated in Shotgun.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The track item associated with this task can be accessed via
+<p class="first admonition-title">Note</p>
+<p class="last">The track item associated with this task can be accessed via
 task._item.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>task</strong> – The Hiero task that is currently being processed. Hiero
-docs are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase">here.</a></p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dictionary to update the data for the PublishedFile in
-Shotgun, or None if there is no extra information to publish.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>task</strong> – The Hiero task that is currently being processed. Hiero
+docs are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase">here.</a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dictionary to update the data for the PublishedFile in
+Shotgun, or None if there is no extra information to publish.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="executing-logic-after-version-entity-creation">
+</div>
+<div class="section" id="executing-logic-after-version-entity-creation">
 <h3>Executing logic after Version entity creation<a class="headerlink" href="#executing-logic-after-version-entity-creation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroPostVersionCreation">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroPostVersionCreation</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_post_version_creation.html#HieroPostVersionCreation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPostVersionCreation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroPostVersionCreation</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_post_version_creation.html#HieroPostVersionCreation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPostVersionCreation" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a hook that can be used to add custom logic to
 be run after a Version entity is created in Shotgun as part of the
 export process.</p>
 <dl class="method">
 <dt id="base_hooks.HieroPostVersionCreation.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">version_data</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_post_version_creation.html#HieroPostVersionCreation.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPostVersionCreation.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>version_data</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_post_version_creation.html#HieroPostVersionCreation.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPostVersionCreation.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs following the creation of the Version entity in Shotgun. The
 provided version data is the data structure containing information
 about the Version entity, including its ID in Shotgun.</p>
@@ -549,84 +575,94 @@ about the Version entity, including its ID in Shotgun.</p>
  <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="mi">39</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Jeff Beeland&#39;</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;HumanUser&#39;</span><span class="p">}}</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>version_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The Version entity that was created in Shotgun.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>version_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The Version entity that was created in Shotgun.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="executing-logic-prior-to-export">
+</div>
+<div class="section" id="executing-logic-prior-to-export">
 <h3>Executing logic prior to export<a class="headerlink" href="#executing-logic-prior-to-export" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroPreExport">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroPreExport</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_pre_export.html#HieroPreExport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPreExport" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroPreExport</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_pre_export.html#HieroPreExport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPreExport" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a hook that can be used to run custom logic prior to
 the start if the export process.</p>
 <dl class="method">
 <dt id="base_hooks.HieroPreExport.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">processor</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_pre_export.html#HieroPreExport.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPreExport.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>processor</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_pre_export.html#HieroPreExport.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroPreExport.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called just prior to export. One use case for would be to clear
 cached data here, just before the export begins.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>processor</strong> – The processor object that is about to be started.
-Hiero API docs are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.ProcessorBase">here.</a></p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>processor</strong> – The processor object that is about to be started.
+Hiero API docs are available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.ProcessorBase">here.</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="resolving-strings-into-shotgun-queried-values">
+</div>
+<div class="section" id="resolving-strings-into-shotgun-queried-values">
 <h3>Resolving strings into Shotgun-queried values<a class="headerlink" href="#resolving-strings-into-shotgun-queried-values" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroResolveCustomStrings">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroResolveCustomStrings</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_resolve_custom_strings.html#HieroResolveCustomStrings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroResolveCustomStrings" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroResolveCustomStrings</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_resolve_custom_strings.html#HieroResolveCustomStrings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroResolveCustomStrings" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a hook that is used to resolve custom tokens into
 their concrete value when paths are being processed during the export.</p>
 <dl class="method">
 <dt id="base_hooks.HieroResolveCustomStrings.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">task</em>, <em class="sig-param">keyword</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_resolve_custom_strings.html#HieroResolveCustomStrings.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroResolveCustomStrings.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>task</em>, <em>keyword</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_resolve_custom_strings.html#HieroResolveCustomStrings.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroResolveCustomStrings.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>The default implementation of the custom resolver simply looks up
 the keyword from the Shotgun Shot entity dictionary. For example,
 to pull the shot code, you would simply specify ‘code’. To pull
 the sequence code you would use ‘sg_sequence.Sequence.code’.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>task</strong> – The export task being processed. Hiero API docs are
-available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase">here.</a></p></li>
-<li><p><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The keyword token that needs to be resolved.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>task</strong> – The export task being processed. Hiero API docs are
+available <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_core.html#hiero.core.TaskBase">here.</a></li>
+<li><strong>keyword</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The keyword token that needs to be resolved.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The resolved keyword value to be replaced into the
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The resolved keyword value to be replaced into the
 associated string.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="resolving-shotgrid-toolkit-templates-into-export-string-representations">
+</div>
+<div class="section" id="resolving-shotgrid-toolkit-templates-into-export-string-representations">
 <h3>Resolving ShotGrid Toolkit templates into export string representations<a class="headerlink" href="#resolving-shotgrid-toolkit-templates-into-export-string-representations" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroTranslateTemplate">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroTranslateTemplate</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_translate_template.html#HieroTranslateTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroTranslateTemplate" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroTranslateTemplate</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_translate_template.html#HieroTranslateTemplate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroTranslateTemplate" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a hook that’s responsible for translating a Toolkit
 template object into a Hiero export string.</p>
 <dl class="method">
 <dt id="base_hooks.HieroTranslateTemplate.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">template</em>, <em class="sig-param">output_type</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_translate_template.html#HieroTranslateTemplate.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroTranslateTemplate.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>template</em>, <em>output_type</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_translate_template.html#HieroTranslateTemplate.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroTranslateTemplate.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Takes a Toolkit template object as input and returns a string
 representation which is suitable for Hiero exports. The Hiero export
 templates contain tokens, such as {shot} or {clip}, which are replaced
@@ -636,103 +672,115 @@ setup, you may have to do different steps here in order to fully
 convert your template. The path returned will be validated to check
 that no leftover template fields are present, and that the returned
 path is fully understood by Hiero.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>template</strong> – The Toolkit template object to be translated.</p></li>
-<li><p><strong>output_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The output type associated with the template.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>template</strong> – The Toolkit template object to be translated.</li>
+<li><strong>output_type</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) – The output type associated with the template.</li>
 </ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A Hiero-compatible path.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
-</dd>
-</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A Hiero-compatible path.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="customizing-version-entity-data">
+</div>
+<div class="section" id="customizing-version-entity-data">
 <h3>Customizing Version entity data<a class="headerlink" href="#customizing-version-entity-data" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUpdateVersionData">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroUpdateVersionData</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_version_data.html#HieroUpdateVersionData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateVersionData" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroUpdateVersionData</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_version_data.html#HieroUpdateVersionData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateVersionData" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a hook that can be used to customize the data
 dictionary for a Version entity that is going to be created by the
 export process.</p>
 <dl class="method">
 <dt id="base_hooks.HieroUpdateVersionData.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">version_data</em>, <em class="sig-param">task</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_version_data.html#HieroUpdateVersionData.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateVersionData.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>version_data</em>, <em>task</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_update_version_data.html#HieroUpdateVersionData.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUpdateVersionData.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Updates the version_data dictionary to change the data for the Version
 that will be created in Shotgun. Updating the given version_data
 dictionary in place will ensure your customizations are used when
 creating the new Version entity.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>version_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The data dictionary that will be used by
-the export process to create a new Version entity in Shotgun.</p></li>
-<li><p><strong>task</strong> – The Hiero export task being processed. Hiero API docs
-can be found <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_ui.html#hiero.ui.TaskUIBase">here.</a></p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>version_data</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The data dictionary that will be used by
+the export process to create a new Version entity in Shotgun.</li>
+<li><strong>task</strong> – The Hiero export task being processed. Hiero API docs
+can be found <a class="reference external" href="https://learn.foundry.com/hiero/developers/1.8/hieropythondevguide/api/api_ui.html#hiero.ui.TaskUIBase">here.</a></li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="uploading-thumbnails-to-shotgrid">
+</div>
+<div class="section" id="uploading-thumbnails-to-shotgrid">
 <h3>Uploading Thumbnails to ShotGrid<a class="headerlink" href="#uploading-thumbnails-to-shotgrid" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroUploadThumbnail">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroUploadThumbnail</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_upload_thumbnail.html#HieroUploadThumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUploadThumbnail" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroUploadThumbnail</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_upload_thumbnail.html#HieroUploadThumbnail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUploadThumbnail" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class implements a hook that’s responsible for uploading a thumbnail
 to a given Shotgun entity for a given Hiero source item.</p>
 <dl class="method">
 <dt id="base_hooks.HieroUploadThumbnail.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">entity</em>, <em class="sig-param">source</em>, <em class="sig-param">item</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_upload_thumbnail.html#HieroUploadThumbnail.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUploadThumbnail.execute" title="Permalink to this definition">¶</a></dt>
+<code class="descname">execute</code><span class="sig-paren">(</span><em>entity</em>, <em>source</em>, <em>item</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_upload_thumbnail.html#HieroUploadThumbnail.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroUploadThumbnail.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Uploads a thumbnail to the given entity in Shotgun.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The entity dictionary that will receive the new
-thumbnail image.</p></li>
-<li><p><strong>source</strong> – The Hiero source sequence object being exported.</p></li>
-<li><p><strong>item</strong> – The Hiero task item being processed.</p></li>
-<li><p><strong>task</strong> – The Hiero task being processed.</p></li>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>entity</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) – The entity dictionary that will receive the new
+thumbnail image.</li>
+<li><strong>source</strong> – The Hiero source sequence object being exported.</li>
+<li><strong>item</strong> – The Hiero task item being processed.</li>
+<li><strong>task</strong> – The Hiero task being processed.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-<section id="creating-custom-ui-elements-and-properties">
+</div>
+<div class="section" id="creating-custom-ui-elements-and-properties">
 <h3>Creating custom UI elements and properties<a class="headerlink" href="#creating-custom-ui-elements-and-properties" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="base_hooks.HieroCustomizeExportUI">
-<em class="property">class </em><code class="sig-prename descclassname">base_hooks.</code><code class="sig-name descname">HieroCustomizeExportUI</code><span class="sig-paren">(</span><em class="sig-param">parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">base_hooks.</code><code class="descname">HieroCustomizeExportUI</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI" title="Permalink to this definition">¶</a></dt>
 <dd><p>This class defines methods that can be used to customize the UI of the various
 Shotgun-related exporters. Each processor has its own set of create/get/set
 methods, allowing for customizable UI elements for each type of export.</p>
 <p>Example properties embedded into a custom QGroupBox:</p>
-<figure class="align-default">
+<div class="figure">
 <img alt="_images/hiero_export_custom_ui.png" src="_images/hiero_export_custom_ui.png" />
-</figure>
+</div>
 <p>Creating custom UI elements for the Hiero export app involves three steps:</p>
 <ul class="simple">
-<li><p>Creating a widget</p></li>
-<li><p>Defining custom properties to add to the associated preset</p></li>
-<li><p>Setting the widget up to display controls for the custom properties</p></li>
+<li>Creating a widget</li>
+<li>Defining custom properties to add to the associated preset</li>
+<li>Setting the widget up to display controls for the custom properties</li>
 </ul>
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.create_shot_processor_widget">
-<code class="sig-name descname">create_shot_processor_widget</code><span class="sig-paren">(</span><em class="sig-param">parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_shot_processor_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_shot_processor_widget</code><span class="sig-paren">(</span><em>parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_shot_processor_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds and returns a custom widget to be embedded in the parent exporter.
 If a custom widget is returned by this method, it will be added to the
 parent exporter’s layout.</p>
@@ -742,19 +790,21 @@ parent exporter’s layout.</p>
 <span class="k">return</span> <span class="n">widget</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parent_widget</strong> – The parent widget.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A custom widget.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent_widget</strong> – The parent widget.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A custom widget.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties">
-<code class="sig-name descname">get_shot_processor_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_shot_processor_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_shot_processor_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_shot_processor_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a list of property dictionaries describing the custom properties
 required by the custom widget. This method will only be run if the
 associated create widget hook method returns a widget. The dictionaries
@@ -779,19 +829,21 @@ associated set hook method.</p>
 <span class="p">]</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of dictionaries.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of dictionaries.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties">
-<code class="sig-name descname">set_shot_processor_ui_properties</code><span class="sig-paren">(</span><em class="sig-param">widget</em>, <em class="sig-param">properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_shot_processor_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_shot_processor_ui_properties</code><span class="sig-paren">(</span><em>widget</em>, <em>properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_shot_processor_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets any custom properties described by get_shot_processor_ui_properties
 on the custom widget returned by create_shot_processor_widget. This method
 will only be called if the create method is implemented to return a custom
@@ -803,43 +855,49 @@ same as the order they’re returned in the get properties hook method.</p>
     <span class="n">layout</span><span class="o">.</span><span class="n">addRow</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
 </pre></div>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>widget</strong> – The Qt widget that was created by the associated create
-widget hook method.</p></li>
-<li><p><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>widget</strong> – The Qt widget that was created by the associated create
+widget hook method.</li>
+<li><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
 objects, keyed by label, that were constructed from the data
-built by the associated get properties hook method.</p></li>
+built by the associated get properties hook method.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.create_transcode_exporter_widget">
-<code class="sig-name descname">create_transcode_exporter_widget</code><span class="sig-paren">(</span><em class="sig-param">parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_transcode_exporter_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_transcode_exporter_widget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_transcode_exporter_widget</code><span class="sig-paren">(</span><em>parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_transcode_exporter_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_transcode_exporter_widget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds and returns a custom widget to be embedded in the parent exporter.
 If a custom widget is returned by this method, it will be added to the
 parent exporter’s layout.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="base_hooks.HieroCustomizeExportUI.create_shot_processor_widget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_shot_processor_widget()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="base_hooks.HieroCustomizeExportUI.create_shot_processor_widget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_shot_processor_widget()</span></code></a> method for
 more detailed documentation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parent_widget</strong> – The parent widget.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A custom widget.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent_widget</strong> – The parent widget.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A custom widget.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.get_transcode_exporter_ui_properties">
-<code class="sig-name descname">get_transcode_exporter_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_transcode_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_transcode_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_transcode_exporter_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_transcode_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_transcode_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a list of property dictionaries describing the custom properties
 required by the custom widget. This method will only be run if the
 associated create widget hook method returns a widget. The dictionaries
@@ -848,70 +906,78 @@ the associated set properties hook method. The order that the dictionaries
 are returned by this method is maintained when they are passed to the
 associated set hook method.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shot_processor_ui_properties()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shot_processor_ui_properties()</span></code></a> method for
 more detailed documentation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of dictionaries.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of dictionaries.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.set_transcode_exporter_ui_properties">
-<code class="sig-name descname">set_transcode_exporter_ui_properties</code><span class="sig-paren">(</span><em class="sig-param">widget</em>, <em class="sig-param">properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_transcode_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_transcode_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_transcode_exporter_ui_properties</code><span class="sig-paren">(</span><em>widget</em>, <em>properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_transcode_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_transcode_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets any custom properties described by get_transcode_exporter_ui_properties
 on the custom widget returned by create_transcode_exporter_widget. This method
 will only be called if the create method is implemented to return a custom
 widget. The order of the properties within the dictionary passed in is the
 same as the order they’re returned in the get properties hook method.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_shot_processor_ui_properties()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_shot_processor_ui_properties()</span></code></a> method for
 for an example implementation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>widget</strong> – The Qt widget that was created by the associated create
-widget hook method.</p></li>
-<li><p><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>widget</strong> – The Qt widget that was created by the associated create
+widget hook method.</li>
+<li><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
 objects, keyed by label, that were constructed from the data
-built by the associated get properties hook method.</p></li>
+built by the associated get properties hook method.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.create_audio_exporter_widget">
-<code class="sig-name descname">create_audio_exporter_widget</code><span class="sig-paren">(</span><em class="sig-param">parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_audio_exporter_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_audio_exporter_widget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_audio_exporter_widget</code><span class="sig-paren">(</span><em>parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_audio_exporter_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_audio_exporter_widget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds and returns a custom widget to be embedded in the parent exporter.
 If a custom widget is returned by this method, it will be added to the
 parent exporter’s layout.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="base_hooks.HieroCustomizeExportUI.create_shot_processor_widget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_shot_processor_widget()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="base_hooks.HieroCustomizeExportUI.create_shot_processor_widget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_shot_processor_widget()</span></code></a> method for
 more detailed documentation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parent_widget</strong> – The parent widget.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A custom widget.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent_widget</strong> – The parent widget.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A custom widget.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.get_audio_exporter_ui_properties">
-<code class="sig-name descname">get_audio_exporter_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_audio_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_audio_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_audio_exporter_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_audio_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_audio_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a list of property dictionaries describing the custom properties
 required by the custom widget. This method will only be run if the
 associated create widget hook method returns a widget. The dictionaries
@@ -920,70 +986,78 @@ the associated set properties hook method. The order that the dictionaries
 are returned by this method is maintained when they are passed to the
 associated set hook method.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shot_processor_ui_properties()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shot_processor_ui_properties()</span></code></a> method for
 more detailed documentation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of dictionaries.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of dictionaries.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.set_audio_exporter_ui_properties">
-<code class="sig-name descname">set_audio_exporter_ui_properties</code><span class="sig-paren">(</span><em class="sig-param">widget</em>, <em class="sig-param">properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_audio_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_audio_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_audio_exporter_ui_properties</code><span class="sig-paren">(</span><em>widget</em>, <em>properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_audio_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_audio_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets any custom properties described by get_audio_exporter_ui_properties
 on the custom widget returned by create_audio_exporter_widget. This method
 will only be called if the create method is implemented to return a custom
 widget. The order of the properties within the dictionary passed in is the
 same as the order they’re returned in the get properties hook method.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_shot_processor_ui_properties()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_shot_processor_ui_properties()</span></code></a> method for
 for an example implementation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>widget</strong> – The Qt widget that was created by the associated create
-widget hook method.</p></li>
-<li><p><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>widget</strong> – The Qt widget that was created by the associated create
+widget hook method.</li>
+<li><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
 objects, keyed by label, that were constructed from the data
-built by the associated get properties hook method.</p></li>
+built by the associated get properties hook method.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.create_nuke_shot_exporter_widget">
-<code class="sig-name descname">create_nuke_shot_exporter_widget</code><span class="sig-paren">(</span><em class="sig-param">parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_nuke_shot_exporter_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_nuke_shot_exporter_widget" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_nuke_shot_exporter_widget</code><span class="sig-paren">(</span><em>parent_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.create_nuke_shot_exporter_widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.create_nuke_shot_exporter_widget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Builds and returns a custom widget to be embedded in the parent exporter.
 If a custom widget is returned by this method, it will be added to the
 parent exporter’s layout.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="base_hooks.HieroCustomizeExportUI.create_shot_processor_widget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_shot_processor_widget()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.create_shot_processor_widget" title="base_hooks.HieroCustomizeExportUI.create_shot_processor_widget"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_shot_processor_widget()</span></code></a> method for
 more detailed documentation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parent_widget</strong> – The parent widget.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A custom widget.</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parent_widget</strong> – The parent widget.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A custom widget.</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.get_nuke_shot_exporter_ui_properties">
-<code class="sig-name descname">get_nuke_shot_exporter_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_nuke_shot_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_nuke_shot_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_nuke_shot_exporter_ui_properties</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.get_nuke_shot_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.get_nuke_shot_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets a list of property dictionaries describing the custom properties
 required by the custom widget. This method will only be run if the
 associated create widget hook method returns a widget. The dictionaries
@@ -992,51 +1066,57 @@ the associated set properties hook method. The order that the dictionaries
 are returned by this method is maintained when they are passed to the
 associated set hook method.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shot_processor_ui_properties()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.get_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_shot_processor_ui_properties()</span></code></a> method for
 more detailed documentation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of dictionaries.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list</p>
-</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of dictionaries.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="base_hooks.HieroCustomizeExportUI.set_nuke_shot_exporter_ui_properties">
-<code class="sig-name descname">set_nuke_shot_exporter_ui_properties</code><span class="sig-paren">(</span><em class="sig-param">widget</em>, <em class="sig-param">properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_nuke_shot_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_nuke_shot_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
+<code class="descname">set_nuke_shot_exporter_ui_properties</code><span class="sig-paren">(</span><em>widget</em>, <em>properties</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/base_hooks/hiero_customize_export_ui.html#HieroCustomizeExportUI.set_nuke_shot_exporter_ui_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#base_hooks.HieroCustomizeExportUI.set_nuke_shot_exporter_ui_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets any custom properties described by get_nuke_shot_exporter_ui_properties
 on the custom widget returned by create_nuke_shot_exporter_widget. This method
 will only be called if the create method is implemented to return a custom
 widget. The order of the properties within the dictionary passed in is the
 same as the order they’re returned in the get properties hook method.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_shot_processor_ui_properties()</span></code></a> method for
+<p class="first admonition-title">Note</p>
+<p class="last">See the <a class="reference internal" href="#base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties" title="base_hooks.HieroCustomizeExportUI.set_shot_processor_ui_properties"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_shot_processor_ui_properties()</span></code></a> method for
 for an example implementation.</p>
 </div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>widget</strong> – The Qt widget that was created by the associated create
-widget hook method.</p></li>
-<li><p><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>widget</strong> – The Qt widget that was created by the associated create
+widget hook method.</li>
+<li><strong>properties</strong> (<em>OrderedDict</em>) – A dict containing property widget
 objects, keyed by label, that were constructed from the data
-built by the associated get properties hook method.</p></li>
+built by the associated get properties hook method.</li>
 </ul>
-</dd>
-</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
-</section>
-</section>
-</section>
+</div>
+</div>
+</div>
 
 
            </div>
