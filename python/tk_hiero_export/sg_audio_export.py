@@ -26,7 +26,7 @@ from hiero import core
 from hiero.core import *
 
 from . import HieroGetShot
-
+import nuke
 
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
     """
@@ -77,10 +77,8 @@ class ShotgunAudioExporter(
         self._resolved_export_path = None
         self._sequence_name = None
         self._thumbnail = None
+        self._initDict = initDict
 
-        # Retrieving the bithDepth and bitRate values
-        self._bitDepth = initDict["preset"]._properties["bitDepth"]
-        self._bitRate = initDict["preset"]._properties["bitRate"]
 
         # Only publish combined audio. This is done by only publishing video track output
         self._do_publish = self._item.mediaType() is core.TrackItem.MediaType.kVideo
@@ -191,8 +189,6 @@ class ShotgunAudioExporter(
                     # Versions of Nuke >= 13  require the additional parameters 3 and 2 to be passed to
                     # the writeAudioToFile method.
                     # Check Nuke´s version
-                    import nuke
-
                     nuke_version = (
                         nuke.NUKE_VERSION_MAJOR,
                         nuke.NUKE_VERSION_MINOR,
@@ -200,15 +196,17 @@ class ShotgunAudioExporter(
                     )
 
                     if nuke_version[0] >= 13:
-                        bitDepth_data = self._bitDepth
-                        bitRate_data = self._bitRate
+                        # Retrieving the bithDepth and bitRate values for nuke version >= 13
+                        bitDepth_data = self._initDict["preset"]._properties["bitDepth"]
+                        bitRate_data = self._initDict["preset"]._properties["bitRate"]
+
                         bitDepth = [
                             int(s) for s in bitDepth_data.split() if s.isdigit()
                         ][0]
                         bitRate = [int(s) for s in bitRate_data.split() if s.isdigit()][
                             0
                         ]
-                        # Let´s pass the bitDepth and bitRate parameters
+                        # Let´s pass the bitDepth and bitRate parameters to writeAudioToFile method
                         self._sequence.writeAudioToFile(
                             self._audioFile, start, end, bitDepth, bitRate
                         )
