@@ -28,6 +28,7 @@ from hiero.core import *
 from . import HieroGetShot
 import nuke
 
+
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
     """
     Custom Preferences UI for the shotgun audio exporter
@@ -78,7 +79,6 @@ class ShotgunAudioExporter(
         self._sequence_name = None
         self._thumbnail = None
         self._initDict = initDict
-
 
         # Only publish combined audio. This is done by only publishing video track output
         self._do_publish = self._item.mediaType() is core.TrackItem.MediaType.kVideo
