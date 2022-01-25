@@ -78,6 +78,10 @@ class ShotgunAudioExporter(
         self._sequence_name = None
         self._thumbnail = None
 
+        # Retrieving the bithDepth and bitRate values
+        self._bitDepth = initDict['preset']._properties['bitDepth']
+        self._bitRate = initDict['preset']._properties['bitRate']
+
         # Only publish combined audio. This is done by only publishing video track output
         self._do_publish = self._item.mediaType() is core.TrackItem.MediaType.kVideo
 
@@ -184,8 +188,27 @@ class ShotgunAudioExporter(
                         (item.timelineOut() + handles) + 1,
                     )
 
-                    # If trackitem write out just the audio within the cut
-                    self._sequence.writeAudioToFile(self._audioFile, start, end)
+                    # Versions of Nuke >= 13  require the additional parameters 3 and 2 to be passed to
+                    # the writeAudioToFile method.
+                    # Check Nuke´s version
+                    import nuke
+                    nuke_version = (
+                        nuke.NUKE_VERSION_MAJOR,
+                        nuke.NUKE_VERSION_MINOR,
+                        nuke.NUKE_VERSION_RELEASE,
+                    )
+
+                    if nuke_version[0] >= 13:
+                        bitDepth_data = self._bitDepth
+                        bitRate_data = self._bitRate
+                        bitDepth = [int(s) for s in bitDepth_data.split() if s.isdigit()][0]
+                        bitRate = [int(s) for s in bitRate_data.split() if s.isdigit()][0]
+                        # Let´s pass the bitDepth and bitRate parameters
+                        self._sequence.writeAudioToFile(self._audioFile, start, end, bitDepth, bitRate)
+
+                    elif nuke_version[0] < 13:
+                        self._sequence.writeAudioToFile(self._audioFile, start, end)
+
 
         elif isinstance(item, Clip):
             # If item is clip, we're writing out the clip audio not the whole sequence
