@@ -186,32 +186,46 @@ class ShotgunAudioExporter(
                         (item.timelineOut() + handles) + 1,
                     )
 
-                    # Versions of Nuke >= 13  require the additional parameters 3 and 2 to be passed to
-                    # the writeAudioToFile method.
-                    # Check Nuke´s version
+                    # Check Nuke version
                     nuke_version = (
                         nuke.NUKE_VERSION_MAJOR,
                         nuke.NUKE_VERSION_MINOR,
                         nuke.NUKE_VERSION_RELEASE,
                     )
 
-                    if nuke_version[0] >= 13:
-                        # Retrieving the bithDepth and bitRate values for nuke version >= 13
-                        bitDepth_data = self._initDict["preset"]._properties["bitDepth"]
-                        bitRate_data = self._initDict["preset"]._properties["bitRate"]
-
+                    if nuke_version[0] >= 12 and nuke_version[1] > 0:
+                        # The following values need to be passed as additional arguments to the writeAudioToFile method
+                        # in nuke versions >= 12.1:
+                        # numChannels[number(int)], sampleRate[Hz], bitDepth[bits], bitRate[kbp/s]
+                        bitDepth_str = self._initDict["preset"]._properties["bitDepth"]
+                        bitRate_str = self._initDict["preset"]._properties["bitRate"]
                         bitDepth = [
-                            int(s) for s in bitDepth_data.split() if s.isdigit()
+                            int(s) for s in bitDepth_str.split() if s.isdigit()
                         ][0]
-                        bitRate = [int(s) for s in bitRate_data.split() if s.isdigit()][
-                            0
-                        ]
-                        # Let´s pass the bitDepth and bitRate parameters to writeAudioToFile method
+                        bitRate = [
+                            int(s) for s in bitRate_str.split() if s.isdigit()
+                        ][0]
+                        numChannels_str = self._initDict["preset"]._properties["numChannels"]
+                        sampleRate_str = self._initDict["preset"]._properties["sampleRate"]
+                        sampleRate = [int(s) for s in sampleRate_str.split() if s.isdigit()][0]
+
+                        # numChannels parameter must be passed as an integer
+                        if numChannels_str == "mono":
+                            numChannels = 1
+                        elif numChannels_str == "stereo":
+                            numChannels = 2
+                        elif numChannels_str == "5.1 (L R C LFE Ls Rs)":
+                            numChannels = 6
+                        else:
+                            numChannels = 8
+
+                        # If trackitem write out just the audio within the cut
                         self._sequence.writeAudioToFile(
-                            self._audioFile, start, end, bitDepth, bitRate
+                            self._audioFile, start, end, numChannels, sampleRate, bitDepth, bitRate
                         )
 
-                    elif nuke_version[0] < 13:
+                    else:
+                        # If trackitem write out just the audio within the cut
                         self._sequence.writeAudioToFile(self._audioFile, start, end)
 
         elif isinstance(item, Clip):
