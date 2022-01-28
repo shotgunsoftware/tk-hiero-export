@@ -193,7 +193,9 @@ class ShotgunAudioExporter(
                         nuke.NUKE_VERSION_RELEASE,
                     )
 
-                    if nuke_version[0] > 12 or (nuke_version[0] == 12 and nuke_version[1] > 0):
+                    if nuke_version[0] > 12 or (
+                        nuke_version[0] == 12 and nuke_version[1] > 0
+                    ):
                         # The following values need to be passed as additional arguments to the writeAudioToFile method
                         # in nuke versions >= 12.1:
                         # numChannels[number(int)], sampleRate[Hz], bitDepth[bits], bitRate[kbp/s]
