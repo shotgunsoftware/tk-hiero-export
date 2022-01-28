@@ -202,12 +202,18 @@ class ShotgunAudioExporter(
                         bitDepth = [
                             int(s) for s in bitDepth_str.split() if s.isdigit()
                         ][0]
-                        bitRate = [
-                            int(s) for s in bitRate_str.split() if s.isdigit()
+                        bitRate = [int(s) for s in bitRate_str.split() if s.isdigit()][
+                            0
+                        ]
+                        numChannels_str = self._initDict["preset"]._properties[
+                            "numChannels"
+                        ]
+                        sampleRate_str = self._initDict["preset"]._properties[
+                            "sampleRate"
+                        ]
+                        sampleRate = [
+                            int(s) for s in sampleRate_str.split() if s.isdigit()
                         ][0]
-                        numChannels_str = self._initDict["preset"]._properties["numChannels"]
-                        sampleRate_str = self._initDict["preset"]._properties["sampleRate"]
-                        sampleRate = [int(s) for s in sampleRate_str.split() if s.isdigit()][0]
 
                         # numChannels parameter must be passed as an integer
                         if numChannels_str == "mono":
@@ -221,7 +227,13 @@ class ShotgunAudioExporter(
 
                         # If trackitem write out just the audio within the cut
                         self._sequence.writeAudioToFile(
-                            self._audioFile, start, end, numChannels, sampleRate, bitDepth, bitRate
+                            self._audioFile,
+                            start,
+                            end,
+                            numChannels,
+                            sampleRate,
+                            bitDepth,
+                            bitRate,
                         )
 
                     else:
