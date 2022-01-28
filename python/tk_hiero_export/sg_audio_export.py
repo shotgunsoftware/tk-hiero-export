@@ -26,6 +26,7 @@ from hiero import core
 from hiero.core import *
 
 from . import HieroGetShot
+import nuke
 
 
 class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExportUI):
@@ -77,6 +78,7 @@ class ShotgunAudioExporter(
         self._resolved_export_path = None
         self._sequence_name = None
         self._thumbnail = None
+        self._initDict = initDict
 
         # Only publish combined audio. This is done by only publishing video track output
         self._do_publish = self._item.mediaType() is core.TrackItem.MediaType.kVideo
@@ -184,8 +186,61 @@ class ShotgunAudioExporter(
                         (item.timelineOut() + handles) + 1,
                     )
 
-                    # If trackitem write out just the audio within the cut
-                    self._sequence.writeAudioToFile(self._audioFile, start, end)
+                    # Check Nuke version
+                    nuke_version = (
+                        nuke.NUKE_VERSION_MAJOR,
+                        nuke.NUKE_VERSION_MINOR,
+                        nuke.NUKE_VERSION_RELEASE,
+                    )
+
+                    if nuke_version[0] > 12 or (
+                        nuke_version[0] == 12 and nuke_version[1] > 0
+                    ):
+                        # The following values need to be passed as additional arguments to the writeAudioToFile method
+                        # in nuke versions >= 12.1:
+                        # numChannels[number(int)], sampleRate[Hz], bitDepth[bits], bitRate[kbp/s]
+                        bitDepth_str = self._initDict["preset"]._properties["bitDepth"]
+                        bitRate_str = self._initDict["preset"]._properties["bitRate"]
+                        bitDepth = [
+                            int(s) for s in bitDepth_str.split() if s.isdigit()
+                        ][0]
+                        bitRate = [int(s) for s in bitRate_str.split() if s.isdigit()][
+                            0
+                        ]
+                        numChannels_str = self._initDict["preset"]._properties[
+                            "numChannels"
+                        ]
+                        sampleRate_str = self._initDict["preset"]._properties[
+                            "sampleRate"
+                        ]
+                        sampleRate = [
+                            int(s) for s in sampleRate_str.split() if s.isdigit()
+                        ][0]
+
+                        # numChannels parameter must be passed as an integer
+                        if numChannels_str == "mono":
+                            numChannels = 1
+                        elif numChannels_str == "stereo":
+                            numChannels = 2
+                        elif numChannels_str == "5.1 (L R C LFE Ls Rs)":
+                            numChannels = 6
+                        else:
+                            numChannels = 8
+
+                        # If trackitem write out just the audio within the cut
+                        self._sequence.writeAudioToFile(
+                            self._audioFile,
+                            start,
+                            end,
+                            numChannels,
+                            sampleRate,
+                            bitDepth,
+                            bitRate,
+                        )
+
+                    else:
+                        # If trackitem write out just the audio within the cut
+                        self._sequence.writeAudioToFile(self._audioFile, start, end)
 
         elif isinstance(item, Clip):
             # If item is clip, we're writing out the clip audio not the whole sequence
