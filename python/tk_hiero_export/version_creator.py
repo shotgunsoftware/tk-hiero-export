@@ -130,7 +130,7 @@ class ShotgunTranscodeExporter(
     _write_set_node_label = "SG_Write_Attachment"
 
     def __init__(self, initDict):
-        """ Constructor """
+        """Constructor"""
         FnTranscodeExporter.TranscodeExporter.__init__(self, initDict)
         CollatingExporter.__init__(self)
         self._resolved_export_path = None
@@ -209,7 +209,10 @@ class ShotgunTranscodeExporter(
         )
         self.app.log_info("Transcode quicktime settings: %s" % (properties,))
         preset.properties().update(
-            {"file_type": file_type, file_type: properties,}
+            {
+                "file_type": file_type,
+                file_type: properties,
+            }
         )
 
         # Sadly Foundry has a habit of changing the interfaces of
@@ -280,7 +283,7 @@ class ShotgunTranscodeExporter(
         return result
 
     def startTask(self):
-        """ Run Task """
+        """Run Task"""
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
             self._tk_version = self._formatTkVersionString(self.versionString())
@@ -390,7 +393,7 @@ class ShotgunTranscodeExporter(
         return FnTranscodeExporter.TranscodeExporter.startTask(self)
 
     def finishTask(self):
-        """ Finish Task """
+        """Finish Task"""
         # run base class implementation
         FnTranscodeExporter.TranscodeExporter.finishTask(self)
 
@@ -501,7 +504,7 @@ class ShotgunTranscodeExporter(
 class ShotgunTranscodePreset(
     ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset, CollatedShotPreset
 ):
-    """ Settings for the SG transcode step """
+    """Settings for the SG transcode step"""
 
     def __init__(self, name, properties):
         FnTranscodeExporter.TranscodePreset.__init__(self, name, properties)

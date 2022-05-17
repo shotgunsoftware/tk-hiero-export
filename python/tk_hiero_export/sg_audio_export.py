@@ -94,7 +94,7 @@ class ShotgunAudioExporter(
             return FnAudioExportTask.AudioExportTask.sequenceName(self)
 
     def startTask(self):
-        """ Run Task """
+        """Run Task"""
         if self._resolved_export_path is None:
             self._resolved_export_path = self.resolvedExportPath()
             self._tk_version = self._formatTkVersionString(self.versionString())
@@ -258,7 +258,7 @@ class ShotgunAudioExporter(
         return False
 
     def finishTask(self):
-        """ Finish Task """
+        """Finish Task"""
         # run base class implementation
         FnAudioExportTask.AudioExportTask.finishTask(self)
 

@@ -163,7 +163,7 @@ class ShotgunNukeShotExporter(
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
     def startTask(self):
-        """ Run Task """
+        """Run Task"""
         # call the publish data hook to allow for publish customization while _item is valid (unlike finishTask)
         self._extra_publish_data = self.app.execute_hook(
             "hook_get_extra_publish_data",
