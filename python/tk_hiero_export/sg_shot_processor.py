@@ -343,7 +343,9 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # Call pre processor hook here to make sure it happens pior to any 'hook_resolve_custom_strings'.
         # The order if execution is basically [init processor, resolve user entries, startProcessing].
         self.app.execute_hook(
-            "hook_pre_export", processor=self, base_class=HieroPreExport,
+            "hook_pre_export",
+            processor=self,
+            base_class=HieroPreExport,
         )
 
     def startProcessing(self, exportItems, preview=False):
@@ -378,7 +380,8 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
                 get_method="get_shot_processor_ui_properties",
             )
             sg_shot_properties = self._preset.properties().get(
-                "shotgunShotCreateProperties", dict(),
+                "shotgunShotCreateProperties",
+                dict(),
             )
 
             for property_data in custom_properties:
@@ -507,7 +510,8 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
             "hook_update_cuts",
             "allow_cut_updates",
             preset_properties=self._preset.properties().get(
-                "shotgunShotCreateProperties", dict(),
+                "shotgunShotCreateProperties",
+                dict(),
             ),
             base_class=HieroUpdateCuts,
         )
