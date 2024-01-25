@@ -93,12 +93,12 @@ class ShotgunShotProcessorUI(
         header_text.setWordWrap(True)
         header_text.setText(
             """
-            <big>Welcome to the ShotGrid Shot Exporter!</big>
-            <p>When you are using the ShotGrid Shot Processor, Shots and
-            Sequences in ShotGrid will be created based on the curent timeline.
+            <big>Welcome to the Flow Production Tracking Shot Exporter!</big>
+            <p>When you are using the Flow Production Tracking Shot Processor, Shots and
+            Sequences in Flow Production Tracking will be created based on the curent timeline.
             Existing Shots will be updated with the latest cut lengths.
             Quicktimes for each shot will be reviewable in the Media app when
-            you use the special ShotGrid Transcode plugin - all included and
+            you use the special Flow Production Tracking Transcode plugin - all included and
             ready to go in the default preset.
             </p>
             """
@@ -167,7 +167,7 @@ class ShotgunShotProcessorUI(
         :param properties: A dict containing the 'sg_cut_type' preset
         :return: QtGui.QLayout - for the cut type widget
         """
-        tooltip = "What to populate in the `Type` field for this Cut in ShotGrid"
+        tooltip = "What to populate in the `Type` field for this Cut in Flow Production Tracking"
 
         # ---- construct the widget
 
@@ -496,7 +496,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         if not self._cutsSupported():
             # cuts not supported. all done here
             self.app.log_info(
-                "No Cut support in this version of ShotGrid. Not attempting to "
+                "No Cut support in this version of Flow Production Tracking. Not attempting to "
                 "create Cut or CutItem entries."
             )
             return
@@ -526,7 +526,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         if collateTracks or collateShotNames:
             self.app.log_info(
                 "Cut support is ill defined for collating in Hiero. Not "
-                "attempting to create Cut or CutItem entries in ShotGrid."
+                "attempting to create Cut or CutItem entries in Flow Production Tracking."
             )
             return
 
@@ -808,8 +808,10 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # create the cut to get the id.
         sg = self.app.shotgun
         cut = sg.create("Cut", cut_data)
-        self._app.log_debug("Created Cut in ShotGrid: %s" % (cut,))
-        self._app.log_info("Created Cut '%s' in ShotGrid!" % (cut["code"],))
+        self._app.log_debug("Created Cut in Flow Production Tracking: %s" % (cut,))
+        self._app.log_info(
+            "Created Cut '%s' in Flow Production Tracking!" % (cut["code"],)
+        )
 
         # make sure the cut item data dicts are updated with the cut info
         for cut_item_data in cut_item_data_list:

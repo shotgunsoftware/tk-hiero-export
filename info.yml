@@ -4,8 +4,8 @@ configuration:
     default_task_template:
         type: str
         description: The default shot task template to use when the app is
-                     creating new shots in ShotGrid. This setting is presented
-                     in the Custom ShotGrid Export UI and you can change it
+                     creating new shots in Flow Production Tracking. This setting is presented
+                     in the Custom Flow Production Tracking Export UI and you can change it
                      prior to running the export if you want.
         default_value: Basic shot template
 
@@ -60,7 +60,7 @@ configuration:
         type: str
         description: "A filter that will return the task in the Shot that publishes will
                      be registered against.  This value must be a valid filter that can be
-                     passed to the find method of the ShotGrid api, without a condition for
+                     passed to the find method of the Flow Production Tracking api, without a condition for
                      entity (a value linking entity to the Shot will be added at publish
                      time).  If the filter contains a condition in the form
                      ['step.Step.code', 'is', VALUE], then whatver VALUE is will be used
@@ -84,9 +84,9 @@ configuration:
 
     hook_upload_thumbnail:
         type: hook
-        description: "Called when a thumbnail needs to be uploaded to ShotGrid
+        description: "Called when a thumbnail needs to be uploaded to Flow Production Tracking
                      for a Hiero source.  First argument is a dictionary that
-                     is the ShotGrid entity to upload for.  The second argument
+                     is the Flow Production Tracking entity to upload for.  The second argument
                      is the Hiero Source to get the thumbnail from. The third
                      argument is the Hiero TrackItem that the source was pulled
                      from.  The TrackItem may be None when the thumbnail does
@@ -104,7 +104,7 @@ configuration:
 
                      The return value is a data dictionary for the shot, whose
                      id will be updated.  Cut information will be merged into this
-                     dictionary before ShotGrid update is called on the shot.
+                     dictionary before Flow Production Tracking update is called on the shot.
                      The default implementation creates or looks up a sequence
                      named after the Hiero Sequence being exported and links that to
                      the shot via the sg_sequence field."
@@ -113,7 +113,7 @@ configuration:
 
     hook_pre_export:
         type: hook
-        description: "Called prior to starting ShotGrid's shot processor. It can be used
+        description: "Called prior to starting Flow Production Tracking's shot processor. It can be used
                       to clear out caches and do other specific initializations."
         parameters: [processor]
         default_value: hiero_pre_export
@@ -133,7 +133,7 @@ configuration:
         type: hook
         description: "Called when generating the default settings for creating
                      a quicktime.  The argument is a boolean that is True when
-                     the resulting quicktime is only for upload to ShotGrid and
+                     the resulting quicktime is only for upload to Flow Production Tracking and
                      False when the settings are used for a default Quicktime
                      transcode.
 
@@ -147,10 +147,10 @@ configuration:
 
     hook_update_version_data:
         type: hook
-        description: "Called before creating a Version in ShotGrid for a transcode.
+        description: "Called before creating a Version in Flow Production Tracking for a transcode.
                      The default values for the version will already be filled in
                      in the version_data dictionary.  Modify this dictionary to
-                     change what will be passed as an argument to the ShotGrid API
+                     change what will be passed as an argument to the Flow Production Tracking API
                      create call."
         parameters: [version_data, task]
         default_value: hiero_update_version_data
@@ -165,10 +165,10 @@ configuration:
 
     hook_get_extra_publish_data:
         type: hook
-        description: "Called before creating a PublishedFile in ShotGrid for a transcode.
+        description: "Called before creating a PublishedFile in Flow Production Tracking for a transcode.
                      This hook should return None if there is no extra info to
                      associate with the published file, or a dictionary that is
-                     compatible with the ShotGrid API's update method."
+                     compatible with the Flow Production Tracking API's update method."
         parameters: [task]
         default_value: hiero_get_extra_publish_data
 
@@ -235,11 +235,11 @@ supported_engines: [tk-hiero, tk-nuke]
 requires_shotgun_fields:
 
 # More verbose description of this item
-display_name: "ShotGrid Export"
-description: "App that adds ShotGrid awareness to Nuke Studio's sequence export.  It
+display_name: "Flow Production Tracking Export"
+description: "App that adds Flow Production Tracking awareness to Nuke Studio's sequence export.  It
              adds a new processor that will use the configuration to determine
              paths for Nuke scripts and plates.  It also will use the tags to
-             determine ShotGrid Shot status and task templates to create/update
-             the Shots in ShotGrid."
+             determine Flow Production Tracking Shot status and task templates to create/update
+             the Shots in Flow Production Tracking."
 
 requires_core_version: "v0.18.124"

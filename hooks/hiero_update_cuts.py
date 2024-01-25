@@ -54,7 +54,9 @@ class HieroUpdateCuts(HookBaseClass):
         :rtype: dict or None
         """
         cut_item = self.parent.sgtk.shotgun.create("CutItem", cut_item_data)
-        self.parent.logger.info("Created CutItem in ShotGrid: %s" % cut_item)
+        self.parent.logger.info(
+            "Created CutItem in Flow Production Tracking: %s" % cut_item
+        )
         return cut_item
 
     def get_cut_thumbnail(self, cut, task_item, preset_properties):
