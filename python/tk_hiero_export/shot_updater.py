@@ -95,7 +95,7 @@ class ShotgunShotUpdater(
 
         if cut_duration != edit_duration:
             self.app.log_warning(
-                "It looks like the shot %s has a retime applied. SG cuts do "
+                "It looks like the shot %s has a retime applied. PTR cuts do "
                 "not support retimes." % (self.clipName(),)
             )
 

@@ -183,7 +183,7 @@ configuration:
 
     hook_update_shot:
         type: hook
-        description: "Called during SG shot processing. Provides methods for managing
+        description: "Called during PTR shot processing. Provides methods for managing
                      if and how the Shot's entity in updated, and if and how creation
                      of the Shots filesystem structure happens during export."
         parameters: []
@@ -191,7 +191,7 @@ configuration:
 
     hook_update_cuts:
         type: hook
-        description: "Called during SG shot processing. Provides methods for managing
+        description: "Called during PTR shot processing. Provides methods for managing
                      if and how Cuts and CutItems are created and updated."
         parameters: []
         default_value: hiero_update_cuts

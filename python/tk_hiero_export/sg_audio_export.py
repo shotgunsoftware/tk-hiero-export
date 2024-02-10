@@ -37,7 +37,7 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
     def __init__(self, preset):
         FnAudioExportUI.AudioExportUI.__init__(self, preset)
 
-        self._displayName = "SG Audio Export"
+        self._displayName = "PTR Audio Export"
         self._taskType = ShotgunAudioExporter
 
     def populateUI(self, widget, exportTemplate):
