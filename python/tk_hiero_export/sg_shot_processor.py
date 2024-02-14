@@ -899,7 +899,7 @@ class ShotgunShotProcessorPreset(
 
         resolver.addResolver(
             "{tk_version}",
-            "Version string formatted by Flow Production Tracking Toolkit.",
+            "Version string formatted by Flow Production Tracking.",
             lambda keyword, task: self._formatTkVersionString(task.versionString()),
         )
 

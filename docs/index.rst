@@ -81,7 +81,7 @@ Resolving strings into Shotgun-queried values
     :members:
 
 
-Resolving Flow Production Tracking Toolkit templates into export string representations
+Resolving Flow Production Tracking templates into export string representations
 ---------------------------------------------------------------------------------------
 
 .. autoclass:: HieroTranslateTemplate
