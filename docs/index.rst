@@ -1,18 +1,18 @@
-ShotGrid Hiero Export API reference, |release|
-##############################################
+Flow Production Tracking Hiero Export API reference, |release|
+##############################################################
 
 Overview
 ********
 
-The ``tk-hiero-export`` app adds custom ShotGrid export processors to the Hiero/Nuke Studio export framework.
+The ``tk-hiero-export`` app adds custom Flow Production Tracking export processors to the Hiero/Nuke Studio export framework.
 
-By way of custom export processors, the user can create and update entities in the current Project in ShotGrid.
+By way of custom export processors, the user can create and update entities in the current Project in Flow Production Tracking.
 
 During the export process a number things can happen:
 
 - Status of associated Shot entities can be updated
 - Nuke scripts can be written into the project's filesystem structure for each Shot that's processed
-- Sequence and Shot entity data can be updated in ShotGrid
+- Sequence and Shot entity data can be updated in Flow Production Tracking
 - Cuts can be update to include new CutItems built from the exported sequences
 
 Documentation from The Foundry concerning the Hiero Python API can be found `here. <https://learn.foundry.com/hiero/developers/11.0/HieroPythonDevGuide/api/index.html>`__
@@ -81,8 +81,8 @@ Resolving strings into Shotgun-queried values
     :members:
 
 
-Resolving ShotGrid Toolkit templates into export string representations
------------------------------------------------------------------------
+Resolving Flow Production Tracking templates into export string representations
+---------------------------------------------------------------------------------------
 
 .. autoclass:: HieroTranslateTemplate
     :members:
@@ -95,8 +95,8 @@ Customizing Version entity data
     :members:
 
 
-Uploading Thumbnails to ShotGrid
---------------------------------
+Uploading Thumbnails to Flow Production Tracking
+------------------------------------------------
 
 .. autoclass:: HieroUploadThumbnail
     :members:

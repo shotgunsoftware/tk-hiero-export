@@ -57,7 +57,9 @@ class HieroGetShot(Hook):
                 "project": self.parent.context.project,
             }
             shot = sg.create("Shot", shot_data, return_fields=fields)
-            self.parent.log_info("Created Shot in ShotGrid: %s" % shot_data)
+            self.parent.log_info(
+                "Created Shot in Flow Production Tracking: %s" % shot_data
+            )
         else:
             shot = shots[0]
 
@@ -121,7 +123,8 @@ class HieroGetShot(Hook):
             }
             parent = sg.create(par_entity_type, par_data)
             self.parent.log_info(
-                "Created %s in ShotGrid: %s" % (par_entity_type, par_data)
+                "Created %s in Flow Production Tracking: %s"
+                % (par_entity_type, par_data)
             )
         else:
             parent = parents[0]

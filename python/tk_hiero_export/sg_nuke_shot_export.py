@@ -34,7 +34,7 @@ class ShotgunNukeShotExporterUI(
 
     def __init__(self, preset):
         FnNukeShotExporterUI.NukeShotExporterUI.__init__(self, preset)
-        self._displayName = "SG Nuke Project File"
+        self._displayName = "PTR Nuke Project File"
         self._taskType = ShotgunNukeShotExporter
 
     def populateUI(self, widget, exportTemplate):
@@ -79,11 +79,11 @@ class ShotgunNukeShotExporterUI(
             form_layout = layout
 
         if form_layout:
-            form_layout.insertRow(0, "SG Write Nodes:", self._toolkit_list)
+            form_layout.insertRow(0, "PTR Write Nodes:", self._toolkit_list)
         else:
             self.app.log_error(
                 "Unable to find the expected UI layout to display the list of "
-                "SG Write Nodes in the export dialog."
+                "PTR Write Nodes in the export dialog."
             )
 
         # Handle any custom widget work the user did via the custom_export_ui
@@ -212,11 +212,13 @@ class ShotgunNukeShotExporter(
 
         publish_entity_type = sgtk.util.get_published_file_entity_type(self.app.sgtk)
 
-        self.app.log_debug("Register publish in ShotGrid: %s" % str(args))
+        self.app.log_debug(
+            "Register publish in Flow Production Tracking: %s" % str(args)
+        )
         sg_publish = sgtk.util.register_publish(**args)
         if self._extra_publish_data is not None:
             self.app.log_debug(
-                "Updating SG %s %s"
+                "Updating PTR %s %s"
                 % (publish_entity_type, str(self._extra_publish_data))
             )
             self.app.shotgun.update(
@@ -231,7 +233,7 @@ class ShotgunNukeShotExporter(
         )
         if extra_publish_data is not None:
             self.app.log_debug(
-                "Updating SG %s %s" % (publish_entity_type, str(extra_publish_data))
+                "Updating PTR %s %s" % (publish_entity_type, str(extra_publish_data))
             )
             self.app.shotgun.update(
                 sg_publish["type"], sg_publish["id"], extra_publish_data
@@ -252,8 +254,8 @@ class ShotgunNukeShotExporter(
         This method overrides the default method added to the base class in
         Nuke 10. The base class returns ``True`` for all items found in the
         list of collated items. This prevents unnecessary exports for those items
-        since non-SG workflows only collate into the exported nuke script of the
-        first exported track item. For SG workflows, we still export versions
+        since non-PTR workflows only collate into the exported nuke script of the
+        first exported track item. For PTR workflows, we still export versions
         for collated tracks and link them back to the hero shot. So we need to
         do our own culling of tasks in the shot processor. So we return ``False``
         unless the item is the current item.
@@ -306,7 +308,7 @@ class ShotgunNukeShotExporter(
                 # now add our new node to the layout
                 currentLayoutContext.getNodes().append(node)
         except Exception:
-            self.app.logger.exception("Failed to add SG writenodes")
+            self.app.logger.exception("Failed to add PTR writenodes")
         finally:
             # now put back the viewer nodes layout
             currentLayoutContext.getNodes().append(oldLayoutEnd)

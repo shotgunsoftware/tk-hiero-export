@@ -71,7 +71,7 @@ class HieroCustomizeExportUI(HookBaseClass):
                     label="Create Cut:",
                     name="custom_create_cut_bool_property",
                     value=True,
-                    tooltip="Create a Cut and CutItems in ShotGrid...",
+                    tooltip="Create a Cut and CutItems in Flow Production Tracking...",
                 ),
                 dict(
                     label="Head In:",
