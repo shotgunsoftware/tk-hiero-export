@@ -219,7 +219,7 @@ class ShotgunTranscodeExporter(
         # their Python classes out from under us, so now we're going
         # to have to handle this the ugly way, via introspecting the
         # arguments expected by the createWriteNode method.
-        arg_spec = inspect.getargspec(FnExternalRender.createWriteNode)
+        arg_spec = inspect.getfullargspec(FnExternalRender.createWriteNode)
         if "projectsettings" in arg_spec.args:
             kwargs = dict(
                 path=self._quicktime_path,
