@@ -258,8 +258,8 @@ class ShotgunShotProcessorUI(
 
         # on change rebuild the properties
         def changed(index):
-            for (row, name) in enumerate(names):
-                for (col, key) in enumerate(keys):
+            for row, name in enumerate(names):
+                for col, key in enumerate(keys):
                     combo = tagTable.cellWidget(row, col + 1)
 
                     # if no tag mapped to a name
@@ -275,7 +275,7 @@ class ShotgunShotProcessorUI(
 
         # and build the table
         tagsByName = self._get_all_tags_by_name()
-        for (row, name) in enumerate(names):
+        for row, name in enumerate(names):
             tag = tagsByName.get(name, None)
             if tag is None:
                 continue
@@ -286,10 +286,10 @@ class ShotgunShotProcessorUI(
             tagTable.setItem(row, 0, item)
 
             # build combo boxes for each set of values
-            for (col, vals) in enumerate(values):
+            for col, vals in enumerate(values):
                 combo = QtGui.QComboBox()
                 combo.addItem(None)
-                for (i, value) in enumerate(vals):
+                for i, value in enumerate(vals):
                     combo.addItem(value)
                     # see if the current item is the one in the properties
                     if map[name][col] == value:
@@ -367,7 +367,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
         # inject collate settings into Tasks where needed
         (collateTracks, collateShotNames) = self._getCollateProperties()
-        for (itemPath, itemPreset) in exportTemplate:
+        for itemPath, itemPreset in exportTemplate:
             if "collateTracks" in itemPreset.properties():
                 itemPreset.properties()["collateTracks"] = collateTracks
             if "collateShotNames" in itemPreset.properties():
@@ -722,7 +722,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         cut_item_data_list = []
 
         # process the tasks in order
-        for (shot_updater_task, transcode_task) in cut_related_tasks:
+        for shot_updater_task, transcode_task in cut_related_tasks:
 
             # cut order was populated by the calling method to update the
             # Shot entity's cut info

@@ -50,7 +50,7 @@ class HieroTranslateTemplate(Hook):
         try:
             task_filter = self.parent.get_setting("default_task_filter", "[]")
             task_filter = ast.literal_eval(task_filter)
-            for (field, op, value) in task_filter:
+            for field, op, value in task_filter:
                 if field == "step.Step.code":
                     mapping["{Step}"] = value
         except ValueError:
@@ -65,11 +65,11 @@ class HieroTranslateTemplate(Hook):
         if output_type == "script":
             template_str = template_str.replace("{name}", "scene")
 
-        for (orig, repl) in mapping.items():
+        for orig, repl in mapping.items():
             template_str = template_str.replace(orig, repl)
 
         # replace {SEQ} style keys with their translated string value
-        for (name, key) in template.keys.items():
+        for name, key in template.keys.items():
             if isinstance(key, tank.templatekey.SequenceKey):
                 # this is a sequence template, for example {SEQ}
                 # replace it with ####
