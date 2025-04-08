@@ -793,10 +793,17 @@ def _subTrackIndex(subTrackItem):
 
 
 class CollatedShotPreset(object):
-    def __init__(self, properties):
-        properties["collateTracks"] = False
-        properties["collateShotNames"] = False
+    def __init__(self, properties=None):
+        """
+        properties is an optional parameter because of a MRO issue with Python
+        3.11.
+        TODO more digging
+        """
 
-        # Not exposed in UI
-        properties["collateSequence"] = False  # Collate all trackitems within sequence
-        properties["collateCustomStart"] = True  # Start frame is inclusive of handles
+        if properties:
+            properties["collateTracks"] = False
+            properties["collateShotNames"] = False
+
+            # Not exposed in UI
+            properties["collateSequence"] = False  # Collate all trackitems within sequence
+            properties["collateCustomStart"] = True  # Start frame is inclusive of handles
