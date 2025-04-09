@@ -813,6 +813,9 @@ class CollatedShotPreset(object):
             properties["collateTracks"] = False
             properties["collateShotNames"] = False
 
-            # Not exposed in UI
-            properties["collateSequence"] = False  # Collate all trackitems within sequence
-            properties["collateCustomStart"] = True  # Start frame is inclusive of handles
+            # Following ones are not exposed in UI
+
+            # Collate all trackitems within sequence
+            properties["collateSequence"] = False
+            # Start frame is inclusive of handles
+            properties["collateCustomStart"] = True
