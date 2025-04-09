@@ -795,9 +795,15 @@ def _subTrackIndex(subTrackItem):
 class CollatedShotPreset(object):
     def __init__(self, properties=None):
         """
-        properties is an optional parameter because of a MRO issue with Python
-        3.11.
-        TODO more digging
+        properties is an optional parameter because of the cooperative
+        multiple-inheritance paradigm in python
+
+        Child classes are using multiple inheritance with classes coming from
+        The Foundry. Some of those classes call `super` in the contrusctor
+        instead of their direct parent but `__init__` methods have different
+        signatures.
+
+        For more information: https://medium.com/swlh/cooperative-multiple-inheritance-paradigm-in-python-f048b7ecdb29
         """
 
         if properties:
