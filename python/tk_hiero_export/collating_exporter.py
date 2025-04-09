@@ -797,18 +797,16 @@ class CollatedShotPreset(object):
         """
         properties is an optional parameter because of the cooperative
         multiple-inheritance paradigm in python.
-
-        Child classes are using multiple inheritance with classes coming from
-        The Foundry. Some of those classes call `super` in the contrusctor
-        instead of their direct parent but `__init__` methods in the MRO have
-        different signatures causing this method to be called with no
-        parameters.
-
         For more information: https://medium.com/swlh/cooperative-multiple-inheritance-paradigm-in-python-f048b7ecdb29
 
-        The method is manually called a second time with the properties
-        parameters by the child class calling their direct parent (instead of
-        `super`).
+        Child classes are using multiple inheritance with sibling classes callin
+        `super` instead of their direct. However, `__init__` methods in the MRO
+        do not all have the same signature, causing this method to be called
+        with no parameters.
+
+        The method is manually called a second time by the child class,
+        providing the `properties` parameters (by addressing their direct parent
+        instead of using `super`).
         """
 
         if properties:
