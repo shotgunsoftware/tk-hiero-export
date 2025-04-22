@@ -18,19 +18,7 @@ from hiero.core import FnExporterBase
 
 from hiero.exporters import FnShotProcessor
 
-# For Hiero versions prior to 9.0 the ShotProcessor class
-# contained both the execution and UI logic. That was split
-# into two classes in 9.0. To maintain backwards compatibility
-# but without duplicating code or breaking existing local
-# export presets we've split into separate UI and Processor
-# classes, but for the UI class we will fall back on using
-# the ShotProcessor as the base class in cases where we are
-# unable to import the separate ShotProcessorUI class that
-# was introduced in 9.0.
-try:
-    from hiero.exporters.FnShotProcessorUI import ShotProcessorUI
-except ImportError:
-    ShotProcessorUI = FnShotProcessor.ShotProcessor
+from hiero.exporters.FnShotProcessorUI import ShotProcessorUI
 
 from .base import ShotgunHieroObjectBase
 from .version_creator import ShotgunTranscodeExporter
