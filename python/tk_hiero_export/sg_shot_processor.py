@@ -198,7 +198,7 @@ class ShotgunShotProcessorUI(
             properties["sg_cut_type"] = new_value
 
         # connect the widget index changed to the callback
-        cut_type_widget.currentIndexChanged[str].connect(value_changed)
+        cut_type_widget.currentTextChanged.connect(value_changed)
 
         # ---- construct the layout with a label
 
@@ -250,7 +250,7 @@ class ShotgunShotProcessorUI(
         tagTable.setMinimumHeight(150)
         tagTable.setHorizontalHeaderLabels(["Hiero Tags"] + labels)
         tagTable.setAlternatingRowColors(True)
-        tagTable.setSelectionMode(tagTable.NoSelection)
+        tagTable.setSelectionMode(QtGui.QAbstractItemView.SelectionMode.NoSelection)
         tagTable.setShowGrid(False)
         tagTable.verticalHeader().hide()
         tagTable.horizontalHeader().setStretchLastSection(True)
@@ -298,7 +298,7 @@ class ShotgunShotProcessorUI(
                 # adjust sizes to avoid clipping or scrolling
                 width = combo.minimumSizeHint().width()
                 combo.setMinimumWidth(width)
-                combo.setSizeAdjustPolicy(combo.AdjustToContents)
+                combo.setSizeAdjustPolicy(QtGui.QComboBox.SizeAdjustPolicy.AdjustToContents)
                 tagTable.setCellWidget(row, col + 1, combo)
 
         tagTable.resizeRowsToContents()
