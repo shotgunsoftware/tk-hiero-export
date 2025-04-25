@@ -16,8 +16,6 @@ import hiero
 
 class CollatingExporter(object):
     def __init__(self, properties=None):
-        super(CollatingExporter, self).__init__()
-
         # When building a collated sequence, everything is offset by 1000
         # This gives head room for shots which may go negative when transposed to a
         # custom start frame. This offset should be negated during script generation.
