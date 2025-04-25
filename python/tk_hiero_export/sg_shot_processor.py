@@ -298,7 +298,9 @@ class ShotgunShotProcessorUI(
                 # adjust sizes to avoid clipping or scrolling
                 width = combo.minimumSizeHint().width()
                 combo.setMinimumWidth(width)
-                combo.setSizeAdjustPolicy(QtGui.QComboBox.SizeAdjustPolicy.AdjustToContents)
+                combo.setSizeAdjustPolicy(
+                    QtGui.QComboBox.SizeAdjustPolicy.AdjustToContents
+                )
                 tagTable.setCellWidget(row, col + 1, combo)
 
         tagTable.resizeRowsToContents()
