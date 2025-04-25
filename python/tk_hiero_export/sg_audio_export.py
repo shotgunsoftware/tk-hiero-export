@@ -62,7 +62,7 @@ class ShotgunAudioExporterUI(ShotgunHieroObjectBase, FnAudioExportUI.AudioExport
 
 
 class ShotgunAudioExporter(
-    ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask, CollatingExporter
+    CollatingExporter, ShotgunHieroObjectBase, FnAudioExportTask.AudioExportTask
 ):
     """
     Create Audio object and send to Shotgun
@@ -304,7 +304,7 @@ class ShotgunAudioExporter(
 
 
 class ShotgunAudioPreset(
-    ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset, CollatedShotPreset
+    CollatedShotPreset, ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset
 ):
     """
     Settings for the shotgun audio export step

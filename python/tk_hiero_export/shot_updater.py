@@ -22,7 +22,7 @@ from . import (
 
 
 class ShotgunShotUpdater(
-    ShotgunHieroObjectBase, FnShotExporter.ShotTask, CollatingExporter
+    CollatingExporter, ShotgunHieroObjectBase, FnShotExporter.ShotTask
 ):
     """
     Ensures that Shots and Sequences exist in Shotgun
