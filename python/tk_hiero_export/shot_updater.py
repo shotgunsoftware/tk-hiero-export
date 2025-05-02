@@ -120,6 +120,10 @@ class ShotgunShotUpdater(
             "working_duration": working_duration,
         }
 
+    def finishTask(self):
+        FnShotExporter.ShotTask.finishTask(self)
+        CollatingExporter.finishTask(self)
+
     def taskStep(self):
         """
         Execution payload.
