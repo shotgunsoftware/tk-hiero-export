@@ -158,7 +158,12 @@ class ShotgunNukeShotExporter(
             )
 
         source = self._item.source()
-        self._thumbnail = source.thumbnail(source.posterFrame())
+        try:
+            self._thumbnail = source.thumbnail(source.posterFrame())
+        except RuntimeError:
+            # Nuke 16.0 issues a RuntimeError when trying to get the thumbnail
+            # RuntimeError: Layer does not exist
+            self.app.logger.error("Unable to extract thumbnail", exc_info=True)
 
         return FnNukeShotExporter.NukeShotExporter.taskStep(self)
 
