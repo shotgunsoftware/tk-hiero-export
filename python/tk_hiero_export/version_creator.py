@@ -119,7 +119,7 @@ class ShotgunTranscodeExporterUI(
 
 
 class ShotgunTranscodeExporter(
-    CollatingExporter, ShotgunHieroObjectBase, FnTranscodeExporter.TranscodeExporter
+    ShotgunHieroObjectBase, CollatingExporter, FnTranscodeExporter.TranscodeExporter
 ):
     """
     Create Transcode object and send to Shotgun
@@ -503,7 +503,7 @@ class ShotgunTranscodeExporter(
 
 
 class ShotgunTranscodePreset(
-    CollatedShotPreset, ShotgunHieroObjectBase, FnTranscodeExporter.TranscodePreset
+    ShotgunHieroObjectBase, CollatedShotPreset, FnTranscodeExporter.TranscodePreset
 ):
     """Settings for the PTR transcode step"""
 

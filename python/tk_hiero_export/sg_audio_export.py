@@ -304,7 +304,7 @@ class ShotgunAudioExporter(
 
 
 class ShotgunAudioPreset(
-    CollatedShotPreset, ShotgunHieroObjectBase, FnAudioExportTask.AudioExportPreset
+    ShotgunHieroObjectBase, CollatedShotPreset, FnAudioExportTask.AudioExportPreset
 ):
     """
     Settings for the shotgun audio export step

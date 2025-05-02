@@ -836,7 +836,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
 
 
 class ShotgunShotProcessorPreset(
-    CollatedShotPreset, ShotgunHieroObjectBase, FnShotProcessor.ShotProcessorPreset
+    ShotgunHieroObjectBase, CollatedShotPreset, FnShotProcessor.ShotProcessorPreset
 ):
     """
     Handles presets for the shot processor.

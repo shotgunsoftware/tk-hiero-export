@@ -318,7 +318,7 @@ class ShotgunNukeShotExporter(
 
 
 class ShotgunNukeShotPreset(
-    CollatedShotPreset, ShotgunHieroObjectBase, FnNukeShotExporter.NukeShotPreset
+    ShotgunHieroObjectBase, CollatedShotPreset, FnNukeShotExporter.NukeShotPreset
 ):
     """
     Settings for the shotgun transcode step
