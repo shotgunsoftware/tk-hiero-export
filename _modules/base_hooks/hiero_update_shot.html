@@ -5,10 +5,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>base_hooks.hiero_update_shot &mdash; tk-hiero-export v0.8.1 documentation</title>
+  <title>base_hooks.hiero_update_shot &mdash; tk-hiero-export v0.8.3 documentation</title>
       <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
   <!--[if lt IE 9]>
     <script src="../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -76,7 +77,7 @@
                              text-decoration: underline; }
     </style>
 
-    <b>tk-hiero-export</b> v0.8.1.<br>
+    <b>tk-hiero-export</b> v0.8.3.<br>
     
         This documentation is part of the Flow Production Tracking.
     
@@ -130,19 +131,19 @@
 <span class="c1"># agreement to the Shotgun Pipeline Toolkit Source Code License. All rights</span>
 <span class="c1"># not expressly granted therein are reserved by Shotgun Software Inc.</span>
 
-<span class="kn">import</span> <span class="nn">sgtk</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sgtk</span>
 
 <span class="n">HookBaseClass</span> <span class="o">=</span> <span class="n">sgtk</span><span class="o">.</span><span class="n">get_hook_baseclass</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="HieroUpdateShot"><a class="viewcode-back" href="../../index.html#base_hooks.HieroUpdateShot">[docs]</a><span class="k">class</span> <span class="nc">HieroUpdateShot</span><span class="p">(</span><span class="n">HookBaseClass</span><span class="p">):</span>
+<div class="viewcode-block" id="HieroUpdateShot"><a class="viewcode-back" href="../../index.html#base_hooks.HieroUpdateShot">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">HieroUpdateShot</span><span class="p">(</span><span class="n">HookBaseClass</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class defines methods that handle updating the Shot entity</span>
 <span class="sd">    in Shotgun, as well as whether and how the filesystem structure</span>
 <span class="sd">    is created for a Shot during export.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="HieroUpdateShot.create_filesystem_structure"><a class="viewcode-back" href="../../index.html#base_hooks.HieroUpdateShot.create_filesystem_structure">[docs]</a>    <span class="k">def</span> <span class="nf">create_filesystem_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">preset_properties</span><span class="p">):</span>
+<div class="viewcode-block" id="HieroUpdateShot.create_filesystem_structure"><a class="viewcode-back" href="../../index.html#base_hooks.HieroUpdateShot.create_filesystem_structure">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_filesystem_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">preset_properties</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Handles creating the filesystem structure for the shot that</span>
 <span class="sd">        was exported. The preset properties dictionary is provided to</span>
@@ -174,7 +175,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="HieroUpdateShot.update_shotgun_shot_entity"><a class="viewcode-back" href="../../index.html#base_hooks.HieroUpdateShot.update_shotgun_shot_entity">[docs]</a>    <span class="k">def</span> <span class="nf">update_shotgun_shot_entity</span><span class="p">(</span>
+<div class="viewcode-block" id="HieroUpdateShot.update_shotgun_shot_entity"><a class="viewcode-back" href="../../index.html#base_hooks.HieroUpdateShot.update_shotgun_shot_entity">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">update_shotgun_shot_entity</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">entity_type</span><span class="p">,</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">entity_data</span><span class="p">,</span> <span class="n">preset_properties</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -211,7 +212,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Autodesk.</p>
+    <p>&#169; Copyright 2025, Autodesk.</p>
   </div>
 
    
