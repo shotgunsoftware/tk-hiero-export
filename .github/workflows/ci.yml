@@ -1,0 +1,17 @@
+name: Azure Pipelines
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  build:
+    uses: shotgunsoftware/tk-ci-tools/.github/workflows/build-pipeline.yml@master
+    with:
+      has_unit_tests: false
