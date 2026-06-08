@@ -69,10 +69,12 @@ class CollatingExporter(object):
                     # Find all the effects which apply to collated items
                     from hiero.exporters import FnEffectHelpers
 
+                    # OL PATCH TO FIX STUDIO V17 REF TO findEffectsAnnotationsForTrackItems
+                    # CHANGE FROM findEffectsAnnotationsForTrackItems to findEffectsForTrackItems
                     (
                         self._effects,
                         self._annotations,
-                    ) = FnEffectHelpers.findEffectsAnnotationsForTrackItems(
+                    ) = FnEffectHelpers.findEffectsForTrackItems(
                         self._collatedItems
                     )
 
@@ -83,10 +85,12 @@ class CollatingExporter(object):
                     # Find the effects which apply to this item.  Note this function expects a list.
                     from hiero.exporters import FnEffectHelpers
 
+                    # OL PATCH TO FIX STUDIO V17 REF TO findEffectsAnnotationsForTrackItems
+                    # CHANGE FROM findEffectsAnnotationsForTrackItems to findEffectsForTrackItems
                     (
                         self._effects,
                         self._annotations,
-                    ) = FnEffectHelpers.findEffectsAnnotationsForTrackItems(
+                    ) = FnEffectHelpers.findEffectsForTrackItems(
                         [self._item]
                     )
 
