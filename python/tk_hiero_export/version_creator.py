@@ -151,9 +151,7 @@ class ShotgunTranscodeExporter(
         set_command = nuke.SetNode(self._write_set_node_label, 0)
         script.addNode(set_command)
 
-        super(ShotgunTranscodeExporter, self).addWriteNodeToScript(
-            script, rootNode, framerate
-        )
+        super().addWriteNodeToScript(script, rootNode, framerate)
 
     def buildScript(self):
         """

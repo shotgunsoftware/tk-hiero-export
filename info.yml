@@ -243,3 +243,4 @@ description: "App that adds Flow Production Tracking awareness to Nuke Studio's 
              the Shots in Flow Production Tracking."
 
 requires_core_version: "v0.18.124"
+minimum_python_version: "3.9"
