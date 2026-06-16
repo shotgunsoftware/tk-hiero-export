@@ -40,7 +40,7 @@ class ShotgunShotUpdater(
         The values correspond to the exported version created on disk.
         """
 
-        (head_in, tail_out) = self.collatedOutputRange(clampToSource=False)
+        head_in, tail_out = self.collatedOutputRange(clampToSource=False)
 
         handles = self._cutHandles if self._cutHandles is not None else 0
         in_handle = handles

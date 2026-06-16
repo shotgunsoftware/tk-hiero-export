@@ -75,9 +75,9 @@ class ShotgunShotProcessorUI(
         # This method's signature changed in NukeStudio/Hiero 10.5v1. So
         # we account for it by parsing the args.
         if self.app.get_nuke_version_tuple() >= (10, 5, 1):
-            (widget, taskUIWidget, exportItems) = args
+            widget, taskUIWidget, exportItems = args
         else:
-            (widget, exportItems, editMode) = args
+            widget, exportItems, editMode = args
 
         # create a layout with custom top and bottom widgets
         master_layout = QtGui.QHBoxLayout(widget)
@@ -91,8 +91,7 @@ class ShotgunShotProcessorUI(
         # create some helpful text
         header_text = QtGui.QLabel()
         header_text.setWordWrap(True)
-        header_text.setText(
-            """
+        header_text.setText("""
             <big>Welcome to the Flow Production Tracking Shot Exporter!</big>
             <p>When you are using the Flow Production Tracking Shot Processor, Shots and
             Sequences in Flow Production Tracking will be created based on the curent timeline.
@@ -101,8 +100,7 @@ class ShotgunShotProcessorUI(
             you use the special Flow Production Tracking Transcode plugin - all included and
             ready to go in the default preset.
             </p>
-            """
-        )
+            """)
         shotgun_layout.addWidget(header_text)
         shotgun_layout.addSpacing(8)
 
@@ -368,7 +366,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         properties = self._preset.properties().get("shotgunShotCreateProperties", {})
 
         # inject collate settings into Tasks where needed
-        (collateTracks, collateShotNames) = self._getCollateProperties()
+        collateTracks, collateShotNames = self._getCollateProperties()
         for itemPath, itemPreset in exportTemplate:
             if "collateTracks" in itemPreset.properties():
                 itemPreset.properties()["collateTracks"] = collateTracks
@@ -445,7 +443,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         for taskGroup in self._submission.children():
 
             # placeholders for the tasks we want to pre-process
-            (shot_updater_task, transcode_task) = (None, None)
+            shot_updater_task, transcode_task = (None, None)
 
             # look at all the tasks in the group and identify the shot updater
             # and transcode tasks.
@@ -483,7 +481,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # go ahead and populate the shot updater tasks with the cut order. this
         # is used to set the cut order on the Shot as it is created/updated.
         for i in range(0, len(cut_related_tasks)):
-            (shot_updater_task, transcode_task) = cut_related_tasks[i]
+            shot_updater_task, transcode_task = cut_related_tasks[i]
 
             # Cut order is 1-based
             shot_updater_task._cut_order = i + 1
@@ -524,7 +522,7 @@ class ShotgunShotProcessor(ShotgunHieroObjectBase, FnShotProcessor.ShotProcessor
         # collate complicates cut support for hiero. For now duck out at this
         # point with a log msg. The user should be aware of this from the
         # message in the collating preset UI.
-        (collateTracks, collateShotNames) = self._getCollateProperties()
+        collateTracks, collateShotNames = self._getCollateProperties()
         if collateTracks or collateShotNames:
             self.app.log_info(
                 "Cut support is ill defined for collating in Hiero. Not "
