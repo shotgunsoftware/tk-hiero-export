@@ -58,7 +58,7 @@ class CollatingExporterUI(object):
             cut_lbl = QtGui.QLabel(
                 "NOTE: Cuts in Shotgun are only created when collate is off."
             )
-            color_role = QtGui.QPalette.WindowText
+            color_role = QtGui.QPalette.ColorRole.WindowText
             palette = widget.palette()
             darker_color = palette.color(color_role).darker(150)
             palette.setColor(color_role, darker_color)

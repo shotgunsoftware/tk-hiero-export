@@ -18,6 +18,13 @@ class CollatingExporter(object):
     def __init__(self, properties=None):
         super(CollatingExporter, self).__init__()
 
+        # Nuke 17+ calls super().__init__() cooperatively from the Foundry task base
+        # classes, which reaches this class through the MRO before the task has set
+        # self._item. The subclasses call us again explicitly once the task is set
+        # up, so skip that early call.
+        if not hasattr(self, "_item"):
+            return
+
         # When building a collated sequence, everything is offset by 1000
         # This gives head room for shots which may go negative when transposed to a
         # custom start frame. This offset should be negated during script generation.
@@ -69,12 +76,10 @@ class CollatingExporter(object):
 
                 if self._has_nuke_backend():
                     # Find all the effects which apply to collated items
-                    from hiero.exporters import FnEffectHelpers
-
                     (
                         self._effects,
                         self._annotations,
-                    ) = FnEffectHelpers.findEffectsAnnotationsForTrackItems(
+                    ) = _findEffectsAnnotationsForTrackItems(
                         self._collatedItems
                     )
 
@@ -83,12 +88,10 @@ class CollatingExporter(object):
             else:
                 if self._has_nuke_backend():
                     # Find the effects which apply to this item.  Note this function expects a list.
-                    from hiero.exporters import FnEffectHelpers
-
                     (
                         self._effects,
                         self._annotations,
-                    ) = FnEffectHelpers.findEffectsAnnotationsForTrackItems(
+                    ) = _findEffectsAnnotationsForTrackItems(
                         [self._item]
                     )
 
@@ -767,6 +770,21 @@ class CollatingExporter(object):
         return self._has_nuke
 
 
+def _findEffectsAnnotationsForTrackItems(trackItems):
+    """
+    Return (effects, annotations) for the given track items.
+
+    Nuke 17 replaced findEffectsAnnotationsForTrackItems() with
+    findEffectsForTrackItems(), which returns only the effects; annotation
+    track items no longer exist there, so the annotation list is empty.
+    """
+    from hiero.exporters import FnEffectHelpers
+
+    if hasattr(FnEffectHelpers, "findEffectsAnnotationsForTrackItems"):
+        return FnEffectHelpers.findEffectsAnnotationsForTrackItems(trackItems)
+    return FnEffectHelpers.findEffectsForTrackItems(trackItems), []
+
+
 def _clone_item(item):
     """
     Older versions of hiero use clone() but it's deprecated in nukestudio in
@@ -793,7 +811,12 @@ def _subTrackIndex(subTrackItem):
 
 
 class CollatedShotPreset(object):
-    def __init__(self, properties):
+    def __init__(self, properties=None):
+        # Nuke 17+ calls super().__init__() cooperatively from ITaskPreset, which
+        # reaches this class through the MRO without arguments. The subclasses call
+        # us again explicitly with their properties, so skip the argument-less call.
+        if properties is None:
+            return
         properties["collateTracks"] = False
         properties["collateShotNames"] = False
 

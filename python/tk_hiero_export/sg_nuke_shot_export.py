@@ -103,7 +103,7 @@ class ShotgunNukeShotExporterUI(
         preset = self._preset.properties()["toolkitWriteNodes"]
         for row in range(0, self._toolkit_model.rowCount()):
             item = self._toolkit_model.item(row, 0)
-            if item.data(QtCore.Qt.CheckStateRole) == QtCore.Qt.Checked:
+            if item.data(QtCore.Qt.CheckStateRole) in (QtCore.Qt.Checked, 2):
                 preset.append(item.text())
 
         self.app.log_debug("toolkitPresetChanged: %s" % preset)

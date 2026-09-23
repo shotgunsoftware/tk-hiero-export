@@ -199,7 +199,8 @@ class ShotgunShotProcessorUI(
             properties["sg_cut_type"] = new_value
 
         # connect the widget index changed to the callback
-        cut_type_widget.currentIndexChanged[str].connect(value_changed)
+        # Qt6 has no currentIndexChanged(str) overload; currentTextChanged works in both
+        cut_type_widget.currentTextChanged.connect(value_changed)
 
         # ---- construct the layout with a label
 
@@ -251,11 +252,14 @@ class ShotgunShotProcessorUI(
         tagTable.setMinimumHeight(150)
         tagTable.setHorizontalHeaderLabels(["Hiero Tags"] + labels)
         tagTable.setAlternatingRowColors(True)
-        tagTable.setSelectionMode(tagTable.NoSelection)
+        # Scoped enums work in both PySide2 and PySide6 (Nuke 17)
+        tagTable.setSelectionMode(QtGui.QAbstractItemView.SelectionMode.NoSelection)
         tagTable.setShowGrid(False)
         tagTable.verticalHeader().hide()
         tagTable.horizontalHeader().setStretchLastSection(True)
-        tagTable.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        tagTable.setSizePolicy(
+            QtGui.QSizePolicy.Policy.Expanding, QtGui.QSizePolicy.Policy.Preferred
+        )
 
         # on change rebuild the properties
         def changed(index):
@@ -289,17 +293,19 @@ class ShotgunShotProcessorUI(
             # build combo boxes for each set of values
             for (col, vals) in enumerate(values):
                 combo = QtGui.QComboBox()
-                combo.addItem(None)
+                combo.addItem("")
                 for (i, value) in enumerate(vals):
                     combo.addItem(value)
                     # see if the current item is the one in the properties
                     if map[name][col] == value:
                         combo.setCurrentIndex(i + 1)
-                combo.currentIndexChanged[int].connect(changed)
+                combo.currentIndexChanged.connect(changed)
                 # adjust sizes to avoid clipping or scrolling
                 width = combo.minimumSizeHint().width()
                 combo.setMinimumWidth(width)
-                combo.setSizeAdjustPolicy(combo.AdjustToContents)
+                combo.setSizeAdjustPolicy(
+                    QtGui.QComboBox.SizeAdjustPolicy.AdjustToContents
+                )
                 tagTable.setCellWidget(row, col + 1, combo)
 
         tagTable.resizeRowsToContents()
